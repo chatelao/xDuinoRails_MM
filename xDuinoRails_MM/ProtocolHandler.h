@@ -6,7 +6,7 @@
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address, int timeout, int mm2LockTime);
+    ProtocolHandler(int address);
     void setup();
     void loop();
     bool isTimeout();
@@ -18,6 +18,8 @@ public:
     MaerklinMotorola mm;
 
 private:
+    static const int MM_TIMEOUT_MS = 1500;
+    static const int MM2_LOCK_TIME    = 5000;
     int mmAddress;
     int mmTimeoutMs;
     int mm2LockTime;
