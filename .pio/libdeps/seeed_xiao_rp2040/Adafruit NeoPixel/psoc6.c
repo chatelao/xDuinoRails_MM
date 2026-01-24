@@ -4,11 +4,11 @@
 #include "cyhal_system.h"
 #include "cy_syslib.h"
 #include "Arduino.h"
-
+ 
  void psoc6_show(uint8_t pin, uint8_t *pixels, uint32_t numBytes, bool is800KHZ)
  {
     if (!pixels) return;
-        noInterrupts();
+        noInterrupts();    
     GPIO_PRT_Type *base = CYHAL_GET_PORTADDR(mapping_gpio_pin[pin]);
     uint32_t pinNum = CYHAL_GET_PIN(mapping_gpio_pin[pin]);
     if(is800KHZ){
@@ -41,8 +41,8 @@
             }
         }
     }
-    else{
-        for (size_t i = 0; i < numBytes; i++){
+    else{ 
+        for (size_t i = 0; i < numBytes; i++){   
             uint8_t b = pixels[i];
             for (uint8_t j = 0; j < 8; j++) {
                 bool bit = (b & 0x80) != 0;
@@ -81,7 +81,7 @@
         }
     }
   interrupts();
-  delayMicroseconds(50);
+  delayMicroseconds(50); 
   return;
  }
- #endif
+ #endif 

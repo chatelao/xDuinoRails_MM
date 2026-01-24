@@ -33,7 +33,7 @@ void setup() {
   clock_prescale_set(clock_div_1);
 #endif
   // END of Trinket-specific code.
-
+  
   // Right about here is where we could read 'pin', 'numPixels' and/or
   // 'pixelFormat' from EEPROM or a file on SD or whatever. This is a simple
   // example and doesn't do that -- those variables are just set to fixed

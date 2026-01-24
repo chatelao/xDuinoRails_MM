@@ -6,8 +6,8 @@ bool Adafruit_NeoPixel::rp2040claimPIO(void) {
   // Find a PIO with enough available space in its instruction memory
   pio = NULL;
 
-  if (! pio_claim_free_sm_and_add_program_for_gpio_range(&ws2812_program,
-                                                         &pio, &pio_sm, &pio_program_offset,
+  if (! pio_claim_free_sm_and_add_program_for_gpio_range(&ws2812_program, 
+                                                         &pio, &pio_sm, &pio_program_offset, 
                                                          pin, 1, true)) {
     pio = NULL;
     pio_sm = -1;
@@ -16,7 +16,7 @@ bool Adafruit_NeoPixel::rp2040claimPIO(void) {
   }
 
   // yay ok!
-
+  
   if (is800KHz) {
     // 800kHz, 8 bit transfers
     ws2812_program_init(pio, pio_sm, pio_program_offset, pin, 800000, 8);
@@ -29,7 +29,7 @@ bool Adafruit_NeoPixel::rp2040claimPIO(void) {
 }
 
 void Adafruit_NeoPixel::rp2040releasePIO(void) {
-  if (pio == NULL)
+  if (pio == NULL) 
     return;
 
   pio_remove_program_and_unclaim_sm(&ws2812_program, pio, pio_sm,  pio_program_offset);

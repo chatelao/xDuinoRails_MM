@@ -1,19 +1,19 @@
 /****************************************************************************
  * This example is based on StrandtestArduinoBLE example to make use of
  * callbacks features of the ArduinoBLE library.
- *
- * https://github.com/arduino-libraries/ArduinoBLE
- *
+ * 
+ * https://github.com/arduino-libraries/ArduinoBLE 
+ * 
  * Supported boards:
  *  Arduino MKR WiFi 1010, Arduino Uno WiFi Rev2 board, Arduino Nano 33 IoT,
     Arduino Nano 33 BLE, or Arduino Nano 33 BLE Sense board.
- *
+ * 
  * You can use a generic BLE central app, like LightBlue (iOS and Android) or
  * nRF Connect (Android), to interact with the services and characteristics
  * created in this sketch.
- *
+ * 
  * This example code is in the public domain.
- *
+ * 
  */
 #include <Adafruit_NeoPixel.h>
 

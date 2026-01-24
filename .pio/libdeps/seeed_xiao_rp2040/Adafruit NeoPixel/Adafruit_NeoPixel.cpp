@@ -156,7 +156,7 @@ bool Adafruit_NeoPixel::begin(void) {
     begun = false;
     return false;
   }
-
+  
 #endif
 
   begun = true;
@@ -3095,7 +3095,7 @@ if(is800KHz) {
 
 #if defined(ARDUINO_PORTENTA_H7_M7) || (defined(ARDUINO_ARCH_MBED_GIGA) && defined(TARGET_M7))
 #define F_CPU 480000000
-#elif defined(ARDUINO_PORTENTA_H7_M4) || (defined(ARDUINO_ARCH_MBED_GIGA) && defined(TARGET_M4))
+#elif defined(ARDUINO_PORTENTA_H7_M4) || (defined(ARDUINO_ARCH_MBED_GIGA) && defined(TARGET_M4)) 
 #define F_CPU 240000000
 #else
 #define F_CPU 48000000

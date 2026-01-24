@@ -12,7 +12,7 @@
  * Toolbox App for Android. Edit the interface and send the characters
  * 'a' to 'i' to switch the animation.
  * There is a no delay because this example does not block the threads execution
- * so the change will be shown immediately and will not need to wait for the current
+ * so the change will be shown immediately and will not need to wait for the current 
  * animation to end.
  * For more info write us at: info _at- teubi.co
  */
@@ -153,9 +153,9 @@ void theaterChase(uint32_t color, int wait) {
 // Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
 void rainbow(uint8_t wait) {
   if(pixelInterval != wait)
-    pixelInterval = wait;
+    pixelInterval = wait;                   
   for(uint16_t i=0; i < pixelNumber; i++) {
-    strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time
+    strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
   }
   strip.show();                             //  Update strip to match
   pixelCycle++;                             //  Advance current cycle
@@ -166,15 +166,15 @@ void rainbow(uint8_t wait) {
 //Theatre-style crawling lights with rainbow effect
 void theaterChaseRainbow(uint8_t wait) {
   if(pixelInterval != wait)
-    pixelInterval = wait;                   //  Update delay time
+    pixelInterval = wait;                   //  Update delay time  
   for(int i=0; i < pixelNumber; i+3) {
-    strip.setPixelColor(i + pixelQueue, Wheel((i + pixelCycle) % 255)); //  Update delay time
+    strip.setPixelColor(i + pixelQueue, Wheel((i + pixelCycle) % 255)); //  Update delay time  
   }
   strip.show();
   for(int i=0; i < pixelNumber; i+3) {
-    strip.setPixelColor(i + pixelQueue, strip.Color(0, 0, 0)); //  Update delay time
-  }
-  pixelQueue++;                           //  Advance current queue
+    strip.setPixelColor(i + pixelQueue, strip.Color(0, 0, 0)); //  Update delay time  
+  }      
+  pixelQueue++;                           //  Advance current queue  
   pixelCycle++;                           //  Advance current cycle
   if(pixelQueue >= 3)
     pixelQueue = 0;                       //  Loop
