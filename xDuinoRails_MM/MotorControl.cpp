@@ -1,5 +1,5 @@
 #include "MotorControl.h"
-#include "pins.h"
+#include "pins_extern.h"
 
 const int PWM_RANGE = 1023;
 

@@ -1,5 +1,5 @@
 #include "LightsControl.h"
-#include "pins.h"
+#include "pins_extern.h"
 
 LightsControl::LightsControl() : pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800) {
     lastVisUpdate = 0;
