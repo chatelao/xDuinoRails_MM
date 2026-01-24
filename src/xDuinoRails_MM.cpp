@@ -10,18 +10,18 @@
 // ==========================================
 // 2. PIN DEFINITIONEN (Seeed XIAO RP2040)
 // ==========================================
-#define MOTOR_PIN_A     D7  
-#define MOTOR_PIN_B     D8  
-#define BEMF_PIN_A      A0  
-#define BEMF_PIN_B      A1  
-#define DCC_MM_SIGNAL   D2  
-#define LED_F0b         D9  
-#define LED_F0f         D10 
+#define DCC_MM_SIGNAL   D2
+#define MOTOR_PIN_A     D7
+#define MOTOR_PIN_B     D8
+#define LED_F0b         D9
+#define LED_F0f         D10
+#define BEMF_PIN_A      A0
+#define BEMF_PIN_B      A1
 #define PIN_INT_RED     17
 #define PIN_INT_GREEN   16
 #define PIN_INT_BLUE    25
-#define NEO_PIN         12 
-#define NEO_PWR_PIN     11 
+#define NEO_PIN         12
+#define NEO_PWR_PIN     11
 #define NUMPIXELS       1
 
 // ==========================================
