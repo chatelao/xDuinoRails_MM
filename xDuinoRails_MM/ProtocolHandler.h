@@ -6,7 +6,10 @@
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address, int timeout, int mm2LockTime);
+    static const int MM_TIMEOUT_MS = 1500;
+    static const int MM2_LOCK_TIME = 5000;
+
+    ProtocolHandler(int address, int timeout = MM_TIMEOUT_MS, int mm2LockTime = MM2_LOCK_TIME);
     void setup();
     void loop();
     bool isTimeout();
