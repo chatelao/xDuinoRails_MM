@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
 #include <Adafruit_NeoPixel.h>
+#include "../xDuinoRails_MM/MotorControl.h"
 
 // ==========================================
 // 1. KONFIGURATION
@@ -31,7 +32,6 @@
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 MaerklinMotorola mm(DCC_MM_SIGNAL);
 
-const int PWM_RANGE = 1023;
 const int PWM_MAX   = 1023; 
 
 #if MOTOR_TYPE == 1

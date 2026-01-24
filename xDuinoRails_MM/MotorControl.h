@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
 
+const int PWM_RANGE = 1023;
+
 class MotorControl {
 public:
     MotorControl(int motorType);
