@@ -25,6 +25,7 @@ private:
     unsigned long kickstartBegin;
     unsigned long lastBemfMeasure;
     int lastSpeed;
+    int previousPwm;
 
     // Motor parameters - will be set based on motorType
     int PWM_FREQ;
