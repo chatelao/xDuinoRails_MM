@@ -8,15 +8,13 @@
 // ==========================================
 #define MOTOR_TYPE 1  // 1=HLA (Gross), 2=Glockenanker (Klein)
 const int MM_ADDRESS       = 24;
-const int MM_TIMEOUT_MS    = 1500;
-const int MM2_LOCK_TIME    = 5000;
 
 #include "pins.h"
 
 // ==========================================
 // 3. MODULE INSTANCES
 // ==========================================
-ProtocolHandler protocol(MM_ADDRESS, MM_TIMEOUT_MS, MM2_LOCK_TIME);
+ProtocolHandler protocol(MM_ADDRESS);
 MotorControl motor(MOTOR_TYPE);
 LightsControl lights;
 

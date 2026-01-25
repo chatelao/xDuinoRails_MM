@@ -7,8 +7,8 @@ void isr_protocol() {
     protocol.mm.PinChange();
 }
 
-ProtocolHandler::ProtocolHandler(int address, int timeout, int mm2LockTime)
-    : mm(DCC_MM_SIGNAL), mmAddress(address), mmTimeoutMs(timeout), mm2LockTime(mm2LockTime) {
+ProtocolHandler::ProtocolHandler(int address)
+    : mm(DCC_MM_SIGNAL), mmAddress(address), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
     lastCommandTime = 0;
     lastMM2Seen = 0;
     targetSpeed = 0;
