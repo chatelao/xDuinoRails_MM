@@ -3,7 +3,7 @@
 
 const int PWM_RANGE = 1023;
 
-MotorControl::MotorControl(int mType) {
+MotorControl::MotorControl(int mType, CvManager& cvMgr) : cvManager(cvMgr) {
     motorType = mType;
     targetPwm = 0;
     currDirection = MM2DirectionState_Forward;
@@ -12,22 +12,6 @@ MotorControl::MotorControl(int mType) {
     kickstartBegin = 0;
     lastBemfMeasure = 0;
     lastSpeed = 0;
-
-    if (motorType == 1) { // HLA
-        PWM_FREQ = 400;
-        PWM_MIN_MOVING = 350;
-        KICK_PWM = 1023;
-        KICK_MAX_TIME = 150;
-        BEMF_THRESHOLD = 120;
-        BEMF_SAMPLE_INT = 15;
-    } else { // Glockenanker
-        PWM_FREQ = 20000;
-        PWM_MIN_MOVING = 80;
-        KICK_PWM = 600;
-        KICK_MAX_TIME = 80;
-        BEMF_THRESHOLD = 80;
-        BEMF_SAMPLE_INT = 10;
-    }
 }
 
 void MotorControl::setup() {
@@ -36,7 +20,7 @@ void MotorControl::setup() {
     pinMode(BEMF_PIN_A, INPUT);
     pinMode(BEMF_PIN_B, INPUT);
 
-    analogWriteFreq(PWM_FREQ);
+    // analogWriteFreq(PWM_FREQ); // This will be set based on CVs later
     analogWriteRange(PWM_RANGE);
 
     writeMotorHardware(0, MM2DirectionState_Forward);
@@ -51,7 +35,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     if (targetPwm == 0) currDirection = targetDirection;
 
     static int previousPwm = 0;
-    if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
+    int kickTime = cvManager.getCv(60); // CV for Kick Time
+    if (previousPwm == 0 && targetPwm > 0 && kickTime > 0) {
         isKickstarting_priv = true;
         kickstartBegin = now;
         lastBemfMeasure = 0;
@@ -61,18 +46,18 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     }
 
     if (isKickstarting_priv) {
-        if (now - kickstartBegin >= KICK_MAX_TIME) {
+        if (now - kickstartBegin >= kickTime) {
             isKickstarting_priv = false;
         } else {
-            if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
+            if (now - lastBemfMeasure > 10) { // BEMF sample interval
                 int currentBEMF = readBEMF();
                 lastBemfMeasure = now;
-                if (currentBEMF > BEMF_THRESHOLD) {
+                if (currentBEMF > cvManager.getCv(59)) { // BEMF Threshold
                     isKickstarting_priv = false;
                 }
             }
             if (isKickstarting_priv) {
-                writeMotorHardware(KICK_PWM, currDirection);
+                writeMotorHardware(cvManager.getCv(61), currDirection); // Kick PWM
             }
         }
     }

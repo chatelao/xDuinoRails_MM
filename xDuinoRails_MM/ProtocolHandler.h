@@ -3,10 +3,12 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include <AP_DCC_library.h>
+#include "CvManager.h"
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address, int timeout, int mm2LockTime);
+    ProtocolHandler(int address, int timeout, int mm2LockTime, CvManager& cvManager);
     void setup();
     void loop();
     bool isTimeout();
@@ -16,8 +18,10 @@ public:
     bool isMm2Locked();
 
     MaerklinMotorola mm;
+    Dcc dcc;
 
 private:
+    CvManager& cvManager;
     int mmAddress;
     int mmTimeoutMs;
     int mm2LockTime;
