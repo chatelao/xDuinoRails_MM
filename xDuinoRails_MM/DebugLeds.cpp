@@ -1,20 +1,24 @@
 #include "DebugLeds.h"
-#include "pins.h"
 
-DebugLeds::DebugLeds() : pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800) {
+DebugLeds::DebugLeds(int neoPin, int neoPwrPin, int numPixels, int redPin, int greenPin, int bluePin)
+    : pixels(numPixels, neoPin, NEO_GRB + NEO_KHZ800) {
+    neoPwrPin_priv = neoPwrPin;
+    redPin_priv = redPin;
+    greenPin_priv = greenPin;
+    bluePin_priv = bluePin;
     lastVisUpdate = 0;
 }
 
 void DebugLeds::setup() {
-    pinMode(NEO_PWR_PIN, OUTPUT);
-    digitalWrite(NEO_PWR_PIN, HIGH);
+    pinMode(neoPwrPin_priv, OUTPUT);
+    digitalWrite(neoPwrPin_priv, HIGH);
     delay(10);
     pixels.begin();
     pixels.setBrightness(40);
 
-    pinMode(PIN_INT_RED, OUTPUT);   digitalWrite(PIN_INT_RED, HIGH);
-    pinMode(PIN_INT_GREEN, OUTPUT); digitalWrite(PIN_INT_GREEN, HIGH);
-    pinMode(PIN_INT_BLUE, OUTPUT);  digitalWrite(PIN_INT_BLUE, HIGH);
+    pinMode(redPin_priv, OUTPUT);   digitalWrite(redPin_priv, HIGH);
+    pinMode(greenPin_priv, OUTPUT); digitalWrite(greenPin_priv, HIGH);
+    pinMode(bluePin_priv, OUTPUT);  digitalWrite(bluePin_priv, HIGH);
 }
 
 void DebugLeds::update(int speedStep, bool f1, bool isMm2Locked, bool isKickstarting, bool isTimeout) {
@@ -23,8 +27,8 @@ void DebugLeds::update(int speedStep, bool f1, bool isMm2Locked, bool isKickstar
     if (now - lastVisUpdate < 50) return;
     lastVisUpdate = now;
 
-    setIntLed(PIN_INT_RED, isMm2Locked);
-    setIntLed(PIN_INT_BLUE, f1);
+    setIntLed(redPin_priv, isMm2Locked);
+    setIntLed(bluePin_priv, f1);
 
     if (isTimeout) {
         if ((now / 250) % 2) {

@@ -6,7 +6,7 @@
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address);
+    ProtocolHandler(int address, int dccMmSignalPin);
     void setup();
     void loop();
     bool isTimeout();
@@ -21,6 +21,7 @@ private:
     static const int MM_TIMEOUT_MS = 1500;
     static const int MM2_LOCK_TIME    = 5000;
     int mmAddress;
+    int dccMmSignalPin_priv;
     int mmTimeoutMs;
     int mm2LockTime;
     unsigned long lastCommandTime;
