@@ -2,8 +2,12 @@
 
 const int PWM_RANGE = 1023;
 
-MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) {
-    motorType = mType;
+MotorControl::MotorControl(
+    int pwmFreq, int pwmMinMoving, int kickPwm, int kickMaxTime,
+    int bemfThreshold, int bemfSampleInt,
+    int pinA, int pinB, int bemfA, int bemfB
+) {
+    motorType = 0; // no longer used
     pinA_priv = pinA;
     pinB_priv = pinB;
     bemfA_priv = bemfA;
@@ -17,21 +21,12 @@ MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) 
     lastSpeed = 0;
     previousPwm = 0;
 
-    if (motorType == 1) { // HLA
-        PWM_FREQ = 400;
-        PWM_MIN_MOVING = 350;
-        KICK_PWM = 1023;
-        KICK_MAX_TIME = 150;
-        BEMF_THRESHOLD = 120;
-        BEMF_SAMPLE_INT = 15;
-    } else { // Glockenanker
-        PWM_FREQ = 20000;
-        PWM_MIN_MOVING = 80;
-        KICK_PWM = 600;
-        KICK_MAX_TIME = 80;
-        BEMF_THRESHOLD = 80;
-        BEMF_SAMPLE_INT = 10;
-    }
+    PWM_FREQ = pwmFreq;
+    PWM_MIN_MOVING = pwmMinMoving;
+    KICK_PWM = kickPwm;
+    KICK_MAX_TIME = kickMaxTime;
+    BEMF_THRESHOLD = bemfThreshold;
+    BEMF_SAMPLE_INT = bemfSampleInt;
 }
 
 void MotorControl::setup() {
@@ -46,8 +41,15 @@ void MotorControl::setup() {
     writeMotorHardware(0, MM2DirectionState_Forward);
 }
 
-void MotorControl::update(int pwm, MM2DirectionState dir) {
-    targetPwm = pwm;
+void MotorControl::update(int speedStep, MM2DirectionState dir) {
+    if (speedStep == 0) {
+        targetPwm = 0;
+    } else if (speedStep >= 14) {
+        targetPwm = PWM_RANGE;
+    } else {
+        targetPwm = map(speedStep, 1, 14, PWM_MIN_MOVING, PWM_RANGE);
+    }
+
     targetDirection = dir;
     unsigned long now = millis();
 

@@ -2,13 +2,8 @@
 #include "ProtocolHandler.h"
 #include "MotorControl.h"
 #include "LightsControl.h"
+#include "CvManager.h"
 #include "DebugLeds.h"
-
-// ==========================================
-// 1. KONFIGURATION
-// ==========================================
-#define MOTOR_TYPE 1  // 1=HLA (Gross), 2=Glockenanker (Klein)
-const int MM_ADDRESS       = 24;
 
 // ==========================================
 // PIN DEFINITIONEN (Seeed XIAO RP2040)
@@ -28,66 +23,79 @@ const int NEO_PWR_PIN = 11;
 const int NUMPIXELS = 1;
 
 // ==========================================
-// 3. MODULE INSTANCES
+// MODULE INSTANCES
 // ==========================================
-ProtocolHandler protocol(MM_ADDRESS, DCC_MM_SIGNAL);
-MotorControl motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
+CvManager cvManager;
+ProtocolHandler* protocol = nullptr;
+MotorControl* motor = nullptr;
 LightsControl lights(LED_F0f, LED_F0b);
 DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
 
 // ==========================================
-// 4. HELPER FUNKTIONEN
+// ISR glue
 // ==========================================
-
-const int PWM_MAX = 1023;
-#if MOTOR_TYPE == 1
-  const int PWM_MIN_MOVING = 350;
-#else
-  const int PWM_MIN_MOVING = 80;
-#endif
-
-int getLinSpeed(int step) {
-    if (step == 0) return 0;
-    if (step >= 14) return PWM_MAX;
-    return map(step, 1, 14, PWM_MIN_MOVING, PWM_MAX);
+void isr_wrapper() {
+  if (protocol) {
+    protocol->isr();
+  }
 }
 
-// Global ISR required for attachInterrupt
-void isr_protocol();
-
 // ==========================================
-// 5. SETUP
+// SETUP
 // ==========================================
 void setup() {
-    analogReadResolution(12); // Wichtig für RP2040 (0-4095)
-    protocol.setup();
-    motor.setup();
+    analogReadResolution(12);
+
+    cvManager.setup();
+
+    // Load CVs
+    uint8_t address = cvManager.getCv(1);
+    uint8_t motorType = cvManager.getCv(100); // Using a custom CV for motor type
+    int pwmFreq = cvManager.getCv(101) * 100;
+    int pwmMinMoving = cvManager.getCv(2);
+    int kickPwm = cvManager.getCv(102);
+    int kickMaxTime = cvManager.getCv(103);
+    int bemfThreshold = cvManager.getCv(104);
+    int bemfSampleInt = cvManager.getCv(105);
+
+    // Instantiate and setup modules
+    protocol = new ProtocolHandler(address, DCC_MM_SIGNAL);
+    motor = new MotorControl(
+        pwmFreq, pwmMinMoving, kickPwm, kickMaxTime, bemfThreshold, bemfSampleInt,
+        MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B
+    );
+
+    protocol->setup();
+    motor->setup();
     lights.setup();
     debugLeds.setup();
+
+    attachInterrupt(digitalPinToInterrupt(DCC_MM_SIGNAL), isr_wrapper, CHANGE);
 }
 
 // ==========================================
-// 6. MAIN LOOP
+// MAIN LOOP
 // ==========================================
 void loop() {
-    protocol.loop();
+    if (!protocol || !motor) return;
 
-    if (protocol.isTimeout()) {
-        motor.stop();
+    protocol->loop();
+
+    if (protocol->isTimeout()) {
+        motor->stop();
     } else {
-        int targetPwm = getLinSpeed(protocol.getTargetSpeed());
-        motor.update(targetPwm, protocol.getTargetDirection());
+        motor->update(protocol->getTargetSpeed(), protocol->getTargetDirection());
     }
 
     lights.update(
-        motor.getCurrentDirection(),
-        protocol.getFunctionState(0)
+        motor->getCurrentDirection(),
+        protocol->getFunctionState(0)
     );
     debugLeds.update(
-        protocol.getTargetSpeed(),
-        protocol.getFunctionState(1),
-        protocol.isMm2Locked(),
-        motor.isKickstarting(),
-        protocol.isTimeout()
+        protocol->getTargetSpeed(),
+        protocol->getFunctionState(1),
+        protocol->isMm2Locked(),
+        motor->isKickstarting(),
+        protocol->isTimeout()
     );
 }

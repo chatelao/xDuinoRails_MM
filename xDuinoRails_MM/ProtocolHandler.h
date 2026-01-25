@@ -2,12 +2,14 @@
 #define PROTOCOL_HANDLER_H
 
 #include <Arduino.h>
+#include <NmraDcc.h>
 #include <MaerklinMotorola.h>
 
 class ProtocolHandler {
 public:
     ProtocolHandler(int address, int dccMmSignalPin);
     void setup();
+    void isr();
     void loop();
     bool isTimeout();
     int getTargetSpeed();
@@ -16,6 +18,15 @@ public:
     bool isMm2Locked();
 
     MaerklinMotorola mm;
+    NmraDcc dcc;
+
+    // Public members for C-style callbacks
+    unsigned long lastCommandTime;
+    int targetSpeed;
+    MM2DirectionState targetDirection;
+    bool stateF0;
+    bool stateF1;
+    bool stateF2;
 
 private:
     static const int MM_TIMEOUT_MS = 1500;

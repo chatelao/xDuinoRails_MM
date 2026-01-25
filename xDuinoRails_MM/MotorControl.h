@@ -6,9 +6,13 @@
 
 class MotorControl {
 public:
-    MotorControl(int motorType, int pinA, int pinB, int bemfA, int bemfB);
+    MotorControl(
+        int pwmFreq, int pwmMinMoving, int kickPwm, int kickMaxTime,
+        int bemfThreshold, int bemfSampleInt,
+        int pinA, int pinB, int bemfA, int bemfB
+    );
     void setup();
-    void update(int targetPwm, MM2DirectionState targetDir);
+    void update(int targetSpeed, MM2DirectionState targetDir);
     void stop();
     bool isKickstarting();
     MM2DirectionState getCurrentDirection();

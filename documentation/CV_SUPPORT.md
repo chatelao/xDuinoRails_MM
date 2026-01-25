@@ -20,3 +20,9 @@ This document specifies the minimal supported Configuration Variables (CVs) for 
 | 🔴 | 34 | Rear Light (F0r) | Standard | 2 | Bit 1 on: Switches physical output B. |
 | 🆔 | 107 | Ext. ID (High) | Meta | 1 | Identifier for DecoderDB (part 1 of ID 266). |
 | 🆔 | 108 | Ext. ID (Low) | Meta | 10 | Identifier for DecoderDB (part 2 of ID 266). |
+| ⚙️ | 100 | Motor Type | Custom | 1 | 1 = HLA, 2 = Coreless |
+| ⚙️ | 101 | PWM Frequency | Custom | 4 | PWM Frequency in kHz (e.g., 4 = 400Hz for HLA) |
+| ⚡ | 102 | Kick PWM | Custom | 255 | PWM value for kickstart (0-255) |
+| ⏱️ | 103 | Kick Time | Custom | 150 | Maximum duration of kickstart in ms |
+| 📈 | 104 | BEMF Threshold | Custom | 120 | BEMF value to end kickstart |
+| ⏱️ | 105 | BEMF Sample Interval | Custom | 15 | Interval in ms to sample BEMF during kickstart |
