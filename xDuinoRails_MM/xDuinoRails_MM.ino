@@ -10,15 +10,30 @@
 #define MOTOR_TYPE 1  // 1=HLA (Gross), 2=Glockenanker (Klein)
 const int MM_ADDRESS       = 24;
 
-#include "pins.h"
+// ==========================================
+// PIN DEFINITIONEN (Seeed XIAO RP2040)
+// ==========================================
+const int MOTOR_PIN_A = D7;
+const int MOTOR_PIN_B = D8;
+const int BEMF_PIN_A = A0;
+const int BEMF_PIN_B = A1;
+const int DCC_MM_SIGNAL = D2;
+const int LED_F0b = D9;
+const int LED_F0f = D10;
+const int PIN_INT_RED = 17;
+const int PIN_INT_GREEN = 16;
+const int PIN_INT_BLUE = 25;
+const int NEO_PIN = 12;
+const int NEO_PWR_PIN = 11;
+const int NUMPIXELS = 1;
 
 // ==========================================
 // 3. MODULE INSTANCES
 // ==========================================
-ProtocolHandler protocol(MM_ADDRESS);
-MotorControl motor(MOTOR_TYPE);
-LightsControl lights;
-DebugLeds debugLeds;
+ProtocolHandler protocol(MM_ADDRESS, DCC_MM_SIGNAL);
+MotorControl motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
+LightsControl lights(LED_F0f, LED_F0b);
+DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
 
 // ==========================================
 // 4. HELPER FUNKTIONEN

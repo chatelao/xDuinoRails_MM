@@ -1,10 +1,13 @@
 #include "MotorControl.h"
-#include "pins.h"
 
 const int PWM_RANGE = 1023;
 
-MotorControl::MotorControl(int mType) {
+MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) {
     motorType = mType;
+    pinA_priv = pinA;
+    pinB_priv = pinB;
+    bemfA_priv = bemfA;
+    bemfB_priv = bemfB;
     targetPwm = 0;
     currDirection = MM2DirectionState_Forward;
     targetDirection = MM2DirectionState_Forward;
@@ -32,10 +35,10 @@ MotorControl::MotorControl(int mType) {
 }
 
 void MotorControl::setup() {
-    pinMode(MOTOR_PIN_A, OUTPUT);
-    pinMode(MOTOR_PIN_B, OUTPUT);
-    pinMode(BEMF_PIN_A, INPUT);
-    pinMode(BEMF_PIN_B, INPUT);
+    pinMode(pinA_priv, OUTPUT);
+    pinMode(pinB_priv, OUTPUT);
+    pinMode(bemfA_priv, INPUT);
+    pinMode(bemfB_priv, INPUT);
 
     analogWriteFreq(PWM_FREQ);
     analogWriteRange(PWM_RANGE);
@@ -106,19 +109,19 @@ void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
     if (pwm < 0) pwm = 0;
 
     if (dir == MM2DirectionState_Forward) {
-        digitalWrite(MOTOR_PIN_B, LOW);
-        analogWrite(MOTOR_PIN_A, pwm);
+        digitalWrite(pinB_priv, LOW);
+        analogWrite(pinA_priv, pwm);
     } else {
-        digitalWrite(MOTOR_PIN_A, LOW);
-        analogWrite(MOTOR_PIN_B, pwm);
+        digitalWrite(pinA_priv, LOW);
+        analogWrite(pinB_priv, pwm);
     }
 }
 
 int MotorControl::readBEMF() {
-    digitalWrite(MOTOR_PIN_A, LOW);
-    digitalWrite(MOTOR_PIN_B, LOW);
+    digitalWrite(pinA_priv, LOW);
+    digitalWrite(pinB_priv, LOW);
     delayMicroseconds(500);
-    int valA = analogRead(BEMF_PIN_A);
-    int valB = analogRead(BEMF_PIN_B);
+    int valA = analogRead(bemfA_priv);
+    int valB = analogRead(bemfB_priv);
     return abs(valA - valB);
 }
