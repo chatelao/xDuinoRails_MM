@@ -2,6 +2,7 @@
 #include "ProtocolHandler.h"
 #include "MotorControl.h"
 #include "LightsControl.h"
+#include "DebugLeds.h"
 
 // ==========================================
 // 1. KONFIGURATION
@@ -17,6 +18,7 @@ const int MM_ADDRESS       = 24;
 ProtocolHandler protocol(MM_ADDRESS);
 MotorControl motor(MOTOR_TYPE);
 LightsControl lights;
+DebugLeds debugLeds;
 
 // ==========================================
 // 4. HELPER FUNKTIONEN
@@ -46,6 +48,7 @@ void setup() {
     protocol.setup();
     motor.setup();
     lights.setup();
+    debugLeds.setup();
 }
 
 // ==========================================
@@ -62,9 +65,11 @@ void loop() {
     }
 
     lights.update(
-        protocol.getTargetSpeed(),
         motor.getCurrentDirection(),
-        protocol.getFunctionState(0),
+        protocol.getFunctionState(0)
+    );
+    debugLeds.update(
+        protocol.getTargetSpeed(),
         protocol.getFunctionState(1),
         protocol.isMm2Locked(),
         motor.isKickstarting(),
