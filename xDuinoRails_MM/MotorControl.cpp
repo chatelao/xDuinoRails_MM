@@ -12,6 +12,7 @@ MotorControl::MotorControl(int mType) {
     kickstartBegin = 0;
     lastBemfMeasure = 0;
     lastSpeed = 0;
+    previousPwm = 0;
 
     if (motorType == 1) { // HLA
         PWM_FREQ = 400;
@@ -50,7 +51,6 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     // Bei Stillstand Richtung sofort übernehmen
     if (targetPwm == 0) currDirection = targetDirection;
 
-    static int previousPwm = 0;
     if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
         isKickstarting_priv = true;
         kickstartBegin = now;
