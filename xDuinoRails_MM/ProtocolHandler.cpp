@@ -6,8 +6,8 @@ void isr_protocol() {
     protocol.mm.PinChange();
 }
 
-ProtocolHandler::ProtocolHandler(int address, int dccMmSignalPin)
-    : mm(dccMmSignalPin), mmAddress(address), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
+ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
+    : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
     dccMmSignalPin_priv = dccMmSignalPin;
     lastCommandTime = 0;
     lastMM2Seen = 0;
@@ -23,6 +23,10 @@ ProtocolHandler::ProtocolHandler(int address, int dccMmSignalPin)
 void ProtocolHandler::setup() {
     attachInterrupt(digitalPinToInterrupt(dccMmSignalPin_priv), isr_protocol, CHANGE);
     lastCommandTime = millis();
+}
+
+void ProtocolHandler::setAddress(int address) {
+    mmAddress = address;
 }
 
 void ProtocolHandler::loop() {
