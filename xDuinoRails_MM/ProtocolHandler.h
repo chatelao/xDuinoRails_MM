@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include "CvManager.h"
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address);
+    ProtocolHandler(CvManager* cvManager);
     void setup();
     void loop();
     bool isTimeout();
@@ -20,7 +21,7 @@ public:
 private:
     static const int MM_TIMEOUT_MS = 1500;
     static const int MM2_LOCK_TIME    = 5000;
-    int mmAddress;
+    CvManager* cvManager;
     int mmTimeoutMs;
     int mm2LockTime;
     unsigned long lastCommandTime;

@@ -1,5 +1,7 @@
 #include "ProtocolHandler.h"
 #include "pins.h"
+#include "CvManager.h"
+#include <NmraDcc.h>
 
 extern ProtocolHandler protocol;
 
@@ -7,8 +9,8 @@ void isr_protocol() {
     protocol.mm.PinChange();
 }
 
-ProtocolHandler::ProtocolHandler(int address)
-    : mm(DCC_MM_SIGNAL), mmAddress(address), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
+ProtocolHandler::ProtocolHandler(CvManager* cvM)
+    : mm(DCC_MM_SIGNAL), cvManager(cvM), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
     lastCommandTime = 0;
     lastMM2Seen = 0;
     targetSpeed = 0;
@@ -29,6 +31,7 @@ void ProtocolHandler::loop() {
     mm.Parse();
     MaerklinMotorolaData* Data = mm.GetData();
     unsigned long now = millis();
+    int mmAddress = cvManager->getCv(CV_MULTIFUNCTION_PRIMARY_ADDRESS);
 
     if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
         lastCommandTime = now;

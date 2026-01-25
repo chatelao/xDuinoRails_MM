@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include "CvManager.h"
 
 class MotorControl {
 public:
-    MotorControl(int motorType);
+    MotorControl(CvManager* cvManager);
     void setup();
     void update(int targetPwm, MM2DirectionState targetDir);
     void stop();
@@ -17,7 +18,7 @@ private:
     void writeMotorHardware(int pwm, MM2DirectionState dir);
     int readBEMF();
 
-    int motorType;
+    CvManager* cvManager;
     int targetPwm;
     MM2DirectionState currDirection;
     MM2DirectionState targetDirection;
@@ -25,14 +26,6 @@ private:
     unsigned long kickstartBegin;
     unsigned long lastBemfMeasure;
     int lastSpeed;
-
-    // Motor parameters - will be set based on motorType
-    int PWM_FREQ;
-    int PWM_MIN_MOVING;
-    int KICK_PWM;
-    int KICK_MAX_TIME;
-    int BEMF_THRESHOLD;
-    int BEMF_SAMPLE_INT;
 };
 
 #endif // MOTOR_CONTROL_H
