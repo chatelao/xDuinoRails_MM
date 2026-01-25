@@ -56,6 +56,7 @@ void setup() {
 
     analogReadResolution(12); // Wichtig für RP2040 (0-4095)
     cvManager.setup();
+    cvManager.setAckCallback(notifyCVAck);
     protocol.setup();
     motor.setup();
     lights.setup();

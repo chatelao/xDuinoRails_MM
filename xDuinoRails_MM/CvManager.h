@@ -11,6 +11,7 @@ public:
     void loop();
     uint8_t getCv(int cv);
     void startFactoryReset();
+    void setAckCallback(void (*callback)(void));
 
 private:
     NmraDcc dcc;

@@ -20,6 +20,7 @@ CVPair FactoryDefaultCVs [] =
   {CV_DECELERATION_RATE, 3},
   {CV_MAXIMUM_SPEED, 255},
   {CV_MID_SPEED, 128},
+  {CV_MOTOR_PWM_FREQUENCY, 100},
   {CV_MANUFACTURER_ID, MANUF_ID},
   {CV_MULTIFUNCTION_EXTENDED_ADDRESS_MSB, CALC_MULTIFUNCTION_EXTENDED_ADDRESS_MSB(100)},
   {CV_MULTIFUNCTION_EXTENDED_ADDRESS_LSB, CALC_MULTIFUNCTION_EXTENDED_ADDRESS_LSB(100)},
@@ -55,4 +56,8 @@ uint8_t CvManager::getCv(int cv) {
 
 void CvManager::startFactoryReset() {
     factoryDefaultCVIndex = sizeof(FactoryDefaultCVs) / sizeof(CVPair);
+}
+
+void CvManager::setAckCallback(void (*callback)(void)) {
+    dcc.setCVProgAcknowledgeCallback(callback);
 }

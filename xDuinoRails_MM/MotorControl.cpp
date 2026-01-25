@@ -22,7 +22,7 @@ void MotorControl::setup() {
     pinMode(BEMF_PIN_A, INPUT);
     pinMode(BEMF_PIN_B, INPUT);
 
-    // analogWriteFreq(PWM_FREQ);
+    analogWriteFreq(cvManager->getCv(CV_MOTOR_PWM_FREQUENCY) * 100);
     analogWriteRange(PWM_RANGE);
 
     writeMotorHardware(0, MM2DirectionState_Forward);
@@ -50,7 +50,13 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         if (now - kickstartBegin >= cvManager->getCv(CV_ACCELERATION_RATE) * 10) {
             isKickstarting_priv = false;
         } else {
-            // No BEMF for now
+            if (now - lastBemfMeasure > 10) {
+                int currentBEMF = readBEMF();
+                lastBemfMeasure = now;
+                if (currentBEMF > 50) {
+                    isKickstarting_priv = false;
+                }
+            }
             if (isKickstarting_priv) {
                 writeMotorHardware(cvManager->getCv(CV_MAXIMUM_SPEED), currDirection);
             }
