@@ -1,5 +1,4 @@
 #include "ProtocolHandler.h"
-#include "pins.h"
 
 extern ProtocolHandler protocol;
 
@@ -7,8 +6,9 @@ void isr_protocol() {
     protocol.mm.PinChange();
 }
 
-ProtocolHandler::ProtocolHandler(int address)
-    : mm(DCC_MM_SIGNAL), mmAddress(address), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
+ProtocolHandler::ProtocolHandler(int address, int dccMmSignalPin)
+    : mm(dccMmSignalPin), mmAddress(address), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
+    _dccMmSignalPin = dccMmSignalPin;
     lastCommandTime = 0;
     lastMM2Seen = 0;
     targetSpeed = 0;
@@ -21,7 +21,7 @@ ProtocolHandler::ProtocolHandler(int address)
 }
 
 void ProtocolHandler::setup() {
-    attachInterrupt(digitalPinToInterrupt(DCC_MM_SIGNAL), isr_protocol, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(_dccMmSignalPin), isr_protocol, CHANGE);
     lastCommandTime = millis();
 }
 

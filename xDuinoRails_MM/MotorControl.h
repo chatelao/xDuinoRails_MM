@@ -6,7 +6,7 @@
 
 class MotorControl {
 public:
-    MotorControl(int motorType);
+    MotorControl(int motorType, int motorPinA, int motorPinB, int bemfPinA, int bemfPinB);
     void setup();
     void update(int targetPwm, MM2DirectionState targetDir);
     void stop();
@@ -16,6 +16,11 @@ public:
 private:
     void writeMotorHardware(int pwm, MM2DirectionState dir);
     int readBEMF();
+
+    int _motorPinA;
+    int _motorPinB;
+    int _bemfPinA;
+    int _bemfPinB;
 
     int motorType;
     int targetPwm;

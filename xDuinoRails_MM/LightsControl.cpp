@@ -1,23 +1,28 @@
 #include "LightsControl.h"
-#include "pins.h"
 
-LightsControl::LightsControl() : pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800) {
+LightsControl::LightsControl(int ledF0f, int ledF0b, int pinIntRed, int pinIntGreen, int pinIntBlue, int neoPin, int neoPwrPin, int numPixels) : pixels(numPixels, neoPin, NEO_GRB + NEO_KHZ800) {
+    _ledF0f = ledF0f;
+    _ledF0b = ledF0b;
+    _pinIntRed = pinIntRed;
+    _pinIntGreen = pinIntGreen;
+    _pinIntBlue = pinIntBlue;
+    _neoPwrPin = neoPwrPin;
     lastVisUpdate = 0;
 }
 
 void LightsControl::setup() {
-    pinMode(NEO_PWR_PIN, OUTPUT);
-    digitalWrite(NEO_PWR_PIN, HIGH);
+    pinMode(_neoPwrPin, OUTPUT);
+    digitalWrite(_neoPwrPin, HIGH);
     delay(10);
     pixels.begin();
     pixels.setBrightness(40);
 
-    pinMode(PIN_INT_RED, OUTPUT);   digitalWrite(PIN_INT_RED, HIGH);
-    pinMode(PIN_INT_GREEN, OUTPUT); digitalWrite(PIN_INT_GREEN, HIGH);
-    pinMode(PIN_INT_BLUE, OUTPUT);  digitalWrite(PIN_INT_BLUE, HIGH);
+    pinMode(_pinIntRed, OUTPUT);   digitalWrite(_pinIntRed, HIGH);
+    pinMode(_pinIntGreen, OUTPUT); digitalWrite(_pinIntGreen, HIGH);
+    pinMode(_pinIntBlue, OUTPUT);  digitalWrite(_pinIntBlue, HIGH);
 
-    pinMode(LED_F0f, OUTPUT);
-    pinMode(LED_F0b, OUTPUT);
+    pinMode(_ledF0f, OUTPUT);
+    pinMode(_ledF0b, OUTPUT);
 }
 
 void LightsControl::update(int speedStep, MM2DirectionState direction, bool f0, bool f1, bool isMm2Locked, bool isKickstarting, bool isTimeout) {
@@ -26,23 +31,23 @@ void LightsControl::update(int speedStep, MM2DirectionState direction, bool f0, 
     // Main lights
     if (f0) {
         if (direction == MM2DirectionState_Forward) {
-            digitalWrite(LED_F0f, HIGH);
-            digitalWrite(LED_F0b, LOW);
+            digitalWrite(_ledF0f, HIGH);
+            digitalWrite(_ledF0b, LOW);
         } else {
-            digitalWrite(LED_F0f, LOW);
-            digitalWrite(LED_F0b, HIGH);
+            digitalWrite(_ledF0f, LOW);
+            digitalWrite(_ledF0b, HIGH);
         }
     } else {
-        digitalWrite(LED_F0f, LOW);
-        digitalWrite(LED_F0b, LOW);
+        digitalWrite(_ledF0f, LOW);
+        digitalWrite(_ledF0b, LOW);
     }
 
     // Visual Debug
     if (now - lastVisUpdate < 50) return;
     lastVisUpdate = now;
 
-    setIntLed(PIN_INT_RED, isMm2Locked);
-    setIntLed(PIN_INT_BLUE, f1);
+    setIntLed(_pinIntRed, isMm2Locked);
+    setIntLed(_pinIntBlue, f1);
 
     if (isTimeout) {
         if ((now / 250) % 2) {
