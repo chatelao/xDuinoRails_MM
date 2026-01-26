@@ -59,6 +59,7 @@ void isr_protocol();
 // ==========================================
 // 5. SETUP
 // ==========================================
+#ifndef PIO_UNIT_TESTING
 void setup() {
     analogReadResolution(12); // Wichtig für RP2040 (0-4095)
     cvManager.setup();
@@ -68,10 +69,12 @@ void setup() {
     lights.setup();
     debugLeds.setup();
 }
+#endif
 
 // ==========================================
 // 6. MAIN LOOP
 // ==========================================
+#ifndef PIO_UNIT_TESTING
 void loop() {
     protocol.loop();
 
@@ -94,3 +97,4 @@ void loop() {
         protocol.isTimeout()
     );
 }
+#endif
