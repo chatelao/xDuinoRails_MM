@@ -1,0 +1,27 @@
+name: Arduino CLI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install Arduino CLI
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+        echo "/home/runner/bin" >> $GITHUB_PATH
+        arduino-cli config set board_manager.additional_urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+        arduino-cli core update-index
+        arduino-cli core install rp2040:rp2040
+
+    - name: Install Libraries
+      run: |
+        arduino-cli lib install "Adafruit NeoPixel"
+        arduino-cli lib install "MaerklinMotorola"
+
+    - name: Compile
+      run: |
+        arduino-cli compile --fqbn rp2040:rp2040:seeed_xiao_rp2040 xDuinoRails_MM/xDuinoRails_MM.ino
