@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-void analogWriteFreq(int freq) {}
-void analogWriteRange(int range) {}
+void analogWriteFreq(int freq);
+void analogWriteRange(int range);
 
 #endif // ARDUINO_MOCK_H
