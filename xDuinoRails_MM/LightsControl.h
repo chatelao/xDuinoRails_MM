@@ -3,14 +3,16 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include "CvManager.h"
 
 class LightsControl {
 public:
-    LightsControl(int f0fPin, int f0bPin);
+    LightsControl(CvManager& cvManager, int f0fPin, int f0bPin);
     void setup();
     void update(MM2DirectionState direction, bool f0);
 
 private:
+    CvManager& cvManager;
     int f0fPin_priv;
     int f0bPin_priv;
 };
