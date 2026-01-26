@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include "IMotorHardware.h"
 
 class MotorControl {
 public:
-    MotorControl(int motorType, int pinA, int pinB, int bemfA, int bemfB);
+    MotorControl(int motorType, IMotorHardware* hardware);
     void setup();
     void update(int targetPwm, MM2DirectionState targetDir);
     void stop();
@@ -14,14 +15,8 @@ public:
     MM2DirectionState getCurrentDirection();
 
 private:
-    void writeMotorHardware(int pwm, MM2DirectionState dir);
-    int readBEMF();
-
+    IMotorHardware* hardware_priv;
     int motorType;
-    int pinA_priv;
-    int pinB_priv;
-    int bemfA_priv;
-    int bemfB_priv;
     int targetPwm;
     MM2DirectionState currDirection;
     MM2DirectionState targetDirection;

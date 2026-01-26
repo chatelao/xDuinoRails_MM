@@ -2,12 +2,9 @@
 
 const int PWM_RANGE = 1023;
 
-MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) {
+MotorControl::MotorControl(int mType, IMotorHardware* hardware) {
     motorType = mType;
-    pinA_priv = pinA;
-    pinB_priv = pinB;
-    bemfA_priv = bemfA;
-    bemfB_priv = bemfB;
+    hardware_priv = hardware;
     targetPwm = 0;
     currDirection = MM2DirectionState_Forward;
     targetDirection = MM2DirectionState_Forward;
@@ -35,15 +32,8 @@ MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) 
 }
 
 void MotorControl::setup() {
-    pinMode(pinA_priv, OUTPUT);
-    pinMode(pinB_priv, OUTPUT);
-    pinMode(bemfA_priv, INPUT);
-    pinMode(bemfB_priv, INPUT);
-
-    analogWriteFreq(PWM_FREQ);
-    analogWriteRange(PWM_RANGE);
-
-    writeMotorHardware(0, MM2DirectionState_Forward);
+    // Hardware setup is now handled by the main application
+    hardware_priv->writeMotor(0, MM2DirectionState_Forward);
 }
 
 void MotorControl::update(int pwm, MM2DirectionState dir) {
@@ -68,24 +58,24 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
             isKickstarting_priv = false;
         } else {
             if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
-                int currentBEMF = readBEMF();
+                int currentBEMF = hardware_priv->readBemf();
                 lastBemfMeasure = now;
                 if (currentBEMF > BEMF_THRESHOLD) {
                     isKickstarting_priv = false;
                 }
             }
             if (isKickstarting_priv) {
-                writeMotorHardware(KICK_PWM, currDirection);
+                hardware_priv->writeMotor(KICK_PWM, currDirection);
             }
         }
     }
 
     if (!isKickstarting_priv) {
         if (currDirection != targetDirection) {
-            writeMotorHardware(0, currDirection);
+            hardware_priv->writeMotor(0, currDirection);
             currDirection = targetDirection;
         } else {
-            writeMotorHardware(targetPwm, currDirection);
+            hardware_priv->writeMotor(targetPwm, currDirection);
         }
     }
     previousPwm = targetPwm;
@@ -93,7 +83,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
 
 void MotorControl::stop() {
     targetPwm = 0;
-    writeMotorHardware(0, currDirection);
+    hardware_priv->writeMotor(0, currDirection);
 }
 
 bool MotorControl::isKickstarting() {
@@ -102,26 +92,4 @@ bool MotorControl::isKickstarting() {
 
 MM2DirectionState MotorControl::getCurrentDirection() {
     return currDirection;
-}
-
-void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
-    if (pwm > PWM_RANGE) pwm = PWM_RANGE;
-    if (pwm < 0) pwm = 0;
-
-    if (dir == MM2DirectionState_Forward) {
-        digitalWrite(pinB_priv, LOW);
-        analogWrite(pinA_priv, pwm);
-    } else {
-        digitalWrite(pinA_priv, LOW);
-        analogWrite(pinB_priv, pwm);
-    }
-}
-
-int MotorControl::readBEMF() {
-    digitalWrite(pinA_priv, LOW);
-    digitalWrite(pinB_priv, LOW);
-    delayMicroseconds(500);
-    int valA = analogRead(bemfA_priv);
-    int valB = analogRead(bemfB_priv);
-    return abs(valA - valB);
 }
