@@ -1,4 +1,3 @@
-#ifdef NATIVE_TESTING
 #include <Arduino.h>
 #include <unity.h>
 
@@ -11,8 +10,3 @@ int main(int argc, char **argv) {
     RUN_TEST(test_native_environment);
     return UNITY_END();
 }
-#else
-// Dummy functions for the embedded environment
-void setup() {}
-void loop() {}
-#endif
