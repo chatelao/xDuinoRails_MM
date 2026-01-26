@@ -23,4 +23,4 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Test PlatformIO Project
-        run: pio test --without-uploading
+        run: pio test -e native
