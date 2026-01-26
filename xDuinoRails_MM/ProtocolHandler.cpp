@@ -1,4 +1,5 @@
 #include "ProtocolHandler.h"
+#include <Arduino.h>
 
 extern ProtocolHandler protocol;
 
