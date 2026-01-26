@@ -18,6 +18,11 @@ void CvManager::setCv(int cv, uint8_t value) {
   if (cv == CV_VERSION) {
     return;
   }
+  if (cv == CV_DECODER_RESET && value == 8) {
+    EEPROM.write(EEPROM_MAGIC_BYTE_ADDR, 0);
+    initCv();
+    return;
+  }
   EEPROM.write(cv, value);
   EEPROM.commit();
 
@@ -43,6 +48,7 @@ void CvManager::initCv() {
     setCv(CV_REAR_LIGHT_F0R, 2);
     setCv(CV_EXT_ID_HIGH, 1);
     setCv(CV_EXT_ID_LOW, 10);
+    setCv(CV_PROGRAMMING_LOCK, 0);
     EEPROM.commit();
   }
 }

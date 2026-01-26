@@ -4,6 +4,7 @@
 #include "MotorControl.h"
 #include "LightsControl.h"
 #include "DebugLeds.h"
+#include "CvProgrammer.h"
 
 // ==========================================
 // 1. KONFIGURATION
@@ -40,6 +41,7 @@ CvManager       cvManager;
 ProtocolHandler protocol(DCC_MM_SIGNAL);
 MotorControl    motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl   lights(LED_F0f, LED_F0b);
+CvProgrammer    cvProgrammer(&cvManager, &protocol);
 
 DebugLeds       debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
 
@@ -84,6 +86,7 @@ void setup() {
 #ifndef PIO_UNIT_TESTING
 void loop() {
     protocol.loop();
+    cvProgrammer.loop();
 
     if (protocol.isTimeout()) {
         motor.stop();
