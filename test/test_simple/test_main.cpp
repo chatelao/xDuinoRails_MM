@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <unity.h>
+#include "../mocks/Arduino.cpp"
 
 void test_simple_assertion(void) {
     TEST_ASSERT_EQUAL(1, 1);

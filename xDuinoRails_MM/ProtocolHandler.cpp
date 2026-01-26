@@ -1,10 +1,12 @@
 #include "ProtocolHandler.h"
 
+#ifndef PIO_UNIT_TESTING
 extern ProtocolHandler protocol;
 
 void isr_protocol() {
     protocol.mm.PinChange();
 }
+#endif
 
 ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
     : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS), mm2LockTime(MM2_LOCK_TIME) {
@@ -21,7 +23,9 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
 }
 
 void ProtocolHandler::setup() {
+#ifndef PIO_UNIT_TESTING
     attachInterrupt(digitalPinToInterrupt(dccMmSignalPin_priv), isr_protocol, CHANGE);
+#endif
     lastCommandTime = millis();
 }
 
