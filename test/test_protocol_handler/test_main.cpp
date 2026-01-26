@@ -1,3 +1,4 @@
+#ifndef NATIVE_TESTING
 #include <Arduino.h>
 #include <unity.h>
 #include "ProtocolHandler.h"
@@ -6,10 +7,11 @@
 #define DCC_MM_SIGNAL_PIN 0
 #define ADDRESS 1
 
-ProtocolHandler protocolHandler(ADDRESS, DCC_MM_SIGNAL_PIN);
+ProtocolHandler protocolHandler(DCC_MM_SIGNAL_PIN);
 
 void setUp(void) {
     // set stuff up here
+    protocolHandler.setAddress(ADDRESS);
     protocolHandler.setup();
 }
 
@@ -19,7 +21,7 @@ void tearDown(void) {
 
 void test_timeout_logic(void) {
     // Initially, timeout should be false
-    TEST_ASSERT_FALSE(protocolHandler.isTimeout());
+    TEST_-ASSERT_FALSE(protocolHandler.isTimeout());
 
     // Simulate time passing without any commands
     // The timeout is 1500ms, so let's simulate 2000ms
@@ -38,3 +40,7 @@ void setup() {
 void loop() {
     UNITY_END();
 }
+#else
+// Dummy function for the native environment
+int main(int argc, char **argv) { return 0; }
+#endif

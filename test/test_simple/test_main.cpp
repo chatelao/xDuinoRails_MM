@@ -1,3 +1,4 @@
+#ifndef NATIVE_TESTING
 #include <Arduino.h>
 #include <unity.h>
 
@@ -14,3 +15,7 @@ void setup() {
 void loop() {
     UNITY_END();
 }
+#else
+// Dummy function for the native environment
+int main(int argc, char **argv) { return 0; }
+#endif
