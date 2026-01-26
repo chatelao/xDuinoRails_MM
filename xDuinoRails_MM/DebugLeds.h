@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #ifndef DEBUG_LEDS_H
 #define DEBUG_LEDS_H
 
@@ -22,3 +24,5 @@ private:
 };
 
 #endif // DEBUG_LEDS_H
+
+#endif // PIO_UNIT_TESTING

@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #include "DebugLeds.h"
 
 DebugLeds::DebugLeds(int neoPin, int neoPwrPin, int numPixels, int redPin, int greenPin, int bluePin)
@@ -53,3 +55,5 @@ void DebugLeds::update(int speedStep, bool f1, bool isMm2Locked, bool isKickstar
 void DebugLeds::setIntLed(int pin, bool on) {
     digitalWrite(pin, on ? LOW : HIGH);
 }
+
+#endif // PIO_UNIT_TESTING

@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #include "LightsControl.h"
 
 LightsControl::LightsControl(int f0fPin, int f0bPin) {
@@ -25,3 +27,5 @@ void LightsControl::update(MM2DirectionState direction, bool f0) {
         digitalWrite(f0bPin_priv, LOW);
     }
 }
+
+#endif // PIO_UNIT_TESTING

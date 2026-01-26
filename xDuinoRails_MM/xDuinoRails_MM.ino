@@ -2,6 +2,7 @@
 #include "CvManager.h"
 #include "ProtocolHandler.h"
 #include "MotorControl.h"
+#include "hal/Eeprom.h"
 #include "LightsControl.h"
 #include "DebugLeds.h"
 
@@ -30,11 +31,14 @@ const int NUMPIXELS = 1;
 // ==========================================
 // 3. MODULE INSTANCES
 // ==========================================
-CvManager cvManager;
+#ifndef PIO_UNIT_TESTING
+Eeprom eeprom;
+CvManager cvManager(eeprom);
 ProtocolHandler protocol(DCC_MM_SIGNAL);
 MotorControl motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl lights(LED_F0f, LED_F0b);
 DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
+#endif
 
 // ==========================================
 // 4. HELPER FUNKTIONEN
@@ -62,7 +66,7 @@ void isr_protocol();
 #ifndef PIO_UNIT_TESTING
 void setup() {
     analogReadResolution(12); // Wichtig für RP2040 (0-4095)
-    cvManager.setup();
+    cvManager.setup(512);
     protocol.setAddress(cvManager.getCv(1));
     protocol.setup();
     motor.setup();

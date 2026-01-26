@@ -1,16 +1,17 @@
 #ifndef CV_MANAGER_H
 #define CV_MANAGER_H
 
-#include <Arduino.h>
+#include "hal/IEeprom.h"
 
 class CvManager {
  public:
-  CvManager();
-  void setup();
+  explicit CvManager(IEeprom& eeprom);
+  void setup(size_t eepromSize);
   uint8_t getCv(int cv);
   void setCv(int cv, uint8_t value);
 
  private:
+  IEeprom& _eeprom;
   void initCv();
 };
 

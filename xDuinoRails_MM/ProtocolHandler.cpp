@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #include "ProtocolHandler.h"
 
 extern ProtocolHandler protocol;
@@ -89,3 +91,5 @@ bool ProtocolHandler::getFunctionState(int f) {
 bool ProtocolHandler::isMm2Locked() {
     return millis() - lastMM2Seen < mm2LockTime;
 }
+
+#endif // PIO_UNIT_TESTING

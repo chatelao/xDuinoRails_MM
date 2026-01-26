@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #include "MotorControl.h"
 
 const int PWM_RANGE = 1023;
@@ -125,3 +127,5 @@ int MotorControl::readBEMF() {
     int valB = analogRead(bemfB_priv);
     return abs(valA - valB);
 }
+
+#endif // PIO_UNIT_TESTING

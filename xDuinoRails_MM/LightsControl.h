@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #ifndef LIGHTS_CONTROL_H
 #define LIGHTS_CONTROL_H
 
@@ -16,3 +18,5 @@ private:
 };
 
 #endif // LIGHTS_CONTROL_H
+
+#endif // PIO_UNIT_TESTING

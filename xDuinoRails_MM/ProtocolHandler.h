@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #ifndef PROTOCOL_HANDLER_H
 #define PROTOCOL_HANDLER_H
 
@@ -37,3 +39,5 @@ private:
 };
 
 #endif // PROTOCOL_HANDLER_H
+
+#endif // PIO_UNIT_TESTING

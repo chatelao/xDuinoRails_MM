@@ -1,3 +1,5 @@
+#ifndef PIO_UNIT_TESTING
+
 #ifndef MOTOR_CONTROL_H
 #define MOTOR_CONTROL_H
 
@@ -41,3 +43,5 @@ private:
 };
 
 #endif // MOTOR_CONTROL_H
+
+#endif // PIO_UNIT_TESTING
