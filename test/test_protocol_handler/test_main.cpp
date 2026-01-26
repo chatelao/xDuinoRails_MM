@@ -6,10 +6,11 @@
 #define DCC_MM_SIGNAL_PIN 0
 #define ADDRESS 1
 
-ProtocolHandler protocolHandler(ADDRESS, DCC_MM_SIGNAL_PIN);
+ProtocolHandler protocolHandler(DCC_MM_SIGNAL_PIN);
 
 void setUp(void) {
     // set stuff up here
+    protocolHandler.setAddress(ADDRESS);
     protocolHandler.setup();
 }
 
