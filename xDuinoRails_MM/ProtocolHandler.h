@@ -6,9 +6,10 @@
 
 class ProtocolHandler {
 public:
-    ProtocolHandler(int address, int dccMmSignalPin);
+    ProtocolHandler(int dccMmSignalPin);
     void setup();
     void loop();
+    void setAddress(int address);
     bool isTimeout();
     int getTargetSpeed();
     MM2DirectionState getTargetDirection();

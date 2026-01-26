@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "CvManager.h"
 #include "ProtocolHandler.h"
 #include "MotorControl.h"
 #include "LightsControl.h"
@@ -8,7 +9,6 @@
 // 1. KONFIGURATION
 // ==========================================
 #define MOTOR_TYPE 1  // 1=HLA (Gross), 2=Glockenanker (Klein)
-const int MM_ADDRESS       = 24;
 
 // ==========================================
 // PIN DEFINITIONEN (Seeed XIAO RP2040)
@@ -30,7 +30,8 @@ const int NUMPIXELS = 1;
 // ==========================================
 // 3. MODULE INSTANCES
 // ==========================================
-ProtocolHandler protocol(MM_ADDRESS, DCC_MM_SIGNAL);
+CvManager cvManager;
+ProtocolHandler protocol(DCC_MM_SIGNAL);
 MotorControl motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl lights(LED_F0f, LED_F0b);
 DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
@@ -61,6 +62,8 @@ void isr_protocol();
 #ifndef PIO_UNIT_TESTING
 void setup() {
     analogReadResolution(12); // Wichtig für RP2040 (0-4095)
+    cvManager.setup();
+    protocol.setAddress(cvManager.getCv(1));
     protocol.setup();
     motor.setup();
     lights.setup();
