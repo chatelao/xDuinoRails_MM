@@ -11,6 +11,7 @@ A model train decoder firmware for the Seeed Xiao RP2040, using the Märklin Mot
 ## Hardware
 
 - Seeed Xiao RP2040
+- [xDuinoRails_Thor](https://github.com/xDuinoRails/xDuinoRails_Thor)
 
 
 ## Getting Started
