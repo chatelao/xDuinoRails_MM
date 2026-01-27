@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 #include <MaerklinMotorola.h>
+#include "CvManager.h"
 
 class MotorControl {
 public:
-    MotorControl(int motorType, int pinA, int pinB, int bemfA, int bemfB);
+    MotorControl(CvManager& cvManager, int pinA, int pinB, int bemfA, int bemfB);
     void setup();
     void update(int targetPwm, MM2DirectionState targetDir);
     void stop();
@@ -17,7 +18,7 @@ private:
     void writeMotorHardware(int pwm, MM2DirectionState dir);
     int readBEMF();
 
-    int motorType;
+    CvManager& cvManager;
     int pinA_priv;
     int pinB_priv;
     int bemfA_priv;
