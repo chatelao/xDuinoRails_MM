@@ -18,7 +18,7 @@ void CvManager::setCv(int cv, uint8_t value) {
   if (cv == CV_VERSION) {
     return;
   }
-  if (cv == CV_DECODER_RESET && value == 8) {
+  if (cv == CV_MANUFACTURER_ID && value == 8) {
     EEPROM.write(EEPROM_MAGIC_BYTE_ADDR, 0);
     initCv();
     return;
