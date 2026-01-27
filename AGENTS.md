@@ -8,6 +8,11 @@ Run CI/CD before commit:
 - Use PlatformIO.
 - Execute ```pio run``` and ```pio test``` to validate the changes.
 
+## Test coverage
+- Write test cases for all new and refactored features
+- Link the underlying specification file and line in the comment above the test case if available
+- Don't comment tests permanently on check-in to pass the tests, fix the tests or the code
+
 ## General Coding and Style
 
 - **English Language:** All documentation, comments, and commit messages must be in English.
