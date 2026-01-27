@@ -139,5 +139,5 @@ int MotorControl::readBEMF() {
     delayMicroseconds(500);
     int valA = analogRead(bemfA_priv);
     int valB = analogRead(bemfB_priv);
-    return abs(valA - valB);
+    return (valA > valB) ? (valA - valB) : (valB - valA);
 }
