@@ -6,7 +6,7 @@ This document provides guidelines for agents working on the xDuinoRails_MM codeb
 
 Run CI/CD before commit:
 - Install PlatformIO if not available.
-- Execute ´´´pio run´´´ and ´´´pio test´´´to validate the changes.
+- Execute ```pio run``` and ```pio test``` to validate the changes.
 
 ## General Coding and Style
 
