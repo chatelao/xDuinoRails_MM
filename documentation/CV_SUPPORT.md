@@ -18,5 +18,6 @@ This document specifies the minimal supported Configuration Variables (CVs) for 
 | ⚙️ | 29 | Configuration | Mandatory | 6 | Default 6 = 28/128 speed steps (2) + analog allowed (4). |
 | 🔦 | 33 | Front Light (F0f) | Standard | 1 | Bit 0 on: Switches physical output A. |
 | 🔴 | 34 | Rear Light (F0r) | Standard | 2 | Bit 1 on: Switches physical output B. |
+| 🏎️ | 52 | Motor Type | Standard | 0 | Selects the motor characteristics curve. 0 = Standard DC, 1 = Faulhaber, 2 = Maxon. |
 | 🆔 | 107 | Ext. ID (High) | Meta | 1 | Identifier for DecoderDB (part 1 of ID 266). |
 | 🆔 | 108 | Ext. ID (Low) | Meta | 10 | Identifier for DecoderDB (part 2 of ID 266). |

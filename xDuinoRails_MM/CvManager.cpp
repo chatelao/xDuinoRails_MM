@@ -41,6 +41,7 @@ void CvManager::initCv() {
     setCv(CV_CONFIGURATION, 6);
     setCv(CV_FRONT_LIGHT_F0F, 1);
     setCv(CV_REAR_LIGHT_F0R, 2);
+    setCv(CV_MOTOR_TYPE, 0);
     setCv(CV_EXT_ID_HIGH, 1);
     setCv(CV_EXT_ID_LOW, 10);
     EEPROM.commit();

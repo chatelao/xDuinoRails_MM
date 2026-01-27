@@ -2,8 +2,7 @@
 
 const int PWM_RANGE = 1023;
 
-MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) {
-    motorType = mType;
+MotorControl::MotorControl(CvManager& cvManager, int pinA, int pinB, int bemfA, int bemfB) : cvManager(cvManager) {
     pinA_priv = pinA;
     pinB_priv = pinB;
     bemfA_priv = bemfA;
@@ -17,20 +16,37 @@ MotorControl::MotorControl(int mType, int pinA, int pinB, int bemfA, int bemfB) 
     lastSpeed = 0;
     previousPwm = 0;
 
-    if (motorType == 1) { // HLA
-        PWM_FREQ = 400;
-        PWM_MIN_MOVING = 350;
-        KICK_PWM = 1023;
-        KICK_MAX_TIME = 150;
-        BEMF_THRESHOLD = 120;
-        BEMF_SAMPLE_INT = 15;
-    } else { // Glockenanker
-        PWM_FREQ = 20000;
-        PWM_MIN_MOVING = 80;
-        KICK_PWM = 600;
-        KICK_MAX_TIME = 80;
-        BEMF_THRESHOLD = 80;
-        BEMF_SAMPLE_INT = 10;
+    int motorType = cvManager.getCv(CV_MOTOR_TYPE);
+    PWM_MIN_MOVING = cvManager.getCv(CV_START_VOLTAGE) * 40;
+    if (PWM_MIN_MOVING == 0) {
+        PWM_MIN_MOVING = 1; // Ensure motor can move if CV is set to 0
+    }
+
+    switch (motorType) {
+        case 1: // Faulhaber
+            PWM_FREQ = 400;
+            // PWM_MIN_MOVING is set from CV
+            KICK_PWM = 1023;
+            KICK_MAX_TIME = 150;
+            BEMF_THRESHOLD = 120;
+            BEMF_SAMPLE_INT = 15;
+            break;
+        case 2: // Maxon
+            PWM_FREQ = 20000;
+            // PWM_MIN_MOVING is set from CV
+            KICK_PWM = 600;
+            KICK_MAX_TIME = 80;
+            BEMF_THRESHOLD = 80;
+            BEMF_SAMPLE_INT = 10;
+            break;
+        default: // Standard DC
+            PWM_FREQ = 20000;
+            // PWM_MIN_MOVING is set from CV
+            KICK_PWM = 800;
+            KICK_MAX_TIME = 100;
+            BEMF_THRESHOLD = 100;
+            BEMF_SAMPLE_INT = 12;
+            break;
     }
 }
 
@@ -123,5 +139,5 @@ int MotorControl::readBEMF() {
     delayMicroseconds(500);
     int valA = analogRead(bemfA_priv);
     int valB = analogRead(bemfB_priv);
-    return abs(valA - valB);
+    return (valA > valB) ? (valA - valB) : (valB - valA);
 }
