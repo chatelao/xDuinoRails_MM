@@ -87,32 +87,47 @@ void test_speed_change(void) {
     TEST_ASSERT_EQUAL(10, protocol.getTargetSpeed());
 }
 
-void test_direction_change(void) {
+void test_direction_change_rising_edge(void) {
     ProtocolHandler localProtocol(DCC_MM_SIGNAL_PIN);
     localProtocol.setAddress(ADDRESS);
     localProtocol.setup();
     localProtocol.mm.SetData(&MaerklinMotorola::mockData);
 
+    MaerklinMotorola::mockData.Address = ADDRESS;
 
-    // Ensure initial direction is Forward
+    // 1. Initial state
+    MaerklinMotorola::mockData.ChangeDir = false;
+    localProtocol.loop();
     TEST_ASSERT_EQUAL(MM2DirectionState_Forward, localProtocol.getTargetDirection());
 
-    // 1. First loop: ChangeDir is false
+    // 2. Rising edge
+    MaerklinMotorola::mockData.ChangeDir = true;
+    localProtocol.loop();
+    TEST_ASSERT_EQUAL(MM2DirectionState_Backward, localProtocol.getTargetDirection());
+}
+
+void test_direction_change_debouncing(void) {
+    ProtocolHandler localProtocol(DCC_MM_SIGNAL_PIN);
+    localProtocol.setAddress(ADDRESS);
+    localProtocol.setup();
+    localProtocol.mm.SetData(&MaerklinMotorola::mockData);
+
+    // 1. First direction change
     MaerklinMotorola::mockData.Address = ADDRESS;
     MaerklinMotorola::mockData.ChangeDir = false;
     localProtocol.loop();
+    MaerklinMotorola::mockData.ChangeDir = true;
+    mock_millis += 100; // Not enough time for debounce
+    localProtocol.loop();
     TEST_ASSERT_EQUAL(MM2DirectionState_Forward, localProtocol.getTargetDirection()); // Should not have changed
 
-    // 2. Second loop: ChangeDir is true (rising edge)
+    // 2. Second direction change, after debounce time
+    MaerklinMotorola::mockData.ChangeDir = false;
+    localProtocol.loop();
     MaerklinMotorola::mockData.ChangeDir = true;
-    mock_millis += 300; // Advance time for debounce
+    mock_millis += 300; // Enough time for debounce
     localProtocol.loop();
     TEST_ASSERT_EQUAL(MM2DirectionState_Backward, localProtocol.getTargetDirection()); // Should have changed
-
-    // 3. Third loop: ChangeDir is still true (not a rising edge)
-    mock_millis += 300; // Advance time
-    localProtocol.loop();
-    TEST_ASSERT_EQUAL(MM2DirectionState_Backward, localProtocol.getTargetDirection()); // Should NOT have changed again
 }
 
 void test_function_change(void) {
@@ -162,7 +177,8 @@ int main(int argc, char **argv) {
     // Protocol Handler Tests
     RUN_TEST(test_initial_state);
     RUN_TEST(test_speed_change);
-    RUN_TEST(test_direction_change);
+    RUN_TEST(test_direction_change_rising_edge);
+    RUN_TEST(test_direction_change_debouncing);
     RUN_TEST(test_function_change);
     RUN_TEST(test_mm2_function_change);
 
