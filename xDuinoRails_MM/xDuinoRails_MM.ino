@@ -9,7 +9,6 @@
 // ==========================================
 // 1. KONFIGURATION
 // ==========================================
-#define MOTOR_TYPE 1  // 1=HLA (Gross), 2=Glockenanker (Klein)
 
 // ==========================================
 // PIN DEFINITIONEN (Seeed XIAO RP2040)
@@ -43,6 +42,7 @@ MotorControl    motor(MOTOR_TYPE, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN
 LightsControl   lights(LED_F0f, LED_F0b);
 CvProgrammer    cvProgrammer(&cvManager, &protocol);
 
+
 DebugLeds       debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN, PIN_INT_BLUE);
 
 // ==========================================
@@ -50,16 +50,15 @@ DebugLeds       debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_
 // ==========================================
 
 const int PWM_MAX = 1023;
-#if MOTOR_TYPE == 1
-  const int PWM_MIN_MOVING = 350;
-#else
-  const int PWM_MIN_MOVING = 80;
-#endif
 
 int getLinSpeed(int step) {
     if (step == 0) return 0;
     if (step >= 14) return PWM_MAX;
-    return map(step, 1, 14, PWM_MIN_MOVING, PWM_MAX);
+    int pwmMinMoving = cvManager.getCv(CV_START_VOLTAGE) * 40;
+    if (pwmMinMoving == 0) {
+        pwmMinMoving = 1; // Ensure motor can move if CV is set to 0
+    }
+    return map(step, 1, 14, pwmMinMoving, PWM_MAX);
 }
 
 // Global ISR required for attachInterrupt
