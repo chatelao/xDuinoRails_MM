@@ -15,6 +15,8 @@ public:
     MM2DirectionState getTargetDirection();
     bool getFunctionState(int f);
     bool isMm2Locked();
+    unsigned long getLastChangeDirTs();
+    unsigned long getLastSpeedChangeTs();
 
     MaerklinMotorola mm;
 
@@ -34,6 +36,7 @@ private:
     bool stateF2;
     bool lastChangeDirInput;
     unsigned long lastChangeDirTs;
+    unsigned long lastSpeedChangeTs;
 };
 
 #endif // PROTOCOL_HANDLER_H

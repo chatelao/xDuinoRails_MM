@@ -18,6 +18,7 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
     stateF2 = false;
     lastChangeDirInput = false;
     lastChangeDirTs = 0;
+    lastSpeedChangeTs = 0;
 }
 
 void ProtocolHandler::setup() {
@@ -60,6 +61,9 @@ void ProtocolHandler::loop() {
         if (Data->IsMM2 && Data->MM2FunctionIndex != 0) {
             // No speed change on function only packets
         } else {
+            if (targetSpeed != Data->Speed) {
+                lastSpeedChangeTs = now;
+            }
             targetSpeed = Data->Speed;
         }
 
@@ -88,4 +92,12 @@ bool ProtocolHandler::getFunctionState(int f) {
 
 bool ProtocolHandler::isMm2Locked() {
     return millis() - lastMM2Seen < mm2LockTime;
+}
+
+unsigned long ProtocolHandler::getLastChangeDirTs() {
+    return lastChangeDirTs;
+}
+
+unsigned long ProtocolHandler::getLastSpeedChangeTs() {
+    return lastSpeedChangeTs;
 }
