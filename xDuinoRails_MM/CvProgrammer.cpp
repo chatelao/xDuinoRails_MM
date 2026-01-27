@@ -1,14 +1,15 @@
 #include "CvProgrammer.h"
 #include <Arduino.h>
 
-CvProgrammer::CvProgrammer(CvManager* cvManager, ProtocolHandler* protocolHandler) {
-  this->cvManager = cvManager;
-  this->protocolHandler = protocolHandler;
-  this->programmingMode = false;
+CvProgrammer::CvProgrammer(CvManager       *cvManager,
+                           ProtocolHandler *protocolHandler) {
+  this->cvManager               = cvManager;
+  this->protocolHandler         = protocolHandler;
+  this->programmingMode         = false;
   this->lastDirectionChangeTime = 0;
-  this->lastSpeedChangeTime = 0;
-  this->directionChangeCount = 0;
-  this->cvAddress = -1;
+  this->lastSpeedChangeTime     = 0;
+  this->directionChangeCount    = 0;
+  this->cvAddress               = -1;
 }
 
 void CvProgrammer::loop() {
@@ -33,12 +34,12 @@ void CvProgrammer::loop() {
     unsigned long lastSpeedTs = protocolHandler->getLastSpeedChangeTs();
     if (lastSpeedTs > 0 && lastSpeedTs != lastSpeedChangeTime) {
       lastSpeedChangeTime = lastSpeedTs;
-      int speed = protocolHandler->getTargetSpeed();
+      int speed           = protocolHandler->getTargetSpeed();
       if (cvAddress == -1) {
         cvAddress = speed;
       } else {
         cvManager->setCv(cvAddress, speed);
-        cvAddress = -1;
+        cvAddress       = -1;
         programmingMode = false;
       }
     }

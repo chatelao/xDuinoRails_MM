@@ -2,8 +2,8 @@
 #include <EEPROM.h>
 #include <RP2040.h>
 
-const uint8_t EEPROM_MAGIC_BYTE = 0xAF;
-const int EEPROM_MAGIC_BYTE_ADDR = 0;
+const uint8_t EEPROM_MAGIC_BYTE      = 0xAF;
+const int     EEPROM_MAGIC_BYTE_ADDR = 0;
 
 CvManager::CvManager() {}
 

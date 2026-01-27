@@ -1,0 +1,6 @@
+Language: Cpp
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveBitFields: true
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
