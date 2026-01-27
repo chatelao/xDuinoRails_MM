@@ -3,7 +3,7 @@
 
 class RP2040 {
 public:
-    void reboot();
+  void reboot();
 };
 
 extern RP2040 rp2040;

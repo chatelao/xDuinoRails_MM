@@ -1,16 +1,14 @@
-#include <unity.h>
 #include "CvManager.h"
-#include "MotorControl.h"
 #include "LightsControl.h"
-#include "mocks/CvManager.h"
+#include "MotorControl.h"
 #include "RP2040.h"
+#include "mocks/CvManager.h"
+#include <unity.h>
 
 // Mock implementation for RP2040 reboot
-bool reboot_called = false;
+bool   reboot_called = false;
 RP2040 rp2040;
-void RP2040::reboot() {
-    reboot_called = true;
-}
+void   RP2040::reboot() { reboot_called = true; }
 
 // Test CV Manager
 void test_cv_manager_get_set(void) {
@@ -56,32 +54,30 @@ void test_cv_manager_special(void) {
 
 // Test Motor Control
 void test_motor_control_default_parameters(void) {
-    CvManagerMock cvManager;
-    MotorControl motor(cvManager, 0, 1, 2, 3);
-    // TODO: Add assertions to check the default motor parameters
+  CvManagerMock cvManager;
+  MotorControl  motor(cvManager, 0, 1, 2, 3);
+  // TODO: Add assertions to check the default motor parameters
 }
 
 // Test Lights Control
 void test_lights_control_default_behavior(void) {
-    CvManagerMock cvManager;
-    LightsControl lights(cvManager, 0, 1);
-    // TODO: Add assertions to check the default lighting behavior
+  CvManagerMock cvManager;
+  LightsControl lights(cvManager, 0, 1);
+  // TODO: Add assertions to check the default lighting behavior
 }
 
-void setUp(void) {
-  reboot_called = false;
-}
+void setUp(void) { reboot_called = false; }
 
 void tearDown(void) {
   // clean stuff up here
 }
 
 int main(int argc, char **argv) {
-    UNITY_BEGIN();
-    RUN_TEST(test_cv_manager_get_set);
-    RUN_TEST(test_cv_manager_defaults);
-    RUN_TEST(test_cv_manager_special);
-    RUN_TEST(test_motor_control_default_parameters);
-    RUN_TEST(test_lights_control_default_behavior);
-    return UNITY_END();
+  UNITY_BEGIN();
+  RUN_TEST(test_cv_manager_get_set);
+  RUN_TEST(test_cv_manager_defaults);
+  RUN_TEST(test_cv_manager_special);
+  RUN_TEST(test_motor_control_default_parameters);
+  RUN_TEST(test_lights_control_default_behavior);
+  return UNITY_END();
 }
