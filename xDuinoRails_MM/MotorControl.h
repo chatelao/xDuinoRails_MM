@@ -9,12 +9,13 @@ class MotorControl {
 public:
   MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA, int bemfB);
   void              setup();
-  void              update(int targetPwm, MM2DirectionState targetDir);
+  void              setSpeed(int step, MM2DirectionState targetDir);
   void              stop();
   bool              isKickstarting();
   MM2DirectionState getCurrentDirection();
 
 private:
+  void update(int targetPwm, MM2DirectionState targetDir);
   void writeMotorHardware(int pwm, MM2DirectionState dir);
   int  readBEMF();
 
@@ -34,7 +35,6 @@ private:
 
   // Motor parameters - will be set based on motorType
   int PWM_FREQ;
-  int PWM_MIN_MOVING;
   int KICK_PWM;
   int KICK_MAX_TIME;
   int BEMF_THRESHOLD;

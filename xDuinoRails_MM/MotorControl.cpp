@@ -18,11 +18,7 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastSpeed           = 0;
   previousPwm         = 0;
 
-  int motorType  = cvManager.getCv(CV_MOTOR_TYPE);
-  PWM_MIN_MOVING = cvManager.getCv(CV_START_VOLTAGE) * 40;
-  if (PWM_MIN_MOVING == 0) {
-    PWM_MIN_MOVING = 1; // Ensure motor can move if CV is set to 0
-  }
+  int motorType = cvManager.getCv(CV_MOTOR_TYPE);
 
   switch (motorType) {
   case 1: // Faulhaber
@@ -62,6 +58,26 @@ void MotorControl::setup() {
   analogWriteRange(PWM_RANGE);
 
   writeMotorHardware(0, MM2DirectionState_Forward);
+}
+
+const int PWM_MAX = 1023;
+
+void MotorControl::setSpeed(int step, MM2DirectionState dir) {
+  if (step == 0) {
+    update(0, dir);
+    return;
+  }
+  if (step >= 14) {
+    update(PWM_MAX, dir);
+    return;
+  }
+  int pwmMinMoving = cvManager.getCv(CV_START_VOLTAGE) * 40;
+  if (pwmMinMoving == 0) {
+    pwmMinMoving = 1; // Ensure motor can move if CV is set to 0
+  }
+  int pwm = map(step, 1, 14, pwmMinMoving, PWM_MAX);
+
+  update(pwm, dir);
 }
 
 void MotorControl::update(int pwm, MM2DirectionState dir) {
