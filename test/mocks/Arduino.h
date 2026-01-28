@@ -2,6 +2,14 @@
 #define ARDUINO_H
 
 #include <cstdint>
+#include <map>
+
+extern std::map<uint8_t, uint8_t> mock_digital_write_state;
+extern std::map<uint8_t, int>     mock_analog_write_state;
+extern unsigned long              mock_millis_time;
+
+void reset_arduino_mocks();
+void advance_millis(unsigned long ms);
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -19,5 +27,7 @@ void analogWriteRange(int range);
 
 unsigned long millis();
 void delayMicroseconds(unsigned int us);
+
+long map(long, long, long, long, long);
 
 #endif // ARDUINO_H

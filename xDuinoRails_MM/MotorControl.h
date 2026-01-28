@@ -35,6 +35,7 @@ private:
   // Motor parameters - will be set based on motorType
   int PWM_FREQ;
   int PWM_MIN_MOVING;
+  int PWM_MAX_SPEED;
   int KICK_PWM;
   int KICK_MAX_TIME;
   int BEMF_THRESHOLD;

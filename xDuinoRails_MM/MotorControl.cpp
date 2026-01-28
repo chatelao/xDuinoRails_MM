@@ -23,6 +23,10 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   if (PWM_MIN_MOVING == 0) {
     PWM_MIN_MOVING = 1; // Ensure motor can move if CV is set to 0
   }
+  PWM_MAX_SPEED = cvManager.getCv(CV_MAXIMUM_SPEED) * 4;
+  if (PWM_MAX_SPEED == 0 || PWM_MAX_SPEED > 1023) {
+    PWM_MAX_SPEED = 1023; // Ensure motor can move if CV is set to 0
+  }
 
   switch (motorType) {
   case 1: // Faulhaber
@@ -68,6 +72,10 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   targetPwm         = pwm;
   targetDirection   = dir;
   unsigned long now = millis();
+
+  if (targetPwm > 0) {
+    targetPwm = map(targetPwm, 1, 1023, PWM_MIN_MOVING, PWM_MAX_SPEED);
+  }
 
   // Bei Stillstand Richtung sofort übernehmen
   if (targetPwm == 0)

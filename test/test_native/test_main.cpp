@@ -2,6 +2,7 @@
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "RP2040.h"
+#include "mocks/Arduino.h"
 #include "mocks/CvManager.h"
 #include <unity.h>
 
@@ -59,6 +60,74 @@ void test_motor_control_default_parameters(void) {
   // TODO: Add assertions to check the default motor parameters
 }
 
+void test_motor_control_speed_steps(void) {
+  CvManagerMock cvManager;
+  MotorControl  motor(cvManager, 10, 11, 12, 13);
+
+  // Stop
+  motor.update(0, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[11]);
+
+  // Speed 1 forward
+  // First update triggers kickstart
+  motor.update(1, MM2DirectionState_Forward);
+  // Advance time to allow kickstart to complete
+  advance_millis(150);
+  // Second update applies target speed
+  motor.update(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(1, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[11]);
+
+  // Speed 1 reverse
+  motor.update(1, MM2DirectionState_Backward);
+  advance_millis(150);
+  motor.update(1, MM2DirectionState_Backward);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(1, mock_analog_write_state[11]);
+
+  // Speed max forward
+  // First update triggers kickstart
+  motor.update(1023, MM2DirectionState_Forward);
+  // Advance time to allow kickstart to complete
+  advance_millis(150);
+  // Second update applies target speed
+  motor.update(1023, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(1023, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[11]);
+
+  // Speed max reverse
+  // First update triggers kickstart
+  motor.update(1023, MM2DirectionState_Backward);
+  // Advance time to allow kickstart to complete
+  advance_millis(150);
+  // Second update applies target speed
+  motor.update(1023, MM2DirectionState_Backward);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(1023, mock_analog_write_state[11]);
+}
+
+void test_motor_control_cv_settings(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_START_VOLTAGE, 5);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 128);
+  MotorControl motor(cvManager, 10, 11, 12, 13);
+
+  // Speed 1 forward
+  motor.update(1, MM2DirectionState_Forward);
+  advance_millis(150);
+  motor.update(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(5 * 40, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[11]);
+
+  // Speed max forward
+  motor.update(1023, MM2DirectionState_Forward);
+  advance_millis(150);
+  motor.update(1023, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(128 * 4, mock_analog_write_state[10]);
+  TEST_ASSERT_EQUAL(0, mock_analog_write_state[11]);
+}
+
 // Test Lights Control
 void test_lights_control_default_behavior(void) {
   CvManagerMock cvManager;
@@ -66,7 +135,10 @@ void test_lights_control_default_behavior(void) {
   // TODO: Add assertions to check the default lighting behavior
 }
 
-void setUp(void) { reboot_called = false; }
+void setUp(void) {
+  reboot_called = false;
+  reset_arduino_mocks();
+}
 
 void tearDown(void) {
   // clean stuff up here
@@ -78,6 +150,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_defaults);
   RUN_TEST(test_cv_manager_special);
   RUN_TEST(test_motor_control_default_parameters);
+  RUN_TEST(test_motor_control_speed_steps);
+  RUN_TEST(test_motor_control_cv_settings);
   RUN_TEST(test_lights_control_default_behavior);
   return UNITY_END();
 }
