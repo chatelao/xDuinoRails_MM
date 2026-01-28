@@ -1,9 +1,12 @@
 #include "CvManager.h"
 #include "LightsControl.h"
 #include "MotorControl.h"
+#include "ProtocolHandler.h"
 #include "RP2040.h"
 #include "mocks/CvManager.h"
 #include <unity.h>
+
+void test_mm_signal_f0_f1_f2(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -66,6 +69,41 @@ void test_lights_control_default_behavior(void) {
   // TODO: Add assertions to check the default lighting behavior
 }
 
+void test_mm_signal_f0_f1_f2(void) {
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+
+  // Simulate an MM2 signal with F1 on
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, true);
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+
+  // Simulate an MM2 signal with F1 off
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, false);
+  protocol.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+
+  // Simulate an MM2 signal with F2 on
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, true);
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(2));
+
+  // Simulate an MM2 signal with F2 off
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, false);
+  protocol.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(2));
+
+  // Simulate an MM signal with F0 on
+  protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(0));
+
+  // Simulate an MM signal with F0 off
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(0));
+}
+
 void setUp(void) { reboot_called = false; }
 
 void tearDown(void) {
@@ -79,5 +117,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_special);
   RUN_TEST(test_motor_control_default_parameters);
   RUN_TEST(test_lights_control_default_behavior);
+  RUN_TEST(test_mm_signal_f0_f1_f2);
   return UNITY_END();
 }
