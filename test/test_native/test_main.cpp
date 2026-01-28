@@ -1,9 +1,12 @@
 #include "CvManager.h"
 #include "LightsControl.h"
 #include "MotorControl.h"
+#include "ProtocolHandler.h"
 #include "RP2040.h"
 #include "mocks/CvManager.h"
 #include <unity.h>
+
+void test_mm_signal_f0_f1_f2(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
