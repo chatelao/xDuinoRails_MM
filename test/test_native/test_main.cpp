@@ -3,6 +3,7 @@
 #include "MotorControl.h"
 #include "RP2040.h"
 #include "mocks/CvManager.h"
+#include "mocks/Arduino.h"
 #include <unity.h>
 
 // Mock implementation for RP2040 reboot
@@ -66,7 +67,86 @@ void test_lights_control_default_behavior(void) {
   // TODO: Add assertions to check the default lighting behavior
 }
 
-void setUp(void) { reboot_called = false; }
+// Test CV Programmer
+#include "CvProgrammer.h"
+#include "mocks/ProtocolHandler.h"
+
+void test_cv_programmer_enter_programming_mode(void) {
+  CvManagerMock       cvManager;
+  ProtocolHandlerMock protocolHandler;
+  CvProgrammer        cvProgrammer(&cvManager, &protocolHandler);
+
+  cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
+
+  // Simulate 4 direction changes
+  mock_millis = 100;
+  protocolHandler.setLastChangeDirTs(100);
+  cvProgrammer.loop();
+  mock_millis = 200;
+  protocolHandler.setLastChangeDirTs(200);
+  cvProgrammer.loop();
+  mock_millis = 300;
+  protocolHandler.setLastChangeDirTs(300);
+  cvProgrammer.loop();
+  mock_millis = 400;
+  protocolHandler.setLastChangeDirTs(400);
+  cvProgrammer.loop();
+
+  // Set CV address
+  mock_millis = 500;
+  protocolHandler.setTargetSpeed(10);
+  protocolHandler.setLastSpeedChangeTs(500);
+  cvProgrammer.loop();
+
+  // Set CV value
+  mock_millis = 600;
+  protocolHandler.setTargetSpeed(42);
+  protocolHandler.setLastSpeedChangeTs(600);
+  cvProgrammer.loop();
+
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+}
+
+void test_cv_programmer_programming_lock(void) {
+  CvManagerMock       cvManager;
+  ProtocolHandlerMock protocolHandler;
+  CvProgrammer        cvProgrammer(&cvManager, &protocolHandler);
+
+  cvManager.setCv(CV_PROGRAMMING_LOCK, 0);
+
+  // Simulate 4 direction changes
+  mock_millis = 100;
+  protocolHandler.setLastChangeDirTs(100);
+  cvProgrammer.loop();
+  mock_millis = 200;
+  protocolHandler.setLastChangeDirTs(200);
+  cvProgrammer.loop();
+  mock_millis = 300;
+  protocolHandler.setLastChangeDirTs(300);
+  cvProgrammer.loop();
+  mock_millis = 400;
+  protocolHandler.setLastChangeDirTs(400);
+  cvProgrammer.loop();
+
+  // Set CV address
+  mock_millis = 500;
+  protocolHandler.setTargetSpeed(10);
+  protocolHandler.setLastSpeedChangeTs(500);
+  cvProgrammer.loop();
+
+  // Set CV value
+  mock_millis = 600;
+  protocolHandler.setTargetSpeed(42);
+  protocolHandler.setLastSpeedChangeTs(600);
+  cvProgrammer.loop();
+
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(10));
+}
+
+void setUp(void) {
+    reboot_called = false;
+    mock_millis = 0;
+}
 
 void tearDown(void) {
   // clean stuff up here
@@ -79,5 +159,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_special);
   RUN_TEST(test_motor_control_default_parameters);
   RUN_TEST(test_lights_control_default_behavior);
+  RUN_TEST(test_cv_programmer_enter_programming_mode);
+  RUN_TEST(test_cv_programmer_programming_lock);
   return UNITY_END();
 }

@@ -11,12 +11,12 @@ public:
   void              loop();
   void              setAddress(int address);
   bool              isTimeout();
-  int               getTargetSpeed();
+  virtual int       getTargetSpeed();
   MM2DirectionState getTargetDirection();
   bool              getFunctionState(int f);
   bool              isMm2Locked();
-  unsigned long     getLastChangeDirTs();
-  unsigned long     getLastSpeedChangeTs();
+  virtual unsigned long getLastChangeDirTs();
+  virtual unsigned long getLastSpeedChangeTs();
 
   MaerklinMotorola mm;
 
