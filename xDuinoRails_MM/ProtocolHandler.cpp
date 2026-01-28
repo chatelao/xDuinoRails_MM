@@ -1,8 +1,10 @@
 #include "ProtocolHandler.h"
 
+#ifndef PIO_UNIT_TESTING
 extern ProtocolHandler protocol;
 
 void isr_protocol() { protocol.mm.PinChange(); }
+#endif
 
 ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
     : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS),
@@ -18,11 +20,14 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
   lastChangeDirInput  = false;
   lastChangeDirTs     = 0;
   lastSpeedChangeTs   = 0;
+  mm2SeenEver         = false;
 }
 
 void ProtocolHandler::setup() {
+#ifndef PIO_UNIT_TESTING
   attachInterrupt(digitalPinToInterrupt(dccMmSignalPin_priv), isr_protocol,
                   CHANGE);
+#endif
   lastCommandTime = millis();
 }
 
@@ -36,9 +41,12 @@ void ProtocolHandler::loop() {
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
 
-    bool mm2Locked = (now - lastMM2Seen < mm2LockTime);
-    if (Data->IsMM2)
+    if (Data->IsMM2) {
       lastMM2Seen = now;
+      mm2SeenEver = true;
+    }
+
+    bool mm2Locked = mm2SeenEver && (now - lastMM2Seen < mm2LockTime);
 
     if (mm2Locked && Data->IsMM2) {
       if (Data->MM2Direction != MM2DirectionState_Unavailable) {
@@ -50,7 +58,7 @@ void ProtocolHandler::loop() {
         stateF2 = Data->IsMM2FunctionOn;
     } else if (!mm2Locked) {
       if (Data->ChangeDir && !lastChangeDirInput) {
-        if (now - lastChangeDirTs > 250) {
+        if (lastChangeDirTs == 0 || now - lastChangeDirTs > 250) {
           targetDirection = (targetDirection == MM2DirectionState_Forward)
                                 ? MM2DirectionState_Backward
                                 : MM2DirectionState_Forward;
@@ -94,7 +102,7 @@ bool ProtocolHandler::getFunctionState(int f) {
 }
 
 bool ProtocolHandler::isMm2Locked() {
-  return millis() - lastMM2Seen < mm2LockTime;
+  return mm2SeenEver && (millis() - lastMM2Seen < mm2LockTime);
 }
 
 unsigned long ProtocolHandler::getLastChangeDirTs() { return lastChangeDirTs; }

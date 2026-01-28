@@ -17,7 +17,13 @@ void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(int freq);
 void analogWriteRange(int range);
 
+#define CHANGE 1
+
+extern unsigned long mock_millis_value;
 unsigned long millis();
+void delay(unsigned long ms);
 void delayMicroseconds(unsigned int us);
+int digitalPinToInterrupt(int pin);
+void attachInterrupt(int interrupt, void (*isr)(), int mode);
 
 #endif // ARDUINO_H

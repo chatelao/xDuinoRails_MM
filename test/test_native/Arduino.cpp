@@ -25,11 +25,25 @@ void analogWriteRange(int range) {
   // Mock implementation
 }
 
+unsigned long mock_millis_value = 0;
+
 unsigned long millis() {
-  // Mock implementation
-  return 0;
+  return mock_millis_value;
+}
+
+void delay(unsigned long ms) {
+  mock_millis_value += ms;
 }
 
 void delayMicroseconds(unsigned int us) {
   // Mock implementation
+}
+
+int digitalPinToInterrupt(int pin) {
+  // Mock implementation, just return the pin
+  return pin;
+}
+
+void attachInterrupt(int interrupt, void (*isr)(), int mode) {
+  // Mock implementation, do nothing
 }

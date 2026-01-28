@@ -37,6 +37,7 @@ private:
   bool              lastChangeDirInput;
   unsigned long     lastChangeDirTs;
   unsigned long     lastSpeedChangeTs;
+  bool              mm2SeenEver;
 };
 
 #endif // PROTOCOL_HANDLER_H
