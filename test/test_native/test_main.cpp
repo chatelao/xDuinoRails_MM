@@ -14,16 +14,21 @@ RP2040 rp2040;
 void   RP2040::reboot() { reboot_called = true; }
 
 // Test CV Manager
+// Testet das Setzen und Lesen eines CV-Wertes.
 void test_cv_manager_get_set(void) {
   CvManager cvManager;
   cvManager.setup();
+  // Setze CV 10 auf den Wert 42
   cvManager.setCv(10, 42);
+  // Überprüfe, ob CV 10 den Wert 42 hat
   TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
 }
 
+// Testet die Standardwerte der CVs nach der Initialisierung.
 void test_cv_manager_defaults(void) {
   CvManager cvManager;
   cvManager.setup();
+  // Überprüfe die wichtigsten CVs auf ihre Standardwerte
   TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
   TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_START_VOLTAGE));
   TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_ACCELERATION));
@@ -40,52 +45,59 @@ void test_cv_manager_defaults(void) {
   TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
 }
 
+// Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den Reset-Mechanismus.
 void test_cv_manager_special(void) {
   CvManager cvManager;
   cvManager.setup();
 
-  // Test read-only CV
+  // Teste schreibgeschützte CV (CV_VERSION)
   uint8_t version = cvManager.getCv(CV_VERSION);
+  // Versuch, die schreibgeschützte CV zu ändern
   cvManager.setCv(CV_VERSION, version + 1);
+  // Der Wert sollte unverändert sein
   TEST_ASSERT_EQUAL(version, cvManager.getCv(CV_VERSION));
 
-  // Test reset CV
+  // Teste den Reset-Mechanismus durch Schreiben auf CV_MANUFACTURER_ID
   reboot_called = false;
   cvManager.setCv(CV_MANUFACTURER_ID, 0);
+  // Überprüfe, ob der Neustart ausgelöst wurde
   TEST_ASSERT_TRUE(reboot_called);
 }
 
 // Test Motor Control
+// Testet die Geschwindigkeits- und Richtungsteuerung des Motors.
 void test_motor_speed_control(void) {
   CvManagerMock cvManager;
+  // Konfiguriere CVs für den Motor
   cvManager.setCv(CV_START_VOLTAGE, 1);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   cvManager.setCv(CV_MAXIMUM_SPEED, 200);
   MotorControl  motor(cvManager, 10, 11, 2, 3);
   motor.setup();
 
-  // Speed 0
+  // Test: Geschwindigkeit 0
   motor.setSpeed(0, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 
-  // Speed 1 -> Forward
+  // Test: Geschwindigkeit 1 in Vorwärtsrichtung
   motor.setSpeed(1, MM2DirectionState_Forward);
-  advance_millis(101);
+  advance_millis(101); // Simuliere Zeitablauf
   motor.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  // Überprüfe den erwarteten PWM-Wert
   TEST_ASSERT_EQUAL(40, analog_write_values[10]);
 
-  // Speed 1 -> Backward
-  motor.setSpeed(0, MM2DirectionState_Forward);
+  // Test: Geschwindigkeit 1 in Rückwärtsrichtung
+  motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
   motor.setSpeed(1, MM2DirectionState_Backward);
   advance_millis(101);
-  motor.setSpeed(1, MM2DirectionState_Backward); // This call stops the motor
-  motor.setSpeed(1, MM2DirectionState_Backward); // This call applies power
+  motor.setSpeed(1, MM2DirectionState_Backward); // Dieser Aufruf stoppt den Motor
+  motor.setSpeed(1, MM2DirectionState_Backward); // Dieser wendet die Leistung an
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(40, analog_write_values[11]);
 
-  // Speed MAX -> Forward
+  // Test: Maximale Geschwindigkeit in Vorwärtsrichtung
   motor.setSpeed(0, MM2DirectionState_Forward);
   motor.setSpeed(14, MM2DirectionState_Forward);
   advance_millis(101);
@@ -93,53 +105,55 @@ void test_motor_speed_control(void) {
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
-  // Speed MAX -> Backward
+  // Test: Maximale Geschwindigkeit in Rückwärtsrichtung
   motor.setSpeed(0, MM2DirectionState_Forward);
   motor.setSpeed(14, MM2DirectionState_Backward);
   advance_millis(101);
-  motor.setSpeed(14, MM2DirectionState_Backward); // This call stops the motor
-  motor.setSpeed(14, MM2DirectionState_Backward); // This call applies power
+  motor.setSpeed(14, MM2DirectionState_Backward); // Stoppt den Motor
+  motor.setSpeed(14, MM2DirectionState_Backward); // Wendet Leistung an
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
 }
 
 // Test Lights Control
+// Testet das Standardverhalten der Lichtsteuerung.
 void test_lights_control_default_behavior(void) {
   CvManagerMock cvManager;
   LightsControl lights(cvManager, 0, 1);
-  // TODO: Add assertions to check the default lighting behavior
+  // TODO: Behauptungen hinzufügen, um das Standard-Lichtverhalten zu überprüfen
 }
 
+// Testet das Schalten der Funktionen F0, F1 und F2 über das MM-Protokoll.
 void test_mm_signal_f0_f1_f2(void) {
   ProtocolHandler protocol(0);
   protocol.setAddress(1);
 
-  // Simulate an MM2 signal with F1 on
+  // Simuliere ein MM2-Signal mit F1 an
   protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, true);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(1));
 
-  // Simulate an MM2 signal with F1 off
+  // Simuliere ein MM2-Signal mit F1 aus
   protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(1));
 
-  // Simulate an MM2 signal with F2 on
+  // Simuliere ein MM2-Signal mit F2 an
   protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, true);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(2));
 
-  // Simulate an MM2 signal with F2 off
+  // Simuliere ein MM2-Signal mit F2 aus
   protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(2));
 
-  // Simulate an MM signal with F0 on
+  // Simuliere ein MM-Signal mit F0 an
   protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(0));
 
-  // Simulate an MM signal with F0 off
+  // Simuliere ein MM-Signal mit F0 aus
   protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
