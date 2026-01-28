@@ -1,12 +1,14 @@
 #include "CvManager.h"
+#include "CvProgrammer.h"
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
 #include "RP2040.h"
-#include "mocks/CvManager.h"
+#include "CvManagerMock.h"
 #include <unity.h>
 
 void test_mm_signal_f0_f1_f2(void);
+void test_cv_programming_6021(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -145,6 +147,48 @@ void test_mm_signal_f0_f1_f2(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
 
+void test_cv_programming_6021(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  CvProgrammer    programmer(&cvManager, &protocol);
+
+  // Set CV 15 to 7 to enable programming
+  cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
+
+  // 4 direction changes to enter programming mode
+  advance_millis(10); // Ensure first change is not at ts=0
+  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Forward, 0, false);
+  protocol.loop();
+  programmer.loop();
+  advance_millis(100);
+
+  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Backward, 0, false);
+  protocol.loop();
+  programmer.loop();
+  advance_millis(100);
+
+  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Forward, 0, false);
+  protocol.loop();
+  programmer.loop();
+  advance_millis(100);
+
+  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Backward, 0, false);
+  protocol.loop();
+  programmer.loop();
+
+  // Set CV 10 to 42
+  protocol.mm.SetData(1, 10, false, false, true, MM2DirectionState_Backward, 0, false);
+  protocol.loop();
+  programmer.loop();
+  advance_millis(100);
+  protocol.mm.SetData(1, 42, false, false, true, MM2DirectionState_Backward, 0, false);
+  protocol.loop();
+  programmer.loop();
+
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+}
+
 void setUp(void) {
   reboot_called = false;
   reset_arduino_mock();
@@ -162,5 +206,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_motor_speed_control);
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
+  RUN_TEST(test_cv_programming_6021);
   return UNITY_END();
 }
