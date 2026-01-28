@@ -18,15 +18,16 @@ void tearDown(void) {
   // clean stuff up here
 }
 
+// Testet die Timeout-Logik des ProtocolHandlers.
 void test_timeout_logic(void) {
-  // Initially, timeout should be false
+  // Initial sollte der Timeout-Status 'false' sein.
   TEST_ASSERT_FALSE(protocolHandler.isTimeout());
 
-  // Simulate time passing without any commands
-  // The timeout is 1500ms, so let's simulate 2000ms
+  // Simuliere das Verstreichen von Zeit ohne eingehende Befehle.
+  // Der Timeout ist auf 1500ms eingestellt, wir simulieren 2000ms.
   delay(2000);
 
-  // Now, the timeout should be true
+  // Nach Ablauf der Zeit sollte der Timeout-Status 'true' sein.
   TEST_ASSERT_TRUE(protocolHandler.isTimeout());
 }
 
