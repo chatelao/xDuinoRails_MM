@@ -20,4 +20,7 @@ void analogWriteRange(int range);
 unsigned long millis();
 void delayMicroseconds(unsigned int us);
 
+void advance_millis(unsigned long ms);
+extern unsigned long current_millis;
+
 #endif // ARDUINO_H

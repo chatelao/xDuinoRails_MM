@@ -7,6 +7,9 @@
 #include <unity.h>
 
 void test_mm_signal_f0_f1_f2(void);
+void test_cv_programmer_instantiation(void);
+void test_cv_programming_success(void);
+void test_cv_programming_fail_lock_cv(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -104,7 +107,12 @@ void test_mm_signal_f0_f1_f2(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
 
-void setUp(void) { reboot_called = false; }
+#include "Arduino.h"
+
+void setUp(void) {
+  reboot_called  = false;
+  current_millis = 0;
+}
 
 void tearDown(void) {
   // clean stuff up here
@@ -118,5 +126,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_motor_control_default_parameters);
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
+  RUN_TEST(test_cv_programmer_instantiation);
+  RUN_TEST(test_cv_programming_success);
+  RUN_TEST(test_cv_programming_fail_lock_cv);
   return UNITY_END();
 }

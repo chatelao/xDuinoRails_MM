@@ -12,6 +12,8 @@ CvProgrammer::CvProgrammer(CvManager       *cvManager,
   this->cvAddress               = -1;
 }
 
+bool CvProgrammer::isProgrammingModeActive() { return programmingMode; }
+
 void CvProgrammer::loop() {
   unsigned long lastChangeDirTs = protocolHandler->getLastChangeDirTs();
   if (lastChangeDirTs > 0 && lastChangeDirTs != lastDirectionChangeTime) {

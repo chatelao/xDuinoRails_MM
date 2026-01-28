@@ -29,6 +29,7 @@ private:
   int               mm2LockTime;
   unsigned long     lastCommandTime;
   unsigned long     lastMM2Seen;
+  bool              mm2SeenEver;
   int               targetSpeed;
   MM2DirectionState targetDirection;
   bool              stateF0;

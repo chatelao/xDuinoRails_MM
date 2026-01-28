@@ -25,10 +25,9 @@ void analogWriteRange(int range) {
   // Mock implementation
 }
 
-unsigned long millis() {
-  // Mock implementation
-  return 0;
-}
+unsigned long current_millis = 0;
+unsigned long millis() { return current_millis; }
+void          advance_millis(unsigned long ms) { current_millis += ms; }
 
 void delayMicroseconds(unsigned int us) {
   // Mock implementation

@@ -12,6 +12,7 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
   dccMmSignalPin_priv = dccMmSignalPin;
   lastCommandTime     = 0;
   lastMM2Seen         = 0;
+  mm2SeenEver         = false;
   targetSpeed         = 0;
   targetDirection     = MM2DirectionState_Forward;
   stateF0             = false;
@@ -54,7 +55,7 @@ void ProtocolHandler::loop() {
         stateF2 = Data->IsMM2FunctionOn;
     } else if (!mm2Locked) {
       if (Data->ChangeDir && !lastChangeDirInput) {
-        if (now - lastChangeDirTs > 250) {
+        if (lastChangeDirTs == 0 || now - lastChangeDirTs > 250) {
           targetDirection = (targetDirection == MM2DirectionState_Forward)
                                 ? MM2DirectionState_Backward
                                 : MM2DirectionState_Forward;
