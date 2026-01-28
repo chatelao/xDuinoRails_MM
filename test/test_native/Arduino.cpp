@@ -13,10 +13,6 @@ int analogRead(uint8_t pin) {
   return 0;
 }
 
-void delayMicroseconds(unsigned int us) {
-  // Mock implementation
-}
-
 void analogWrite(uint8_t pin, int val) {
   // Mock implementation
 }
@@ -32,4 +28,8 @@ void analogWriteRange(int range) {
 unsigned long millis() {
   // Mock implementation
   return 0;
+}
+
+void delayMicroseconds(unsigned int us) {
+  // Mock implementation
 }
