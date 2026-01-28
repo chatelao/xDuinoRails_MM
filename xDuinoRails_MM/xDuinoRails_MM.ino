@@ -49,20 +49,6 @@ DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN,
 // 4. HELPER FUNKTIONEN
 // ==========================================
 
-const int PWM_MAX = 1023;
-
-int getLinSpeed(int step) {
-  if (step == 0)
-    return 0;
-  if (step >= 14)
-    return PWM_MAX;
-  int pwmMinMoving = cvManager.getCv(CV_START_VOLTAGE) * 40;
-  if (pwmMinMoving == 0) {
-    pwmMinMoving = 1; // Ensure motor can move if CV is set to 0
-  }
-  return map(step, 1, 14, pwmMinMoving, PWM_MAX);
-}
-
 // Global ISR required for attachInterrupt
 void isr_protocol();
 
@@ -92,8 +78,7 @@ void loop() {
   if (protocol.isTimeout()) {
     motor.stop();
   } else {
-    int targetPwm = getLinSpeed(protocol.getTargetSpeed());
-    motor.update(targetPwm, protocol.getTargetDirection());
+    motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
   }
 
   lights.update(motor.getCurrentDirection(), protocol.getFunctionState(0));

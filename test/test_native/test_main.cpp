@@ -56,10 +56,51 @@ void test_cv_manager_special(void) {
 }
 
 // Test Motor Control
-void test_motor_control_default_parameters(void) {
+void test_motor_speed_control(void) {
   CvManagerMock cvManager;
-  MotorControl  motor(cvManager, 0, 1, 2, 3);
-  // TODO: Add assertions to check the default motor parameters
+  cvManager.setCv(CV_START_VOLTAGE, 1);
+  cvManager.setCv(CV_MOTOR_TYPE, 0);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 200);
+  MotorControl  motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  // Speed 0
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  TEST_ASSERT_EQUAL(0, analog_write_values[10]);
+
+  // Speed 1 -> Forward
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+
+  // Speed 1 -> Backward
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(1, MM2DirectionState_Backward);
+  advance_millis(101);
+  motor.setSpeed(1, MM2DirectionState_Backward); // This call stops the motor
+  motor.setSpeed(1, MM2DirectionState_Backward); // This call applies power
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(40, analog_write_values[11]);
+
+  // Speed MAX -> Forward
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(14, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+
+  // Speed MAX -> Backward
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(14, MM2DirectionState_Backward);
+  advance_millis(101);
+  motor.setSpeed(14, MM2DirectionState_Backward); // This call stops the motor
+  motor.setSpeed(14, MM2DirectionState_Backward); // This call applies power
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
 }
 
 // Test Lights Control
@@ -104,7 +145,10 @@ void test_mm_signal_f0_f1_f2(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
 
-void setUp(void) { reboot_called = false; }
+void setUp(void) {
+  reboot_called = false;
+  reset_arduino_mock();
+}
 
 void tearDown(void) {
   // clean stuff up here
@@ -115,7 +159,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_get_set);
   RUN_TEST(test_cv_manager_defaults);
   RUN_TEST(test_cv_manager_special);
-  RUN_TEST(test_motor_control_default_parameters);
+  RUN_TEST(test_motor_speed_control);
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
   return UNITY_END();
