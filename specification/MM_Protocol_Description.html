@@ -1,0 +1,1161 @@
+<HTML>
+<HEAD><TITLE>Dr. K&ouml;nig\xb4s M&auml;rklin-Digital-Page: Das neue M&auml;rklin-
+Motorola-Format | von Dr. Michael K&ouml;nig (Dr. K\xf6nig - Dr. Koenig) | Modelleisenbahn -
+M&auml;rklin (M\xe4rklin - Maerklin) - Digital</TITLE></HEAD>
+<BODY BACKGROUND="back3.gif">
+<!--hr-->
+<FONT SIZE=4>
+<center><IMG SRC="bahn7.gif" align=middle BORDER=0></center><br>
+<center><h3><IMG SRC="mk2.gif" ALT="Dr. K&ouml;nig\xb4s M&auml;rklin-Digital-Page" WIDTH=376 HEIGHT=32></h3></center>
+<p>
+<center><IMG SRC="bahn8.gif" BORDER=0></center><br>
+<center><h2><FONT SIZE=+3>Das neue M&auml;rklin-Motorola-Format
+</FONT></h2></center>
+<p>
+<p>
+<i>Dies ist die autorisierte deutsche &Uuml;bersetzung Version 1.1/3.7 von</i>
+<p>
+<HR>
+<A HREF="http://spazioinwind.libero.it/scorzoni/motorola.htm"><H2><CENTER>DIE BESCHREIBUNG DES </CENTER></H2>
+<H2><CENTER>NEUEN M&Auml;RKLIN-MOTOROLA-FORMATS</CENTER></H2></A>
+<H4><CENTER>&copy; Andrea Scorzoni, 1995-1999</CENTER></H4>
+<HR>
+<p>
+<i>Es handelt sich vorliegend <b>nicht</b> um eine Bearbeitung; ich habe mich vielmehr um eine
+m&ouml;glichst w&ouml;rtliche &Uuml;bersetzung bem&uuml;ht und Stil pp. des Originals
+beibehalten. Erg&auml;nzungen und Anmerkungen, die mir wichtig erscheinen, habe ich daher in
+kursiver Schrift eingef&uuml;gt (Anmerkung des &Uuml;bersetzers).<br>
+Ich danke <A HREF="mailto:RHeinz1964@aol.com">R. Heinzelmann</A> aus Ummendorf, <A HREF="mailto:A.Gross@sel.de">Andreas Gro&szlig;</a> sowie <A HREF="mailto:Thomas_Reich@acwins.com">Thomas Reich</a> f&uuml;r Korrekturhinweise.</i>
+<p>
+<H3><U>EINLEITUNG</U> </H3>
+<P>
+Dies ist die Version 3.7 der Beschreibung des&quot;neuen Motorola-Formats&quot;,
+das M&auml;rklin 1994 mit der Control Unit 6021 eingef&uuml;hrt hat. Wie Sie sehen werden, ist
+das neue Format nur noch teilweise mit dem normalen tern&auml;ren <i>(Anmerkung des &Uuml;bersetzers: Nach den j&uuml;gnsten Sprachforschungen ist sowohl "tern&auml;r" als auch "trin&auml;r" f&uuml;r die Beschreibung dieser Dreiwertigkeit zul&auml;ssig.)</i> Motorola-Format (145026-
+Format) identisch. Da eine Menge einschl&auml;giger Literatur verf&uuml;bar ist, wird das alte
+Format hier nicht mehr detailliert beschrieben.</P>
+<P>
+Nachdem ich der M&auml;rklin-Export-Abteilung die erste Version dieser Beschreibung
+&uuml;bersandt hatte, erhielt ich die Antwort, da&szlig; sie (offenbar bis heute) keine Zeit
+h&auml;tten, eine offizielle Beschreibung des neuen M&auml;rklin-Motorola-Formats zu
+ver&ouml;ffentlichen. Ich hoffe, da&szlig; diese Beschreibung beiden helfen wird - Ihnen, dem
+Leser, und den "Offiziellen" von M&auml;rklin.</P>
+<P>
+Das hier beschriebene Format wurde eingehend &uuml;berpr&uuml;ft und getestet.</P>
+<P>
+Dennoch kann ich selbstverst&auml;ndlich keine Haftung bzw. Verantwortung f&uuml;r
+irgendwelche Sch&auml;den &uuml;bernehmen, die durch die Benutzung der Informationen dieser
+Beschreibung entstehen k&ouml;nnten. <i>Dies gilt in gleicher Weise f&uuml;r den
+&Uuml;bersetzer (Anmerkung des &Uuml;bersetzers).</i> Schreibfehler und logische
+Irrt&uuml;mer k&ouml;nnen nicht ausgeschlossen werden; bitte &uuml;berpr&uuml;fen Sie es. Ich
+erwarte Ihre Antwort und Kommentare.</P>
+<P>
+Bei schriftlicher Verwertung dieser Informationen zitieren Sie diese Quelle bitte wie folgt:</P>
+<P>
+Andrea Scorzoni, via Agucchi 169, 40131, Bologna, Italy.
+<P>
+e-mail (B&uuml;ro): <STRONG><A HREF="MAILTO:scorzoni@diei.unipg.it">scorzoni@diei.unipg.it</a></STRONG>
+<P>
+Internet (B&uuml;ro): <STRONG><A HREF="http://www.diei.unipg.it/STAFF/scorzoni.htm">http://www.diei.unipg.it/STAFF/scorzoni.htm</a></STRONG>
+<P>
+<i>Deutsche &Uuml;bersetzung von Dr. M. Michael K&ouml;nig, Antoniter-Weg 11, 65843
+Sulzbach/Ts., Deutschland.
+<p>
+e-mail: <STRONG><A HREF="homepag.htm#kontakt">Kontakt</a></STRONG>
+<P>
+Internet: <STRONG><A HREF="http://www.drkoenig.de">http://www.drkoenig.de</a></STRONG></i>
+<P>
+Ich danke Stefano Chiti-Batelli vielmals f&uuml;r seine ausf&uuml;hrlichen Tests und
+&Uuml;berpr&uuml;fungen des hier beschriebenen Formats. Auch die Unterst&uuml;tzung von Rob
+Hamerling war hilfreich beim besseren Verst&auml;ndnis des Datenstrom, das die 6021-Control-
+Unit aussendet. Au&szlig;erdem danke ich den anderen Freunden aus der M&auml;rklin-Mailing-
+Liste.
+<A NAME="Contents"></A>
+<HR>
+<H3><U>INHALT</U> </H3>
+<UL>
+<LI><A HREF="#4dip"><B>Funktion der 4 DIP-Schalter der 6021-Control-Unit</B></A>
+<LI><A HREF="#def"><B>Definitionen</B></A>
+<LI><A HREF="#trit_description"><B>&Uuml;ber die Trits eines Pakets</B></A>
+<LI><A HREF="#address_description"><B>Adre&szlig;teil eines Pakets</B></A>
+<LI><A HREF="#idle_state"><B>Idle state</B></A>
+<LI><A HREF="#bit_description"><B>Bits f&uuml;r Loks im neuen Motorola-Format</B></A>
+<LI><A HREF="#packets"><B>Beschreibung der Abfolge der Pakete</B></A>
+<LI><A HREF="#details"><B>Details &uuml;ber die letzten 8 bin&auml;ren Pulse eines
+Pakets</B></A>
+<LI><A HREF="#DIP3"><B>Funktion von DIP-Schalter Nr.3 - Pause zwischen den
+Paketen</B></A>
+<LI><A HREF="#questions"><B>Fragen und Antworten</B></A>
+</UL>
+<HR>
+<H3><A NAME="4dip"><U>FUNKTION DER 4 DIP-SCHALTER DER 6021-CONTROL-
+UNIT:</U> </A></H3>
+<DL>
+<DT>DIP-Schalter Nr.1
+<DD>[OFF]/[ON] -&gt;[OLD&amp;NEW] /[ONLY-NEW] Extrafunktion-Dekoder-Codes
+und [OLD&amp;NEW] /[ONLY-NEW] &quot;Fahrtrichtungsumkehr&quot;-Information.<BR>
+Um mit den Dekodern der alten Art (von Zy &uuml;ber LME bis 701.13) kompatibel zu bleiben,
+mu&szlig; DIP-Schalter Nr.1 in OFF-Stellung sein  (dies erl&auml;utere ich noch weiter unten);
+<DT>DIP-Schalter Nr.2
+<DD>[OFF]/[ON] -&gt;[OLD]/[NEW] Motorola-Format; Richtungsanzeigen der Control-80f
+(6036) werden aktiviert <i>(zur Klarstellung: Befindet sich DIP-Schalter Nr.2 in OFF-Position wird ungeachtet der Stellung von DIP-Schalter Nr.1 nur das "pure" alte Datenformat erzeugt - Anmerkung des &Uuml;bersetzers:)</i>.
+<DT>DIP-Schalter Nr.3
+<DD>Nur f&uuml;r das neue Motorola-Format. Pakete werden schneller gesendet, indem die Pause
+zwischen jeder Serie von 18 Impulsen reduziert wird. Dies ist nicht kompatibel mit den Chips der
+&auml;lteren Dekoder (vor 701.13, z.B. LME03 - LME=Lenz M&auml;rklin Electronics)
+<DT>DIP-Schalter Nr.4
+<DD>Die Ausgangsspannung der Control-Unit wird auf +/-12 Volt stabilisiert.
+</DL>
+<P>
+Mit DIP-Schalter Nr.1 auf OFF und Nr.2 auf ON kann tats&auml;chlich eine Mischung zwischen
+dem neuen Motorola-Format und dem alten, f&uuml;r alte Funktions-Dekoder geeigneten Format
+eingestellt werden. Die Extrafunktionen F1, F2, F3 und F4 werden dadurch sowohl bei "alten"
+Funktions-Dekodern (z.B. dem Digital-Kran-Dekoder) als auch den neuen Dekodern f&uuml;r das
+neue Format (z.B. dem Spur-1-Dekoder 6095 <i>und auch sowohl bei den neuen H0-Dekodern 60901 und
+60902 als auch den selbst modifizierten Delta-Dekodern mit dem 701.17b - Anmerkung des
+&Uuml;bersetzers</i>) angesteuert.<BR>
+Bitte beachten Sie, da&szlig; die 6021-Control-Unit die DIP-Schalter nur w&auml;hrend des
+&quot;Einschaltens&quot; sowie nach einem &quot;Reset&quot;
+(&quot;Stop&quot; und &quot;Go&quot; f&uuml;r eine halbe Sekunden gleichzeitig
+dr&uuml;cken) liest. Daher bleibt die Ver&auml;nderung der DIP-Schalter w&auml;hrend des
+normalen Betriebs ohne Auswirkung.<BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="def"><U>DEFINITIONEN.</U></A></H3>
+<UL>
+<LI> Grundfrequenz (Loks): Basiert auf der seriellen Daten&uuml;bertragung mit 38400 baud.
+<LI> Dauer eines Takts (Loks): 26 us (Mikrosekunden) = 1/38400 (ungef&auml;hr)<BR>
+                  Kommentar: Dies ist die Traktfrequenz der alten 6020-CU
+<LI> Doppelte Frequenz (Weichen- und "alte" Funktionsdekoder): 76800 baud
+<LI> Halbe Taktdauer (Weichen- und "alte" Funktionsdekoder): 13 us
+<LI> Normale Pulsdauer (Loks): 8 x (Dauer eines Takts) = 208 us
+<LI> Halbe Pulsdauer (solenoids): 8 x (Halbe Taktdauer) = 104 us<br>
+     <i>Anmerkung des &Uuml;bersetzers: Anstelle von "Pulsdauer" sollte vorstehend besser von "Periodendauer" die Rede sein - denn die Pulse bestehen, wie nachfolgend erl\xe4utert wird, aus einer Kombination von 1 x Takten high und 7 x Takten low bzw. 7 x Takten high und 1 x Takten low.</i>
+<LI> Bin&auml;re "1": Ein langer Puls
+<PRE>
+    -------
+           -
+    12345678
+</PRE>
+<LI> Bin&auml;re "0": Ein kurzer Puls
+<PRE>
+    -
+     -------
+    12345678
+</PRE>
+<LI> Tern&auml;re "1": Ein Paar langer Pulse
+<PRE>
+    ------- -------
+           -       -
+    1234567812345678
+</PRE>
+<LI> Tern&auml;re "0": Ein Paar kurzer Pulse
+<PRE>
+    -       -
+     ------- -------
+    1234567812345678
+</PRE>
+<LI> Tern&auml;re "OPEN": Ein langer Puls gefolgt von einem kurzen Puls
+<PRE>
+    ------- -
+           - -------
+    1234567812345678
+</PRE>
+<LI> Paket: Eine Folge von 18 bin&auml;ren Pulsen (Motorola-Format)
+ bzw. von 9 tern&auml;ren Pulsen ("Trits"). Jedem Paket folgt eine Pause,
+ w&auml;hrend der kein Puls gesendet wird.
+<LI> Doppel-Paket: Eine Folge von 2 Paketen (+ 2 Pausen) zur Fehlerkorrektur.
+ Genau besehen besteht ein Doppel-Paket aus einem Paket, einer Pause (t1), der
+ Wiederholung desselben Pakets und einer abschlie&szlig;enden Pause (t2).
+ F&uuml;r die Erl&auml;uterung von t1 und t2 verweise ich auf einen folgenden
+ <A HREF="#DIP3"><U>Abschnitt</U></A>
+<LI> Sonderfunktion: Richtungsabh&auml;ngige Funktion der M&auml;rklin-Dekoder.
+ Sie kann mit dem "function"-Taster der M&auml;rklin-Control-Unit geschaltet werden.
+<LI> Extrafunktionen: Neue richtungsunabh&auml;ngige Funktionen.
+ Sie k&ouml;nnen mit den Tastern "f1","f2","f3","f4" der M&auml;rklin-Control-Unit geschaltet
+werden.
+</UL>
+
+<P>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="trit_description"><U>&Uuml;BER DIE TRITS EINES PAKETS</U>
+</A></H3>
+<P>
+Ein Paket besteht aus 18 bin&auml;ren Pulsen bzw. 9 Trits. In Abh&auml;ngigkeit von dem
+dadurch adressierten Dekodertyp werden die folgenden Pakete und Trit-Kombinationen benutzt:
+<PRE><FONT SIZE=+0>
+Loks: A1 A2 A3 A4 F S1 S2 S3 S4  (Grundfrequenz,
+                      altes und neues M&auml;rklin-Motorola-Protokoll)
+       -&gt; A1 A2 A3 A4 Adre&szlig;teil (tern&auml;r)
+       -&gt; F           Sonderfunktions-Trit im bin&auml;ren Modus:
+                      Die Sonderfunktion ist "An" bei zwei langen Pulsen,
+                      "Aus" wenn zwei kurze Pulse gesendet werden
+       -&gt; S1 S2 S3 S4 Geschwindigkeit und Richtungsumkehr-Befehl im alten
+                      Motorola-Protokoll (im bin&auml;ren Modus);
+                      Geschwindigkeit, Richtung und Status der
+                      Extrafunktionen f1...f4 im neuen
+                      M&auml;rklin-Motorola-Protokoll.
+                      S1 S2 S3 S4 sind nicht mehr bin&auml;re oder tern&auml;re
+                      Daten (hierzu weiter unten).
+
+Weichen: A1 A2 A3 A4 0 D0 D1 D2 S  (Doppelte Frequenz,
+                      altes und neues M&auml;rklin-Motorola-Protokoll)
+       -&gt; A1 A2 A3 A4 Adre&szlig;teil (tern&auml;r)
+       -&gt; &quot;0&quot;         fixiertes Trit
+       -&gt; D2 D1 D0    Bin&auml;re Trits zum Adressieren der einzelnen Ports
+                      des Weichendekoders (Z,B. des k83). Bereich: 0...7; D2=MSB, D0=LSB.
+       -&gt; S           Status des k83: &quot;1&quot;=on, &quot;0&quot;=Ausschalten aller
+                      Ports des k83, ungeachtet des Inhalts von D2 D1 D0.
+
+&quot;Alte&quot; Funktions-Dekoder: A1 A2 A3 A4 1 F1 F2 F3 F4
+                      (Doppelte Frequenz, altes M&auml;rklin-Motorola-Protokoll)
+       -&gt; A1 A2 A3 A4 Adre&szlig;teil (tern&auml;r)
+       -&gt; &quot;1&quot;         fixiertes Trit
+       -&gt; F1 F2 F3 F4 Bin&auml;re Trits zum An- und Ausschalten jeweils eines
+                      der 4 Funktionen f1...f4.
+</FONT>
+</PRE>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="address_description"><U>ADRESSTEIL &quot;A1 A2
+A3 A4&quot; EINES PAKETS</U> </A></H3>
+<P>
+&quot;A1 A2 A3 A4&quot; sind Trits, d.h. sie werden als tern&auml;re "Bits" verwendet. 3^4=81
+Adressen sind dadurch m&ouml;glich. Tats&auml;chlich verwendet M&auml;rklin aber nur 80
+Adressen f&uuml;r Loks und "alte" Funktions-Dekoder und nur 64 Adressen f&uuml;r
+Weichendekoder.<BR>
+Die tern&auml;ren Adressen entsprechen der Anleitung f&uuml;r die Einstellung der DIP-Schalter,
+wie sie den Dekoder-Lokomotiven beigef&uuml;gt sind, sowie den entsprechenden M&auml;rklin-
+Digital-Publikationen. Es sind 8 DIP-Schalter, numeriert von 1 bis 8.<BR>
+<PRE><FONT SIZE=+0>
+-&gt; 1,3,5,7 verbinden die 4 Adre&szlig;-Eing&auml;nge mit Masse ;
+-&gt; 2,4,6,8 verbinden die 4 Adre&szlig;-Eing&auml;nge mit Vcc (Plus);
+</FONT>
+</PRE>
+<P>
+sind diese Eing&auml;nge weder mit Masse noch mit Vcc verbunden, so werden sie als
+&quot;open&quot; erkannt..<BR>
+So bedeutet z.B. -2--5-7- :
+<PRE><FONT SIZE=+0>
+      -2  1. trit   = 1
+      --  2. trit = open.
+      5-  3. trit   = 0
+      7-  4. trit   = 0
+</FONT>
+</PRE><P>
+Bitte beachten Sie, da&szlig; in dem M&auml;rklin-/Motorola-Protokoll die tern&auml;re
+Adresse &quot;0000&quot; als &quot;80&quot; definiert ist, die Adresse
+&quot;open open open open&quot; der Lok- und "alten" Funktionsdekoder
+hingegen zum Senden des &quot;idle state&quot; benutzt wird (hierzu mehr
+im n&auml;chsten Abschnitt).
+<PRE><FONT SIZE=+0>
+Beispiel: Adresse 34:
+34:3=11      Rest: 1
+11:3= 3      Rest: 2
+ 3:3= 1      Rest: 0
+ 1:3= 0      Rest: 1
+
+Somit: 34=1*27+0*9+2*3+1*1
+
+</FONT>
+</PRE>
+<P>
+Das tern&auml;re Format von 34 ist 1021, d.h. &quot;1&quot; &quot;0&quot;
+&quot;open&quot; &quot;1&quot;. Im Motorola-Format werden die Daten
+aber tats&auml;chlich in umgekehrter Reihenfolge gesendet, d.h.:
+<PRE><FONT SIZE=+0>
+&quot;1&quot; &quot;open&quot; &quot;0&quot; &quot;1&quot; (Trits) oder
+11 10 00 11 (bits)
+-2 -- 5- -8 (M&auml;rklin-DIP-Schalter)
+A1 A2 A3 A4
+</FONT>
+</PRE>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="idle_state"><U>IDLE STATE</U> </A></H3>
+<P>
+Der &quot;idle state&quot; erscheint nach dem Einschalten sowie nach einem Reset.<BR>
+Im alten Motorola-Protokoll sorgt der &quot;idle state&quot; f&uuml;r eine negative
+Dauerspannung
+an der Schiene (am roten Anschlu&szlig; gegen&uuml;ber dem braunen Anschlu&szlig;
+gemessen).<BR>
+Im neuen M&auml;rklin-Motorola-Protokoll besteht der &quot;idle state&quot; im
+ununterbrochenen Senden von Paketen mit einer in M&auml;rklin Digital nicht benutzten Adresse,
+z.B. vier &quot;open&quot;-Trits, und einem Datenteil aus f&uuml;nf &quot;0&quot;-Trits.<BR>
+Die hierbei benutzte Adresse ist tats&auml;chlich &quot;80&quot; im tern&auml;ren Code; die bei
+Lok- und "alten" Sonderfunktions-Dekodern einstellbare Adresse &quot;80&quot; besteht hingegen
+aus 4 &quot;0&quot;-Trits.
+<BR>
+Der &quot;idle state&quot; endet sobald das erste g&uuml;ltige Paket f&uuml;r Loks gesendet
+wird.<BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="bit_description"><U>BITS F&Uuml;R LOKOMOTIVEN IM NEUEN
+MOTOROLA-FORMAT</U> </A></H3>
+<P>
+Das neue M&auml;rklin-Motorola-Format wird gesendet, wenn DIP-Schalter Nr.2 der Control-Unit
+auf ON gestellt wird.<BR>
+Im neuen M&auml;rklin-Motorola-Format:
+<UL>
+<LI>sind die ersten 4 Trits (4 Paare von Pulsen) tern&auml;r wie gewohnt,
+die Werte reichen von &quot;0...80&quot; wobei: <BR>
+- der Wert &quot;0&quot; von M&auml;rklin als Lokadresse 80  bezeichnet  wird (d.h.: die Lokadresse
+80 wird als "0" gesendet);<BR>
+- der Wert &quot;;80&quot; im &quot;idle&quot; der 6021-Control-Unit gesendet wird;<BR>
+<LI>das 5. Trit wie gewohnt als bin&auml;res Paar (d.h. zwei gleiche Pulse - zweimal "1" oder
+zweimal "0") verwendet wird;<br>
+<LI>Die letzten 4 &quot;trits&quot; (4 Paare von Pulsen) bislang als bin&auml;re Paare von Pulsen
+verwendet wurden, so da&szlig; mit ihnen 2^4=16 verschiedene Kombinationen dargestellt werden
+konnten. Nunmehr werden sie als 8 unterschiedliche und eigenst&auml;ndige Pulse bzw. Bit
+verwendet und k&ouml;nnen daher 2^8=256 verschiedene Kombinationen (Werte) darstellen. Dies
+bedeutet, da&szlig; nunmehr auch die Kombination aus &quot;01&quot;, die bislang nicht
+zul&auml;ssig bzw. definiert war (nur &quot;11&quot;, &quot;00&quot; und &quot;10&quot;
+waren im normalen tern&auml;ren Motorola-Format zul&auml;ssig), definiert ist und auftritt.
+Allerdings k&ouml;nnen aus Kompatibilit&auml;tsgr&uuml;nden leider nicht alle dieser 256
+Kombination verwendet werden.
+</UL>
+<P>
+Festzuhalten ist also, da&szlig; bei den ersten 10 bin&auml;ren Pulsen (5 Trits) des
+neuen&quot;M&auml;rklin-Motorola-Formats&quot; keinerlei Unterschied zu den ersten 10
+bin&auml;ren Pulsen (5 Trits) des alten Formats besteht. Beispielsweise bedeuten &quot;11&quot;
+an 9. und 10 Stelle - also als 9. und 10. Bit bzw. als 5. Trit (= 1) unver&auml;ndert &quot;function
+on&quot;. Nur die letzten 8 Trits unterscheiden sich im neuen Format von denen des alten
+Formats.<BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="packets"><U>BESCHREIBUNG DER ABFOLGE DER PAKETE</U>
+</A></H3>
+<P>
+Im neuen Format werden die Datenpakete f&uuml;r JEDE LOK wie folgt gesendet:
+<PRE><FONT SIZE=+0>
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   (*)
+- 2x Doppel-Paket f&uuml;r Extrafunktion f1;
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   [wie (*)]
+- 2x Doppel-Paket f&uuml;r Extrafunktion f2;
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   [wie (*)]
+- 2x Doppel-Paket f&uuml;r Extrafunktion f3;
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   [wie (*)]
+- 2x Doppel-Paket f&uuml;r Extrafunktion f4;
+</FONT>
+</PRE>
+<P>
+Wenn ZWEI LOKS aktiv sind, sieht die Abfolge der Datenpakete so aus:
+<PRE><FONT SIZE=+0>
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   (1. Lok)
+- 2x Doppel-Paket f&uuml;r Extrafunktion f1; (1. Lok)
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   (2. Lok)
+- 2x Doppel-Paket f&uuml;r Extrafunktion f1; (2. Lok)
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   (1. Lok)
+- 2x Doppel-Paket f&uuml;r Extrafunktion f2; (1. Lok)
+- 2x Doppel-Paket f&uuml;r Geschwindigkeit und Richtung;   (2. Lok)
+- 2x Doppel-Paket f&uuml;r Extrafunktion f2; (2. Lok)
+...
+</FONT>
+</PRE>
+<p>
+und so weiter. <BR>
+Der Grund f&uuml;r das wiederholte Aussenden identischer Datenpakete ist die Erh&ouml;hung der
+St&ouml;rsicherheit, denn wenn ein elektrisches Signal &uuml;ber ein rotierendes Rad
+aufgenommen bzw. &uuml;bertragen wird entstehen elektrische St&ouml;rungen. Zur
+Fehlerkorrektur reagiert ein Dekoder nur, wenn er zweimal identische Informationen empfangen hat.
+Nur unter gl&uuml;cklichen Umst&auml;nden gen&uuml;gen zwei aufeinanderfolgenden Pakete.
+Normalerweise sind mehr als zwei Pakete erforderlich - typischerweise vier oder mehr Pakete.<BR>
+<i>Anmerkung des &Uuml;bersetzers: Dies entspricht nicht meinen Erfahrungen. Zur
+Verk&uuml;rzung der Reaktionszeiten begn&uuml;ge ich mich in LOK mit dem Aussenden
+einfacher Doppel-Pakete. Trotz der Verwendung der alten und weniger st&ouml;rsicheren
+Metallgleise sind verz&ouml;gerte Reaktionen aufgrund nicht erkannter Befehle die Ausnahme und
+auf Loks mit nur wenigen elektrisch leitenden R&auml;dern (z.B. dreiachsige Loks mit Haftreifen
+und abgenutzten R&auml;dern) beschr&auml;nkt. Allerdings mag ein besonderer Refresh-Algorithmus dieses Verhalten beg&uuml;nstigen.</i><br>
+Es gibt keine Beschr&auml;nkung hinsichtlich der Zahl der Loks, die in diesem Refresh-Zyklus
+adressiert werden k&ouml;nnen. Dies bedeutet, da&szlig; bis zu 80 Loks, also alle 80 Lokadressen,
+in dem Refresh-Zyklus gleichzeitig adressiert werden k&ouml;nnen. Der Refresh-Zyklus ist sehr
+zeitaufwendig, wenn die DIP-Schalter Nr.1 und Nr.2 auf ON gestellt sind (vgl. Abschnitt <A
+HREF="#DIP3">FUNKTION DES DIP-SCHALTERS Nr.3</A>).
+Der Refresh-Zyklus ben&ouml;tigt wesentlich weniger Zeit, wenn sich die DIP-Schalter Nr.1 und
+Nr.2 in OFF-Stellung befinden. Hier werden nur 4 Pakete je Lok gesendet, so da&szlig; ein
+kompletter Zyklus f&uuml;r alle 80 Loks nur etwas mehr als  zwei Sekunden ben&ouml;tigt.<BR>
+Die Abfolge der Pakete ist in umgekehrter Folge zu dem Aktivieren der Loks: Wenn die Loks
+beispielweise in der Reihenfolge 1,2,3,4,5 aktiviert werden, werden die Pakete im Refresh-Zyklus in
+der Reihenfolge 5,4,3,2,1 gesendet.
+<BR>
+<BR>
+Wir wollen einen Blick auf den Datenstrom werfen, den die 6021-Control-Unit aufgrund einzelner
+Kommandos aussendet. Die folgenden Abschnitte wurden unter Zuhilfenahme eines
+&quot;Schn&uuml;ffler-&quot;Programms erstellt, das von Rob Hamerling entwickelt wurde.
+F&uuml;r weitere Informationen verweise ich auf <A
+HREF="http://users.capitolonline.nl/~nlco5907/mklsoft.html">die Homepage von Rob
+Hamerling</A>.
+<BR>
+Bei jeder &Auml;nderung der Geschwindigkeit einer Lok sendet die 6021-Control-Unit
+zun&auml;chst 16 identische Pakete (8 Doppel-Pakete) mit den neuen
+Geschwindigkeitsinformationen und setzt dann den Refresh-Zyklus fort.<BR>
+Bei &Auml;nderung der Fahrtrichtung und Aussenden der
+&quot;Richtungs&auml;nderungs&quot;information sendet die 6021-Control-Unit bei DIP-Schalter
+Nr.2 in &quot;ON&quot;-Stellung 16 Pakete (8 Doppel-Pakete) des neuen Typs mit der neuen
+&quot;Richtungs&quot;information. Ist DIP-Schalter Nr.1 in &quot;OFF&quot;-Stellung werden
+auch 12 &quot;Richtungs&auml;nderungs&quot;-Pakete des alten Typs (6 Doppel-Pakete)
+gesendet.<BR>
+<i>Anmerkung des &Uuml;bersetzers: Dies bedeutet, da&szlig; auch im neuen Format immer das
+&quot;Richtungs&auml;nderungs&quot;kommando des alten Typs - &quot;0 0 0 1&quot; - als Teil der Geschwindigkeitsdaten
+gesendet wird; ein "reines" neues Format ohne "0 0 0 1", das ja im neuen Format an sich nicht ben&ouml;tigt wird, gibt es tats&auml;chlich nicht. Dieser im neuen Format an sich nicht mehr vorhandene Geschwindigkeitswert &quot;1&quot; wird von den
+neueren Dekodern mit dem Chip 701.17(b) und neuer ignoriert. Die &auml;lteren Dekoder werten
+ihn aus, ignorieren hingegen die &quot;Richtungs&quot;information des neuen Formats; dies gilt
+zumindest f&uuml;r die am weitesten verbreiteten &auml;lteren Dekoder mit dem 701.13-
+Chip. Die noch &auml;lteren Chips kommen damit aber nicht zurecht und ben&ouml;tigen einen rein im alten Format gesendeten Fahrtrichtungsumkehrbefehl "0 0 0 1". Dieser kann wie beschrieben mit DIP-Schalter Nr.1 im neuen Format aktiviert werden.</i><br>
+Beim Dr&uuml;cken einer der Extrafunktions-Tasten (f1...f4) der 6021-Control-Unit werden der
+Refresh-Zyklus unterbrochen, 12 identische Pakete (6 Doppel-Pakete) mit dem Status der jeweiligen
+Extrafunktion mit der Adresse der jeweils adressierten Loks gesendet und danach der Refresh-Zyklus
+fortgesetzt.<BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<hr>
+<H3><A NAME="details"><U>DETAILS &Uuml;BER DIE LETZTEN 8 BIN&Auml;REN
+PULSE EINES PAKETS.</U> </A></H3>
+<P>
+Nunmehr werde ich lediglich die letzten 8 bin&auml;ren Pulse er&ouml;rtern. Bislang wurden sie
+als 4 tern&auml;re Pulse verstanden, wobei aber nur die Werte &quot;0&quot; und &quot;1&quot;
+verwendet wurden, so da&szlig; sie tats&auml;chlich 4 bin&auml;re Digits waren und die 16 (2^4)
+Fahrtstufen des M&auml;rklin-Digital-Systems darstellten. Von jetzt an sind sie als 8 bin&auml;re
+pulse mit 2^8=256 m&ouml;glichen Kombinationen zu verstehen.
+<P>
+Nennen wir die 8 bin&auml;ren Pulse: A E B F C G D H .
+<P>
+Im alten Motorola-Format stellten sich diese Bits tats&auml;chlich als AABBCCDD (E=A,
+F=B, G=C, D=H, 16 Kombinationen) dar und, denkt man an Trits<BR>
+<BR>
+<P>
+<A NAME="TABLE1"></A><CENTER><TABLE BORDERCOLOR=#000000 BORDER=1>
+<TR><TD WIDTH=129><CENTER>invers -&gt; D C B A</FONT></CENTER>
+</TD><TD WIDTH=80><CENTER>Fahrtstufen</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>1 1 1 1</CENTER></TD><TD
+WIDTH=80><CENTER>14</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>1 1 1 0</CENTER></TD><TD
+WIDTH=80><CENTER>13</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>...</CENTER></TD><TD
+WIDTH=80><CENTER>...</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 1 1</CENTER></TD><TD
+WIDTH=80><CENTER>2</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 1 0</CENTER></TD><TD
+WIDTH=80><CENTER>1</CENTER>
+</TD></TR><TR><TD WIDTH=129><CENTER>0 0 0 1</CENTER></TD><TD
+WIDTH=80><CENTER>Umkehr</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 0 0</CENTER></TD><TD
+WIDTH=80><CENTER>Stop</CENTER>
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER>Tabelle 1 <BR>
+</CENTER>
+<P>
+Um das neue M&auml;rklin-Motorola-Format besser analysieren zu k&ouml;nnen, wollen wir diese
+Bits wie folgt aufsplitten:
+<PRE><FONT SIZE=+0>
+                     A   B   C   D
+                       E   F   G   H
+</FONT>
+</PRE>
+<P>
+Die Fahrtstufe ist immer in den Pulsen A B C D vorhanden und sie ist kompatibel mit dem alten
+Format<BR>
+<BR>
+<P>
+<A NAME="TABLE2"></A><CENTER><TABLE BORDERCOLOR=#000000 BORDER=1>
+<TR><TD WIDTH=129><CENTER>invers -&gt; D C B A</FONT></CENTER>
+</TD><TD WIDTH=80><CENTER>Fahrtstufen</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>1 1 1 1</CENTER></TD><TD
+WIDTH=80><CENTER>14</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>1 1 1 0</CENTER></TD><TD
+WIDTH=80><CENTER>13</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>...</CENTER></TD><TD
+WIDTH=80><CENTER>...</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 1 1</CENTER></TD><TD
+WIDTH=80><CENTER>2</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 1 0</CENTER></TD><TD
+WIDTH=80><CENTER>1</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>(0 0 0 1)</CENTER></TD><TD
+WIDTH=80><CENTER>(Umkehr)</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>0 0 0 0</CENTER></TD><TD
+WIDTH=80><CENTER>Stop</CENTER>
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER>Tabelle 2 <BR>
+</CENTER>
+<P>
+Bitte beachten Sie, da&szlig; theoretisch der Code &quot;0 0 0 1&quot; im neuen Format nicht
+ben&ouml;tigt wird (er ist &uuml;berfl&uuml;ssig!). Allerdings sendet die 6021-Control-Unit bei
+DIP-Schalter Nr.2 in ON-Stellung zum Zwecke der R&uuml;ckw&auml;rts-Kompatibilit&auml;t
+16 Pakete mit einer Mischung des &quot;alten Fahrtrichtungsumkehr&quot;-Befehls (DCBA=0001)
+und der absoluten Richtungsinformation (HGFE ist verschieden von DCBA). Au&szlig;erdem
+werden bei DIP-Schalter Nr.2 in ON-Stellung und DIP-Schalter Nr.1 in OFF-Stellung (&quot;neues
+Motorola-Format&quot; MIT R&uuml;ckw&auml;rtskompatibilit&auml;t zu den LME-Dekodern),
+vor den eben beschriebenen 16 Paketen 12 alte Motorola-&quot;11 00 00 00&quot;-Pakete
+(Fahrtrichtungsumkehr) gesendet.<br>
+<i>Anmerkung des &Uuml;bersetzers: Die letztgenannte Einstellung - DIP-Schalter Nr.1 in OFF-Stellung -
+ist auch erforderlich, wenn im neuen Format die alten (Extra)Funktionsdekoder (z.B. der Tanzwagen oder
+der ROCO-Kran) kontrolliert werden sollen, da bei DIP-Schalter Nr.1 in ON-Stellung bei Bet&auml;tigen der
+Tasten F1- F4 nicht die erforderlichen Befehle generiert und gesendet werden.</i>
+<P>
+Bei der oben beschriebenen Abfolge der Pakete hat sich nur der Inhalt von EFGH
+ge&auml;ndert.<BR>
+<H4><A NAME="details1">DAS DOPPEL-PAKET F&Uuml;R GESCHWINDIGKEIT UND
+RICHTUNG </A></H4>
+<P>
+Wenn das Doppel-Paket die Geschwindigkeit und Richtung bestimmt, h&auml;ngen die Werte von
+EFGH von der Fahrtstufe ab:<BR>
+<BR>
+<P>
+<A NAME="TABLE3"></A><CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129><CENTER>  Fahrtstufen  </CENTER></TD><TD
+WIDTH=80><CENTER>E F G H</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>-14 bis -7</CENTER></TD><TD
+WIDTH=80><CENTER>1 0 1 0</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>-6 bis -0</CENTER></TD><TD
+WIDTH=80><CENTER>1 0 1 1</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>+0 bis +6</CENTER></TD><TD
+WIDTH=80><CENTER>0 1 0 1</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129><CENTER>+7 bis +14</CENTER></TD><TD
+WIDTH=80><CENTER>0 1 0 0</CENTER>
+</TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER>Tabelle 3<BR>
+</CENTER>
+<P>
+Beachten Sie, da&szlig; &quot;+0&quot; Geschwindigkeit=0 und Vorw&auml;rts bedeutet,
+&quot;-0&quot; hingegen Geschwindigkeit=0 und R&uuml;ckw&auml;rts. In &quot;-6 bis -0&quot;
+und &quot;+6 bis +0&quot; ist der Befehl f&uuml;r die Fahrtrichtungsumkehr &quot;0 0 0
+1&quot; enthalten<i>, der im neuen Format aber an sich nicht mehr ben&ouml;tigt w&uuml;rde (Anmerkung des
+&Uuml;bersetzers)</i>.<BR>Au&szlig;erdem ist es auf dieser Grundlage nicht m&ouml;glich, die letzten 8 Bits eines Pakets mit
+denselben Bits des alten Format zu verwechseln. Es ist n&auml;mlich tats&auml;chlich
+unm&ouml;glich, eine Bitfolge von AABBCCDD zu erhalten, denn die Beziehung zwischen H und
+dem MSB des Geschwindigkeits-Teils (D) bestimmt sich immer nach:<BR>
+<P>
+<CENTER>H = <STRONG>NOT</STRONG>(D) <BR>
+</CENTER>
+<P>
+Es gibt insgesamt 32 Kombinationen f&uuml;r Geschwindigkeit und Richtung, n&auml;mlich die
+Gesamtzahl der Geschwindigkeiten von -14 bis  +14 plus 2 Kombinationen f&uuml;r die
+Fahrtrichtungsumkehr des alten Formats, die noch aus Gr&uuml;nden der Kompatibilit&auml;t mit
+den &auml;lteren Dekodern benutzt wird.<BR>
+<BR>
+<H4><A NAME="details2">DAS DOPPEL-PAKET F&Uuml;R GESCHWINDIGKEIT UND
+DEN STATUS VON F1...F4 </A></H4>
+<P>
+Standard-Werte<BR>
+<BR>
+<P>
+<A NAME="TABLE4"></A><CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>f1</CENTER></TD><TD
+WIDTH=80><CENTER>f2</CENTER>
+</TD><TD WIDTH=80><CENTER>f3</CENTER></TD><TD
+WIDTH=80><CENTER>f4</CENTER>
+</TD></TR>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD>
+<TD WIDTH=80><CENTER>E F G H</CENTER></TD><TD WIDTH=80><CENTER>E F G
+H</CENTER>
+</TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>Standard-Werte</CENTER></TD><TD
+WIDTH=80><CENTER>1 1 0 f</CENTER>
+</TD><TD WIDTH=80><CENTER>0 0 1 f</CENTER></TD><TD WIDTH=80><CENTER>0
+1 1 f</CENTER>
+</TD><TD WIDTH=80><CENTER>1 1 1 f</CENTER></TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER>Tabelle 4a<BR>
+</CENTER>
+<P>
+Der Wert der Variablen &quot;f&quot; im letzten Bit (H) aller Reihen h&auml;ngt vom Status der
+betreffenden Extrafunktion ab: OFF: f=&quot;0&quot;; ON: f=&quot;1&quot;.<BR>
+Bitte beachten Sie, da&szlig; in den Tabellen 3 und 4a nur 6 der m&ouml;glichen Kombinationen
+der drei Bits EFG verwendet werden.<BR>
+Da andererseits das Bit &quot;f&quot; je nach Status der jeweiligen Extrafunktion sowohl
+&quot;0&quot; als auch &quot;1&quot; sein kann, k&ouml;nnen die m&ouml;glichen
+Kombinationen von AEBFCGDH mit AABBCCDD aus dem alten Motorola-Protokoll
+kollidieren.<BR>
+Aus diesem Grund gibt es einige Ausnahmen von der Tabelle 4a. Diese Ausnahmen sollen die
+Kompatibilit&auml;t mit dem alten Format gew&auml;hrleisten. Tats&auml;chlich k&ouml;nnte
+sich z.B. im Falle der Fahrtstufe 2 und dem Status der Extrafunktion f1 mit EFGH=1100:
+<PRE><FONT SIZE=+0>
+    A   B   C   D
+      E   F   G   H
+    1 1 1 1 0 0 0 0
+</FONT>
+</PRE>
+<P>
+ergeben  - was exakt der Fahrtstufe &quot;2&quot; im alten Format entspricht.<BR>
+Die Ausnahmen sind aus Tabelle 4b ersichtlich.<BR>
+<BR>
+<P>
+<CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>f1 OFF</CENTER></TD>
+<TD WIDTH=80><CENTER>f1 ON</CENTER></TD></TR>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD>
+<TD WIDTH=80><CENTER>E F G H</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>Standard-Werte</CENTER></TD><TD
+WIDTH=80><CENTER>1 1 0 0</CENTER>
+</TD><TD WIDTH=80><CENTER>1 1 0 1</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>  Fahrtstufen  </CENTER></TD><TD WIDTH=80>
+</TD><TD WIDTH=80></TD></TR>
+<TR><TD WIDTH=129><CENTER>2</CENTER></TD><TD WIDTH=80><CENTER>1 0 1
+0</CENTER>
+</TD><TD WIDTH=80><CENTER>normal</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>10</CENTER></TD><TD
+WIDTH=80><CENTER>normal</CENTER>
+</TD><TD WIDTH=80><CENTER>0 1 0 1</CENTER></TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER><BR>
+</CENTER>
+<P>
+<CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>f2 OFF</CENTER></TD>
+<TD WIDTH=80><CENTER>f2 ON</CENTER></TD></TR>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD>
+<TD WIDTH=80><CENTER>E F G H</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>Standard-Werte</CENTER></TD><TD
+WIDTH=80><CENTER>0 0 1 0</CENTER>
+</TD><TD WIDTH=80><CENTER>0 0 1 1</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>  Fahrtstufen  </CENTER></TD><TD WIDTH=80>
+</TD><TD WIDTH=80></TD></TR>
+<TR><TD WIDTH=129><CENTER>3</CENTER></TD><TD WIDTH=80><CENTER>1 0 1
+0</CENTER>
+</TD><TD WIDTH=80><CENTER>normal</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>11</CENTER></TD><TD
+WIDTH=80><CENTER>normal</CENTER>
+</TD><TD WIDTH=80><CENTER>0 1 0 1</CENTER></TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER><BR>
+</CENTER>
+<P>
+<CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>f3 OFF</CENTER></TD>
+<TD WIDTH=80><CENTER>f3 ON</CENTER></TD></TR>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD>
+<TD WIDTH=80><CENTER>E F G H</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>Standard-Werte</CENTER></TD><TD
+WIDTH=80><CENTER>0 1 1 0</CENTER>
+</TD><TD WIDTH=80><CENTER>0 1 1 1</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>  Fahrtstufen  </CENTER></TD><TD WIDTH=80>
+</TD><TD WIDTH=80></TD></TR>
+<TR><TD WIDTH=129><CENTER>5</CENTER></TD><TD WIDTH=80><CENTER>1 0 1
+0</CENTER>
+</TD><TD WIDTH=80><CENTER>normal</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>13</CENTER></TD><TD
+WIDTH=80><CENTER>normal</CENTER>
+</TD><TD WIDTH=80><CENTER>0 1 0 1</CENTER></TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER><BR>
+</CENTER>
+<P>
+<CENTER><TABLE BORDER=2>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>f4 OFF</CENTER></TD>
+<TD WIDTH=80><CENTER>f4 ON</CENTER></TD></TR>
+<TR><TD WIDTH=129></TD><TD WIDTH=80><CENTER>E F G H</CENTER></TD>
+<TD WIDTH=80><CENTER>E F G H</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>Standard-Werte</CENTER></TD><TD
+WIDTH=80><CENTER>1 1 1 0</CENTER>
+</TD><TD WIDTH=80><CENTER>1 1 1 1</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>  Fahrtstufen  </CENTER></TD><TD WIDTH=80>
+</TD><TD WIDTH=80></TD></TR>
+<TR><TD WIDTH=129><CENTER>6</CENTER></TD><TD WIDTH=80><CENTER>1 0 1
+0</CENTER>
+</TD><TD WIDTH=80><CENTER>normal</CENTER></TD></TR>
+<TR><TD WIDTH=129><CENTER>14</CENTER></TD><TD
+WIDTH=80><CENTER>normal</CENTER>
+</TD><TD WIDTH=80><CENTER>0 1 0 1</CENTER></TD></TR>
+</TABLE>
+</CENTER>
+<P>
+<CENTER><BR>
+Tabelle 4b<BR>
+</CENTER>
+<P>
+Bitte beachten Sie, da&szlig; die Kombinationen 1010 und 0101 von EFGH normalerweise dazu
+dienen, die Fahrtrichtung in dem Paket f&uuml;r Geschwindigkeit und Richtung anzugeben. Diese
+normale Bedeutung von EFGH=1010 ist &quot;R&uuml;ckw&auml;rts, Geschwindigkeit zwischen
+-14 und -7&quot;,
+bei den Ausnahmen in Tabelle 4b wird es es hingegen f&uuml;r Geschwindigkeit 2,3,5,6 verwendet.
+In &auml;hnlicher Weise bedeutet EFGH=0101 normalerweise &quot;Vorw&auml;rts,
+Geschwindigkeit zwischen 0 und 6&quot;, in Tabelle 4b hingegen ist es f&uuml;r die Fahrtstufen
+10,11,13,14 verwendet. Aufgrund dieser Ausnahmen ist das M&auml;rklin-Motorola-Protokoll
+vollst&auml;ndig konsistent.<BR>
+Die f&uuml;r die &Uuml;bermittlung der Zust&auml;nde der Extrafunktionen verwendete
+Gesamtzahl der Kombinationen dieser 8 Bit betr&auml;gt:<BR>
+(Zahl der Extrafunktionen) x (Zahl der Fahrtstufen) x (ON/OFF) = 4 x 16 x 2 = 128 <BR>
+Bei dieser Berechnung habe ich bei den Fahrstufen auch die beiden Werte von ABCD
+ber&uuml;cksichtigt, die wegen der erforderlichen Kompatibilit&auml;t mit den &auml;lteren
+Dekodern f&uuml;r die Fahrtrichtungsumkehr im alten Protokoll erforderlich sind.<BR>
+<H4>BEISPIEL </H4>
+<P>
+Lok Nr.34, Sonderfunktion ON, Geschwindigkeit -4, Extrafunktionen f1 ON und f2,f3,f4 OFF.
+<PRE><FONT SIZE=+0>
+<A HREF="#address_description">Addre&szlig;teil</A>: 11 10 00 11
+Sonderfunktion: 11
+
+Das 1. Paket besteht aus:
+Geschwindigkeit (aus <A HREF="#TABLE2">Tabelle 2</A>):  A   B   C   D         1   0   1   0
+aus <A HREF="#TABLE3">Tabelle 3</A>:                      E   F   G   H         1   0   1   1
+
+Das 2. Paket besteht aus:
+Geschwindigkeit (aus <A HREF="#TABLE2">Tabelle 2</A>):  A   B   C   D         1   0   1   0
+aus <A HREF="#TABLE4">Tabelle 4</A>:                      E   F   G   H         1   1   0   1
+</FONT>
+</PRE>
+<P>
+etc.<BR>
+<BR>
+Das komplette Set der Pakete f&uuml;r Lok Nr.34 besteht aus:
+<PRE><FONT SIZE=+0>
+4x  [11 10 00 11 11 11 00 11 01]  Geschwindigkeit &amp; Richtung
+4x  [11 10 00 11 11 11 01 10 01]  Geschwindigkeit &amp; f1 ON
+4x  [11 10 00 11 11 11 00 11 01]  Geschwindigkeit &amp; Richtung
+4x  [11 10 00 11 11 10 00 11 00]  Geschwindigkeit &amp; f2 OFF
+4x  [11 10 00 11 11 11 00 11 01]  Geschwindigkeit &amp; Richtung
+4x  [11 10 00 11 11 10 01 11 00]  Geschwindigkeit &amp; f3 OFF
+4x  [11 10 00 11 11 11 00 11 01]  Geschwindigkeit &amp; Richtung
+4x  [11 10 00 11 11 11 01 11 00]  Geschwindigkeit &amp; f4 OFF
+</FONT>
+</PRE>
+<P>
+Mit &quot;4x&quot; meine ich &quot;zweimal ein Doppel-Paket&quot;
+<BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="DIP3"><U>FUNKTION VON DIP-SCHALTER NR.3 - PAUSE ZWISCHEN
+DEN PAKETEN </U></A></H3>
+<P>
+2x Doppel-Paket<BR>
+<PRE><FONT SIZE=+0>
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0 ---\xa0 ---\xa0\xa0\xa0\xa0\xa0\xa0 ---\xa0 ---\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0 ---
+#3 OFF\xa0 ----------\xa0\xa0 --\xa0\xa0 -------\xa0\xa0 --\xa0\xa0 ----------\xa0\xa0 ...
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0 t3\xa0\xa0\xa0\xa0\xa0\xa0\xa0 t1\xa0\xa0\xa0\xa0 t2\xa0\xa0\xa0\xa0\xa0 t1\xa0\xa0\xa0\xa0\xa0\xa0 t3
+
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0 ---\xa0 --- ---\xa0 ---
+#3 ON\xa0\xa0 -\xa0\xa0 --\xa0\xa0 -\xa0\xa0 --\xa0\xa0 -...
+\xa0\xa0\xa0\xa0\xa0\xa0 t2\xa0\xa0 t1\xa0\xa0 t2\xa0 t1\xa0 t2
+</FONT>
+</PRE>
+<P>
+t1, t2 und t3 sind Pausen zwischen den Paketen.<BR>
+<BR>
+<B>6021-Control-Unit<BR>
+</B>Befindet sich DIP-Schalter Nr.3 in OFF-Stellung, sind t1=1,525 ms, t2=4,024 ms und t3=6,025 ms<BR>
+Befindet sich DIP-Schalter Nr.3 in ON-Stellung, sind t1=1,525 ms and t2=1,025 ms<BR>
+Befindet sich DIP-Schalter Nr.3 in OFF-Stellung, sind t1 &lt; t2 und t1 &lt; t3, andernfalls ist t1
+&gt; t2. Im letztgenannten Fall ist die durchschnittliche bzw. mittlere Spannung am Gleis
+n&auml;her an 0 V als im erstgenannten Fall. Eine durchschnittliche/mittlere Spannung nahe 0 V ist
+vorteilhaft bei 2-Leiter-Systemen, besonders wenn der Lok-Dekoder normal angeschlossen wird (der
+gemeinsame Anschlu&szlig; der Lampen am braunen Kabel des Dekoders), da das - manuelle -
+Umdrehen/Umsetzen der Lok auf dem Gleis die Helligkeit der Lichter kaum beeinflu&szlig;t.<BR>
+Anmerkung: C80/81-decoders, die mit einem LME03-chip best\xfcckt sind, funktionieren nicht korrekt mit DIP-Schalter Nr.3 in ON-Stellung. Au\xdferdem funktionieren sie nicht richtig mit t1=1,525 ms und t2=t3=4,025 ms.
+<p>
+<B>Alte 6022-Central-Unit</B> (alte Central-Unit mit internem 145026-Encoder-Chip)
+<BR>
+t1=1,25 ms und t2 schwankt zwischen ca. 4 ms und 5,9 ms.
+<P>
+Wir wollen die Gesamtl&auml;nge eines Doppel-Pakets (einschlie&szlig;lich Pausen)  bei einer
+6021-Control-Unit berechnen.
+<PRE><FONT SIZE=+0>
+Die erste Wiederholung der 18 Bits dauert:
+(1/38400 * 8 Takte * 2 Bits * 9 Trits) s = 3,75 ms
+
+Eine Doppel-Paket dauert:
+(3,75 + 1,525 + 3,75 + 4,025) ms = 13,05 ms (lange Pausen, DIP-Schalter Nr.3 = OFF,
+                                             nur t1 und t2 ber&uuml;cksichtigt)
+(3,75 + 1,525 + 3,75 + 6,025) ms = 15,05 ms (lange Pausen, DIP-Schalter Nr.3 = OFF,
+                                             nur t1 und t3 ber&uuml;cksichtigt)
+(3,75 + 1,525 + 3,75 + 1,025) ms = 10,05 ms (kurze Pausen, DIP-Schalter Nr.3 = ON)
+
+2x Doppel-Pakete dauern:
+(13,05 + 15,05) ms = 28,1 ms (lange Pausen, DIP-Schalter Nr.3 = OFF)
+(10,05 * 2) ms     = 20,1 ms (kurze Pausen, DIP-Schalter Nr.3 = ON)
+
+Ein komplettes Datenset f&uuml;r eine Lok dauert:
+(28,1 * 8) ms = 224,8 ms (lange Pausen, DIP-Schalter Nr.3 = OFF)
+(20,1 * 8) ms = 160,8 ms (kurze Pausen, DIP-Schalter Nr.3 = ON)
+
+Die kompletten Datensets f&uuml;r 80 Loks dauern:
+(224,8 * 80) ms = 17,98 s (lange Pausen, DIP-Schalter Nr.3 = OFF)
+(160,8 * 80) ms = 12,86 s (kurze Pausen, DIP-Schalter Nr.3 = ON)
+</FONT>
+</PRE>
+<P>
+Nun wollen wir die unterschiedlichen Werte f&uuml;r t1 und t2 (und t3) pr&uuml;fen. Der
+Motorola-Encoder 145026 bemi&szlig;t t1 zu 3 Trit-L&auml;ngen, also 1,248 ms. Dies
+sollte die &quot;regul&auml;re&quot; Dauer von t1 sein, wie von den alten 6020 und 6022
+gesendet. Andererseits gibt das Datenblatt des 145026 die &quot;dead time discriminator&quot; des
+Chips, also die Maximaldauer unseres &quot;t1&quot; mit etwas mehr als 4 Trit-L&auml;ngen
+(1,742 ms gegen&uuml;ber der Dauer von exakt &quot;4 Trit-L&auml;ngen&quot; von 1,664 ms) an.
+Die alten Central-Units (6020 und 6022) folgen mit t1=1,25 ms den Vorgaben des Datenblatts des
+145026-Encoders. Andererseits ist die Pause t1 der 6021-Control-Unit mit ca.1,5 ms gerade noch
+kompatibel mit den Vorgaben f&uuml;r den 145026-Encoder (aber an der Grenze zur
+Inkompatibilt&auml;t). <BR>
+<p>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A>
+<HR>
+<H3><A NAME="questions"><U>FRAGEN UND ANTWORTEN</U> </A></H3>
+<P>
+Frage Nr.1:<BR>
+Wenn ich es richtig verstehe sind das LENZ- und das M&auml;rklin-System nicht kompatibel, d.h.
+da&szlig; die erweiterten Funktionsdekoder von LENZ nicht im M&auml;rklin-Motorola-System
+funktionieren?<BR>
+Antwort:<BR>
+So ist es. Funktionsdekoder von Lenz funktionieren nur mit dem Lenz-Protokoll,
+&quot;Motorola&quot;-Funktionsdekoder funktionieren nur mit dem Motorola-Format.
+Verkompliziert wird dies dadurch, da&szlig; nunmehr zwei Sorten von Motorola-Funktionsdekodern
+existieren!<br>
+<i>Anmerkung des &Uuml;bersetzers: Dott.Scorzoni meint damit die vier Funktionen der
+Funktionsdekoder im alten Format, die z.B. in den Funktionsmodellen wie Tanz- und
+Panoramewagen oder auch dem Digital-Kran Verwendung finden, und die vier Extrafunktionen des
+neuen Formats, die origin&auml;r f&uuml;r zus&auml;tzliche Funktionen der Loks - TELEX,
+Ger&auml;usche, Rauch, Abschalten der Motorregelung - verwendet werden.</i> <br>
+(Ich warte noch darauf, da&szlig; ein Lok- bzw. Funktionsdekoder beide Formate - das
+M&auml;rklin- und das Lenz-Protokoll - versteht. M&ouml;glich ist es mit der Ultra-Large-Scale-
+Integration!)<BR>
+1) Die fr&uuml;heren Typen des Funktionsdekoders waren in einigen Digital-Wagen und dem
+Digital-Kran von M&auml;rklin montiert <i>(und dem Digital-Kran von ROCO - Anmerkung des
+&Uuml;bersetzers)</i>. Sie k&ouml;nnen nur angesteuert werden, wenn sich DIP-Schalter Nr.1 der
+6021-Control-Unit in OFF-Stellung befindet. Sie arbeiten mit dem Format und der &quot;doppelten
+Frequenz&quot; des k83-Dekoders (6083), nur da&szlig; ein &quot;Trit&quot; (oder besser:
+Pulspaar) verschieden ist <i>(Dies ist das 5. &quot;Trit&quot; bzw, Pulspaar, das bei den
+Weichendekodern den Wert &quot;00&quot; und bei den Funktionsdekodern den Wert
+&quot;11&quot; besitzt - Anmerkung des &Uuml;bersetzers)</i>. Au&szlig;erdem hat es Speicher
+zum Speichern des Kommandos, die ja nicht kontinuierlich gesendet werden sondern nur beim
+Dr&uuml;cken einer der Tasten f1 ... f4 oder beim Erhalt eines entsprechenden Kommandos vom
+Interface. M&auml;rklin verkauft diese alten Funktions-Dekoder nicht (aber es gibt Extrafunktions-
+Dekoder f&uuml;r das neue Motorola-M&auml;rklin-Format). Sie k&ouml;nnen diesen Dekoder-
+Typ aber beispielsweise von Modeltreno, via Cipriani 6, 40131  Bologna, Italien, Fax: +39-51-
+524114 in nicht miniaturisierter und zum Einbau in Wagen bestimmter Form kaufen.
+<i>Au&szlig;erdem wurde in der Elektor im Rahmen des EDITS-Projekts die Bauanleitung zu
+derartigen Dekodern ver&ouml;ffentlicht (Anmerkung des &Uuml;bersetzers).</i><BR>
+2) Das neue Format wird von der 6021-Control-Unit gesendet, wenn sich der DIP-Schalter Nr.2 in
+ON-Stellung befindet. Gegenw&auml;rtig funktioniert dies nur mit den 701.17-Chips, die auf dem
+c95-Dekoder (6095) montiert sind. <i>Dies ist nicht - mehr - zutreffend. Zum einen gibt es schon
+l&auml;ngere Zeit auch in H0 Delta-Dekoder und auch lokspezifische 6090-Dekoder mit dem
+701.17 bzw. 701.17b, die das neue Format auf jeden Fall hinsichtlich der Richtungsumschaltung
+auswerten k&ouml;nnen. Au&szlig;erdem lassen sich alle Dekoder mit dem 701.17 bzw. 701.17b -
+leider offenbar nicht auch die mit dem 701.21/a -
+individuell um die vier neuen Extrafunktionen erweitern. Schlie&szlig;lich gibt nunmehr sowohl H0-
+Loks mit Extra-Funktionen (z.B. Ger&auml;usch) und mit den 60901, 60902 usw. nun auch offiziell
+Dekoder von M&auml;rklin, die die vier neuen Extrafunktionen zur Verf&uuml;gung stellen.
+Bezeichnenderweise hat mir M&auml;rklin aber nur wenige Monate vor dem Ank&uuml;ndigen
+dieser Dekoder auf eine entsprechende Anfrage hin mitgeteilt, da&szlig; man auf absehbare Zeit
+nicht beabsichtige, dieses neue Format in H0 zu nutzen (Anmerkung des &Uuml;bersetzers).</i> Der Status der Extrafunktionen wird im
+neuen Motorola-Protokoll kontinuierlich gesendet. Es ist anzunehmnen, da&szlig; dies in Zukunft
+das Standard-Protokoll werden wird und die n&auml;chsten weiter miniaturisierten c90 die
+M&ouml;glichkeit besitzen werden, die vier neuen Extrafunktionen zu nutzen.
+<P>
+Frage Nr.2:<BR>
+Wird das neue Protokoll nur f&uuml;r Loks benutzt oder wird es auch bei Weichendekodern (k83)
+eingesetzt (anders gesagt: Kann ich meine Elektor-Weichendekoder in dem neuen Protokoll
+weiterbenutzen)?<BR>
+Antwort:<BR>
+Das neue Protokoll wird nur f&uuml;r Loks und Extrafunktions-Dekoder verwendet.
+M&auml;rklin hat f&uuml;r Kompatibilit&auml;t mit den tausenden der bis heute verkauften k83-
+Weichendekoder gesorgt. Sie k&ouml;nnen daher Ihre Elektor-Weichendekoder oder dazu
+kompatible Dekoder (z.B. die Modeltreno-66001-Dekoder) weiterverwenden.<br>
+<i>Anmerkung des &Uuml;bersetzers: Um es auf den Punkt zu bringen: Die 6021-Control-Unit
+sendet die Weichen-Kommandos nach wie vor und unver&auml;ndert im alten Format,
+gleichg&uuml;ltig, auf welches Format die Daten&uuml;bertragung hinsichtlich der Loks eingestellt
+ist. Davon zu trennen ist die Frage, wie und wof&uuml;r man das neue Format verwenden
+m&ouml;chte - etwa in Eigenbau-Controllern oder Software-Controllern wie LOK.</i>
+<P>
+Frage Nr.3:<BR>
+In welchen Lokdekoder ist das neue  Protokoll implementiert, sind die Delta-Dekoder kompatibel
+zum neuen Protokoll?<BR>
+Antwort:<BR>
+Alle Dekoder mit Zymos-, LME03-, 701.13- and 701.17-Chips sind mit dem neuen Protokoll
+kompatibel. Dies beruht auf der Tatsache, da&szlig; sie tats&auml;chlich nur die jeweils ersten
+Pulse der letzten vier Trits bzw. Pulspaare eines Pakets auswerten, die die Geschwindigkeits- und
+Richtungsinformation enthalten (Sie erinnern sich da&szlig; in dem alten Motorola-Protokoll diese
+Pulspaare aus jeweils zwei identischen Pulsen, zwei langen oder zwei kurzen Pulsen,
+zusammengesetzt sind). Auch der erste Dekodertyp (ohne SMD-Bauteile) arbeitet mit dem neuen
+Format korrekt. Allerdings ist f&uuml;r diese Dekoder f&uuml;r die &Auml;nderung der
+Fahrtrichtung ein Paket des alten Protokolls (AABBCCDD=11000000) erforderlich.<BR>
+Neuere Delta-Dekoder und c95-Dekoder haben einen 701.17-Chip und alte Delta-Dekoder haben
+einen 701.13-Chip. Daher verstehen gegenw&auml;rtigt nur neue neue Delta-, c95- und 6090x-
+Dekoder die absolute Richtungsinformation korrekt (1998 wurden neuen c90-Dekoder mit dem
+701.17-Chip verkauft).<br>
+<i>Anmerkung des &Uuml;bersetzers: Dies ist etwas mi&szlig;verst&auml;ndlich: Geht man von
+dem &quot;unverf&auml;lschten&quot; und &quot;reinen&quot; neuen Format (das aber tats&auml;chlich nicht vorkommt) aus, so
+k&ouml;nnen nur Dekoder mit dem 701.17, 701.17b oder neuer (wie z.B. bei den 60901, 60902 usw. - 701.22/a/b - sowie dem neuen Delta-Dekoder mit dem 701.21a) eingesetzt werden, denn im neuen Format wird die Fahrichtung ja nicht durch den Befehl
+&quot;0001&quot; bzw. &quot;11 00 00 00 &quot; umgeschaltet sondern inkorporiert im Befehl
+f&uuml;r Geschwindigkeit und Fahrtrichtung absolut bestimmt. Diese in dem jeweils zweiten Puls
+eines &quot;Trits&quot; bzw. Pulspaars codierte Information k&ouml;nnen die &auml;lteren
+Dekoder nicht verstehen. Daher erkennen sie zwar die Geschwindigkeit, die ja in den jeweils ersten
+Pulsen der &quot;Trits&quot; bzw. Pulspaaren enthalten ist, korrekt, k&ouml;nnen aber die
+Fahrtichtung nicht &auml;ndern. Daher sind die &auml;lteren Dekoder mit dem
+unver&auml;nderten neuen Format nicht kompatibel. Sie erfordern eine Erg&auml;nzung des
+Formats dahingehend, da&szlig; - wie von Dott.Scorzoni ausgef&uuml;hrt - der Fahrtrichtungsumkehrbefehl &quot;0001&quot; - oder wie von Dott.Scorzoni ausf&uuml;hrlich  mit
+&quot;AABBCCDD=11000000&quot; bezeichnet - als Geschwindigkeitsinformation in ein Paket
+bzw Doppel-Paket des neuen Formats inkorporiert oder zus&auml;tzlich ein Paket bzw.
+Doppelpaket mit dem Fahrtrichtungsumkehrbefehl im alten Format eingeschoben wird.</i>
+<P>
+Frage Nr.4:<BR>
+Werden zwei Dekoder-Chips ben&ouml;tigt, um 4 Extrafunktionen und die Lokgeschwindigkeit zu
+steuern oder k&ouml;nnen die neuen Chips beides (wie bei den Dekodern der Spur I)?<BR>
+Antwort:<BR>
+Ich habe die Frage schon teilweise beantwortet. Im neuen Format braucht
+man nicht zwei Dekoder. Es ist nur eine Frage des Platzes (der c95 ist sehr gro&szlig;). In jedem Fall
+gen&uuml;gt ein 701.17 und wird bei den n&auml;chsten Versionen des c90 eingesetzt. Es ist
+anzunehmen da&szlig; der n&auml;chste c90 wenigstens die Extrafunktionen f1 und f2 aufweisen
+wird. Im alten Protokoll w&uuml;rde dies zwei verschiedene Dekoder erfordern.<br>
+<i>Anmerkung des &Uuml;bersetzers: Der c95 ist nicht allein wegen der Extrafunktionen so
+gro&szlig;. Tats&auml;chlich beruht seine unverh&auml;ltnism&auml;&szlig;ige
+Gr&ouml;&szlig;e im wesentlichen darauf , da er sowohl f&uuml;r AC, DC als auch Digital
+geeignet ist und daher jede Menge Elektronik enth&auml;lt, die allein der Umschaltung zwischen
+diesen Betriebsarten dient. Nat&uuml;rlich spielt auch der h&ouml;here Strombedarf der Spur-I-
+Komponenten eine Rolle. Wie man mittlerweile sehen kann, erfordert die Erweiterung von Dekodern
+mit dem 701.17 oder 701.17b um zumindest die Extrafunktionen f1 und f2 nur relativ wenig
+Bauteile, die in fast jeder Lok noch Platz finden. Bei den neuen c90-Dekodern - besser gesagt den
+Nachfolgetypen des c90 60901, 60902 usw. - wird der 701.17 nicht mehr eingesetzt.
+Tats&auml;chlich handelt es sich um ein wesentlich gr&ouml;&szlig;eres IC mit der Bezeichnung
+701.22a/b, das nunmehr auch wesentliche Teile der Geschwindkeitsregelung enth&auml;lt, die
+M&auml;rklin bislang im c90 aufgrund verfehlter Produktpolitik nachtr&auml;glich durch eine zwar
+intelligente, jedoch verh&auml;ltnism&auml;&szlig;ig anachronistische analoge Schaltung realisiert
+hat.</i>
+<P>
+Frage Nr.5:<BR>
+Wie ist es mit der alten Central-Unit?<BR>
+Antwort:<BR>
+Die alte Central-Uni kann die neuen vier Extrafunktionen des c95 nicht ansteuern.<br>
+<i>Anmerkung des &Uuml;bersetzers: Von den M&auml;rklin-Komponenten ist nur die 6021-
+Control-Unit in der Lage, das neue Format zu erzeugen. Allerdings ist man auf die Control-Unit
+nicht angewiesen. Es gibt verschiedene Methoden, selbst einen Hardware-Controller zu bauen, der
+das neue Format erzeugt. Au&szlig;erdem bieten andere Hersteller derartige Controller an - das
+j&uuml;ngste ist die Intellibox als Kooperation von Modeltreno und Uhlenbrock. Au&szlig;erdem
+kann man - wie bei LOK - das neue Format auch per Software erzeugen.</i>
+<P>Frage Nr.6:<BR>
+Wie kann ich neue Extrafunktions-Dekoder und alte Funktionsdekoder gleichzeitig/zusammen
+benutzen?<BR>
+Antwort:<BR>
+Indem die  DIP-Schalter Nr.1 in OFF- und DIP-Schalter Nr.2 in ON-Stellung gebracht werden.
+<P>
+Frage Nr.7:<BR>
+Wie kann ich alte und neue Lokdekoder gleichzeitig/zusammen benutzen?<BR>
+Antwort:<BR>
+Wie bei der vorherigen Antwort: Indem die  DIP-Schalter Nr.1 in OFF- und DIP-Schalter Nr.2 in
+ON-Stellung gebracht werden. Dies hat ein &quot;gemischtes&quot; Protokoll zur Folge. Bei
+Fahrtrichtungs&auml;nderungen wird das Paket zur Fahrtrichtungsumschaltung im alten Motorola-
+Format (&quot;11000000&quot;) gesendet, bevor das absolute Richtungskommndo des neuen
+Formats im &quot;gemischten&quot; Format (&quot;1E0F0G0H0&quot;) gesendet wird. Dadurch
+k&ouml;nnen alle Typen von Lokdekodern der Anweisung auf &Auml;nderung der Fahrtrichtung
+Folge leisten.<BR>
+Alle, die ihren eigenen Controller bauen wollen, m&uuml;ssen folgendes beherzigen: Wenn der
+Richtungsumschaltbefehl <i>des alten Formats (Anmerkung des &Uuml;bersetzers)</i> (&quot;0 0 0
+1&quot;) gesendet wird und sich zur selben Zeit die absolute Richtungsinformation <i>im neuen
+Format (Anmerkung des &Uuml;bersetzers)</i> nicht &auml;ndert (was bei der 6021-Control-Unit
+Unsinn w&auml;re), &auml;ndern weder die neuen Dekoder mit dem 701.17(b)-Chip noch die alten
+Dekoder (701.13-Chip und &auml;lter) ihre Fahrtrichtung.<br>
+<i>Anmerkung des &Uuml;bersetzers: Wenn man den Fahrichtungsumkehr-Befehl
+&quot;0001&quot; bzw. &quot;11 00 00 00 &quot; in das erste Paket des neuen Formats
+(Geschwindigkeit und Richtung) inkorporiert, gen&uuml;gt es zumindest f&uuml;r Dekoder mit
+dem 701.13, diesen Befehl zusammen mit der neuen Richtungsinformation zu senden, also als
+&quot;1E0F0G0H0&quot;. Die oben beschriebene Vorgehensweise, zuerst ein Paket im alten
+Format mit dem Fahrtrichtungsumkehrbefehl zu senden, ist also nicht erforderlich. Am saubersten
+erscheint mit jedoch, durch entsprechende Einstellm&ouml;glichkeiten daf&uuml;r zu sorgen,
+da&szlig; nur die zu den jeweiligen Dekodern origin&auml;r passende Formate verwendet
+werden.</i>
+<P>
+Frage Nr.8:<BR>
+Hat schon jemand das neue MKL-Format (DIP-Schalter Nr.1 und Nr.2 der Control-80f in ON-
+Stellung) mit einem computergesteuerten Layout und vielen aktiven Loks getestet?<BR>
+Antwort:<BR>
+Ja, alles funtioniert prima, viel besser als mit der alten 6020-Central-Unit, die ja keinen
+&quot;Refresh&quot;-Zyklus besitzt. Ich benutze normalerweise DIGIPET 4.01 nebst dessen
+Timetable-System. Der &quot;Refresh&quot;-Zyklus ist ebenso vorteilhaft, wenn man vergi&szlig;t,
+den 1k5-Widerstand an den abschaltbaren Gleissegmenten vor Signalen zu installieren (diese sollen
+sicherstellen, da&szlig; die Loks mit &auml;lteren Dekodern, die noch keinen 701.17(b) besitzen, in
+der alten Fahrtrichtung weiterfahren).<br>
+<i>Anmerkung des &Uuml;bersetzers: Dies scheint mir aber ein Trugschlu&szlig; zu sein. Denn der
+Refresh-Zyklus wiederholt ja nur die &quot;aktuellen&quot; Lokdaten. Bei &auml;lteren Dekodern
+bzw. im alten Format wird die Fahrtrichtung aber durch ein internes Flip-Flop bestimmt, das durch
+den Fahrichtungsumkehrbefehl &quot;0001&quot; nur bei dem jeweiligen Wechsel der
+Fahrtrichtung gesetzt bzw. gel&ouml;scht wird. &quot;Vergi&szlig;t&quot; der Dekoder mangels
+1k5-Widerstand bei einem Halt auf einem spannungslosen Gleisabschnitt seinen Fahrtdaten, so
+vergi&szlig;t er auch die eingestellte Fahrtrichtung. Allein bei Dampfloks, die ja &uuml;berwiegend
+in Vorw&auml;hrtsrichtung fahren, besteht eine gro&szlig;e Wahrscheinlichkeit, da&szlig; die Lok
+danach in der alten Fahrichtung weiterfahren. Bei E- und Dieselloks wird die Wahrscheinlichkeit
+daf&uuml;r bei 50% liegen. Daraus folgt, da&szlig; der Refresh-Zyklus nur im neuen Format und
+bei Verwendung der neueren Dekoder mit dem 701.17(b) oder neuer onboard den 1k5-Widerstand
+&uuml;berfl&uuml;ssig macht.</i>
+<P>
+Frage Nr.9:<BR>
+Hat schon jemand die computergesteuerte Doppel-Traktion im neuen Format getestet? Ich vermute,
+da&szlig; einige Probleme auftauchen werden, wenn mehr als drei Z&uuml;ge  (je mehr destso mehr
+Probleme) aktiv sind und der Computer versuchen wird, viele von diesen zu stoppen.
+&quot;Parallel&quot;-Betrieb von zu vielen Z&uuml;gen kann ein Problem sein!<BR>
+Antwort:<BR>
+Ich vermute, Sie beziehen sich hierbei auf eine m&ouml;gliche Zeitverz&ouml;gerung zwischen den
+beiden an einer Doppel-Traktion beteiligten Loks. Ber&uuml;cksichtigen Sie bitte, da&szlig; jedes
+Kommando, das &uuml;ber das Interface oder ein Control-80 gegeben wird,
+&quot;unverz&uuml;glich&quot; ans Gleis gesendet wird. Mit anderen Worten: Der normale
+&quot;Refresh&quot;-Zyklus der Control-Unit wird bei Erhalt eines neuen Kommandos
+unterbrochen und unmittelbar nach dem Ausf&uuml;hren dieses Kommandos fortgesetzt.
+<P>
+Frage Nr.10:<BR>
+Welchen Befehl &quot;versteht&quot; ein Lokdekoder tats&auml;chlich, wenn sich DIP-Schalter
+Nr.2 in ON-Stellung befindet? Ist es ein einfaches Doppel-Paket oder mu&szlig; der Dekoder einen
+kompletten Refresh-Zyklus abwarten, bis er seine Einstellung &auml;ndert?<BR>
+Antwort:<BR>
+Die k&uuml;rzeste, f&uuml;r einem Dekoder verst&auml;ndliche Informationseinheit
+<i>(Dott.Scorzoni spricht von </i>&quot;atomic&quot; component<i>s - Anmerkung des
+&Uuml;bersetzers)</i> ist ein Doppel-Paket, nicht aber der gesamte Refresh-Block. Dies beruht auf
+dem Umstand, da&szlig; die 6021-Control-Unit mit den alten Dekoder (mit dem ZyMOS-Chip) und
+umgekehrt die neuen Dekoder mit der allersten 6020-Central-Unit kompatibel sein m&uuml;ssen. In
+einem Selbstbausystem kann nach jedem Doppel-Paket irgendein &quot;Doppel-Paket&quot;-Typ,
+auch mit einer anderen Adresse, gesendet werden. <br>
+<P>
+Frage Nr.11:<BR>
+Warum ist im Manual nicht beschrieben, wie das neue Protokoll von einem Computer &uuml;ber
+das Interface gesteuert werden kann? Kann man das 'alte' Interface? benutzen<BR>
+Antwort:<BR>
+Ja, nat&uuml;rlich, aber das &quot;neue&quot; 6051-Interface ist mit Ausnahme des Kabels und
+der Diskette v&ouml;llig identisch zu dem 6050-Interface.
+<P>
+Frage Nr.12:<BR>
+Nochmals zum 6050/51-Interface. Ich vermute, da&szlig; die Geschwindigkeitseinstellung
+unver&auml;ndert geblieben ist - aber wie sieht es mit dem Fahrtrichtungsumkehrkommando aus?
+Mu&szlig; ich noch ein '15'-Befehl senden um die Control-Unit anzuweisen, die Fahrtrichtung zu
+&auml;ndern?<BR>
+Antwort:<BR>
+Ungl&uuml;cklicherweise ja. Das Standard-6050-Protokoll enth&auml;lt keinerlei &quot;absolutes
+Richtungs&quot;-Kommando.<br>
+<i>Anmerkung des &Uuml;bersetzers: Die oben bereits erw&auml;hnte Intellibox weist eine
+entsprechende Erweiterung des Interface-Protokolls auf.</i>
+<P>
+Frage Nr.13:<BR>
+Sie schrieben: &quot;Wenn sich die DIP-Schalter Nr.1 und Nr.2 in ON-Stellung befinden, sendet die
+6021-Control-Unit aus Gr&uuml;nden der R&uuml;ckw&auml;rts-Kompatibilit&auml;t
+zus&auml;tzlich zu den Daten des neuen Formats einige alte Motorola-&quot;0 0 0 1&quot;-Pakete
+(Fahrtrichtungsumkehr) aus.&quot; Aber mein LME03-Dekoder &auml;ndert nicht die
+Fahrtrichtung wenn sich beide DIP-Schalter Nr.1 und Nr.2 in ON-Stellung befinden. Warum? <BR>
+Antwort:<BR>
+Beginnen wir mit einigen Definitionen. M&auml;rklin produzierte verschiedene Dekodertypen. Wir
+wollen sie anhand der verwendeten Chips benennen.<br>
+<UL>
+<LI>Zy (sowohl als SMD- als auch nicht-SMD-Version)<br>
+<LI>LME (Lenz M&auml;rklin Electronics)<BR>
+<LI>701.13<BR>
+<LI>701.17<BR>
+<li><i>701.21A (Anmerkung des &Uuml;bersetzers)<br></i>
+<li><i>701.22A (Anmerkung des &Uuml;bersetzers)<br></i>
+<LI>...<BR>
+<BR>
+</UL>
+<P>
+Nehmen wir an, da&szlig; sich die beiden DIP-Schalter Nr.1 und Nr.2 der 6021-Control-Unit in
+ON-Stellung befinden. Die einzelnen Dekoder verhalten sich unterschiedlich. Im einzelnen:<BR>
+<UL>
+<LI>Zy, 701.13 und 701.17 <i>sowie 701.21A und 701.22A (Anmerkung des &Uuml;bersetzers)</i> &auml;ndern die Fahrtrichtung nach einem &quot;Klick&quot;
+(Fahrtrichtungsumkehr).
+<LI>LME &auml;ndert die Fahrtrichtung nach einem &quot;Klick&quot; nicht (wie Sie
+beschrieben haben).
+</UL>
+<P>
+Nun wollen wir folgendes Experiment machen
+<UL>
+<LI>Wir &uuml;bernehmen die Kontrolle &uuml;ber den Dekoder;
+<LI>Wir heben die Lok von den Schienen;
+<LI>Wir geben mit hochgehobener Lok (!) an der 6021-Control-Unit den Befehl zur
+Fahrtrichtungs&auml;nderung mit einem &quot;Klick&quot; (Fahrtrichtungs&auml;nderung);
+<LI>Wir stellen die Lok wieder auf die Schienen und schauen, was passiert, wenn wir die
+Geschwindigkeit erh&ouml;hen.
+</UL>
+<P>
+Ergebnis des Experiments:<BR>
+<UL>
+<LI>Zy, LME and 701.13 &auml;ndern die Fahrtrichtung nicht.
+<LI>701.17 <i>sowie 701.21A und 701.22A (Anmerkung des &Uuml;bersetzers)</i> &auml;ndert<i>/n</i> die Fahrtrichtung.
+</UL>
+<P>
+L&ouml;sung des Problems:.<BR>
+Bei DIP-Schalter Nr.1 in OFF-Stellung sendet die 6021-Control-Unit 6 &quot;normale
+Fahrtrichtungsumschalt&quot;-Doppel-Pakete im alten Motorola-Format und 8
+&quot;Fahrtrichtungsumschalt&quot;-Doppel-Pakete des neuen Typs (eine Mischung zwischen
+&quot;Geschwindigkeit = Fahrtrichtungsumkehr&quot; im alten Format und &quot;Richtung =
+EFGH&quot; im neuen Format) aus. Befindet sich DIP-Schalter Nr.1 in ON-Stellung sind die
+&quot;Fahrtrichtungsumkehr&quot;-Pakete nur vom neuen Typ. Die Ursache f&uuml;r das unterschiedliche Verhalten (wenn sich DIP-
+Schalter Nr.1 in ON-Stellung befindet) der Zy- und 701.13-Dekoder einerseits und des LME-
+Dekoders andererseits ist, da&szlig; der LME-Dekoder beide Bits jedes Trits dekodiert, die Zy- und
+701.13-Dekoder hingegen nur das jeweils erste Bit jedes Trits dekodieren. Daher sind die LME-
+Dekoder nicht in der Lage, das &quot;Richtungs= EFGH&quot;-Paket im neuen Format zu
+dekodieren. Das k&ouml;nnte wie ein Bug des LME-Dekoder aussehen. Tats&auml;chlich ist es
+aber kein richtiger Bug, denn damals war das &quot;neue Motorola-Format&quot; nicht bekannt.
+Dies ist der Grund, warum M&auml;rklin r&auml;t, den DIP-Schalter Nr.1 bei H0-Modellen in
+OFF-Stellung zu lassen (R&uuml;ckw&auml;rtskompatibilit&auml;t &uuml;ber alles!!!).
+<P>
+Frage Nr.14:<BR>
+Warum reagieren meine Dekoder auf ein Extrafunktions-Dekoder-Kommando vom 6050/51-
+Interface mit einer Verz&ouml;gerung von einigen Sekunden? Warum gibt es keine
+Verz&ouml;gerung, wenn ich die Tasten f1...f4 der 6021-Control-Unit dr&uuml;cke? <BR>
+Antwort:<BR>
+Dies beruht auf dem Verhalten der 6021-Control-Unit bei Erhalt eines Extrafunktions-Dekoders-
+Befehls vom Interface: Die 6021-Control-Unit akzeptiert zwar den Befehl, unterbricht aber nicht den
+Refresh-Zyklus zum Sender der &quot;normalen&quot; 6 Doppel-Pakete wie beim Dr&uuml;cken
+einer der Tasten f1 ... f4 (fragen Sie mich nicht warum). Daher kann es im schlimmsten Fall von 80
+Loks im Refresh-Zyklus 18,3 Sekunden bis zum tats&auml;chlichen Schalten der betreffenden
+Funktion dauern! <BR>
+<BR>
+<A HREF="#Contents">Zur&uuml;ck zum Inhaltsverzeichnis</A> <BR>
+<BR>
+<A HREF="http://spazioinwind.libero.it/scorzoni">Zur Homepage von Dott.A.Scorzoni</A>
+<BR>
+<BR>
+<A HREF="http://www.modeltreno.it/dig_infi.html">A beginner's guide on Digital systems</A>
+<P>
+<center><IMG SRC="bahn8.gif" width=60% BORDER=0></center>
+<p>
+Diese &Uuml;bersetzung wurde von Dr. M. Michael K&ouml;nig angefertigt. &copy; 1998-2000.
+Korrekturhinweise sind willkommen.
+<p>
+<center><IMG SRC="bahn8.gif" width=60% BORDER=0></center>
+<p>
+<center><A HREF="digital.htm"><I>Homepage</I></A></center>
+<P>
+<center><IMG SRC="bahn6.gif" BORDER=0></center>
+<P>
+</BODY>
+<P>
+<FONT SIZE=3>
+<address>
+<center>&copy; 1998-2000 by Dr. M. Michael K&ouml;nig | Antoniter-Weg 11 | 65843 Sulzbach/Ts. |
+<A HREF="homepag.htm#kontakt">Kontakt</A> |
+Stand: 3.11.2000</center>
+<P>
+</address>
+<FONT SIZE=2>
+<A HREF="http://www.drkoenig.de/digital/motoueb.htm">Revisit this page</A>
+</HTML>
