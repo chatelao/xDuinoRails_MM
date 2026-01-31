@@ -2,11 +2,11 @@
 #define PROTOCOL_HANDLER_H
 
 #include <Arduino.h>
-#include <MaerklinMotorola.h>
+#include "RealTimeProtocolDecoder.h"
 
 class ProtocolHandler {
 public:
-  ProtocolHandler(int dccMmSignalPin);
+  ProtocolHandler(RealTimeProtocolDecoder &decoder);
   void              setup();
   void              loop();
   void              setAddress(int address);
@@ -18,13 +18,11 @@ public:
   unsigned long     getLastChangeDirTs();
   unsigned long     getLastSpeedChangeTs();
 
-  MaerklinMotorola mm;
-
 private:
   static const int  MM_TIMEOUT_MS = 1500;
   static const int  MM2_LOCK_TIME = 5000;
   int               mmAddress;
-  int               dccMmSignalPin_priv;
+  RealTimeProtocolDecoder &decoder_priv;
   int               mmTimeoutMs;
   int               mm2LockTime;
   unsigned long     lastCommandTime;
