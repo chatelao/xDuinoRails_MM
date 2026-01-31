@@ -1,15 +1,8 @@
 #include "ProtocolHandler.h"
 
-#ifndef PIO_UNIT_TESTING
-extern ProtocolHandler protocol;
-
-void isr_protocol() { protocol.mm.PinChange(); }
-#endif
-
-ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
-    : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS),
+ProtocolHandler::ProtocolHandler(RealTimeProtocolDecoder &decoder)
+    : decoder_priv(decoder), mmTimeoutMs(MM_TIMEOUT_MS),
       mm2LockTime(MM2_LOCK_TIME) {
-  dccMmSignalPin_priv = dccMmSignalPin;
   lastCommandTime     = 0;
   lastMM2Seen         = 0;
   targetSpeed         = 0;
@@ -23,18 +16,13 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
 }
 
 void ProtocolHandler::setup() {
-#ifndef PIO_UNIT_TESTING
-  attachInterrupt(digitalPinToInterrupt(dccMmSignalPin_priv), isr_protocol,
-                  CHANGE);
-#endif
   lastCommandTime = millis();
 }
 
 void ProtocolHandler::setAddress(int address) { mmAddress = address; }
 
 void ProtocolHandler::loop() {
-  mm.Parse();
-  MaerklinMotorolaData *Data = mm.GetData();
+  MaerklinMotorolaData *Data = decoder_priv.getData();
   unsigned long         now  = millis();
 
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {

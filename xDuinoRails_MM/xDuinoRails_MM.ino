@@ -4,6 +4,7 @@
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
+#include "RealTimeProtocolDecoder.h"
 #include <Arduino.h>
 
 // ==========================================
@@ -37,7 +38,8 @@ const int NUMPIXELS = 1;
 // ==========================================
 CvManager cvManager;
 
-ProtocolHandler protocol(DCC_MM_SIGNAL);
+RealTimeProtocolDecoder realTimeProtocolDecoder(DCC_MM_SIGNAL);
+ProtocolHandler protocol(realTimeProtocolDecoder);
 MotorControl motor(cvManager, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl lights(cvManager, LED_F0f, LED_F0b);
 CvProgrammer cvProgrammer(&cvManager, &protocol);
@@ -49,8 +51,11 @@ DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN,
 // 4. HELPER FUNKTIONEN
 // ==========================================
 
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Verlegung der ISR in die neue Klasse
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Global ISR required for attachInterrupt
-void isr_protocol();
+// void isr_protocol();
 
 // ==========================================
 // 5. SETUP
@@ -60,6 +65,7 @@ void setup() {
   analogReadResolution(12); // Wichtig für RP2040 (0-4095)
   cvManager.setup();
   protocol.setAddress(cvManager.getCv(1));
+  realTimeProtocolDecoder.setup();
   protocol.setup();
   motor.setup();
   lights.setup();
@@ -72,6 +78,7 @@ void setup() {
 // ==========================================
 #ifndef PIO_UNIT_TESTING
 void loop() {
+  realTimeProtocolDecoder.loop();
   protocol.loop();
   cvProgrammer.loop();
 

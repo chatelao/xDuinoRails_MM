@@ -2,6 +2,7 @@
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
+#include "RealTimeProtocolDecoder.h"
 #include "RP2040.h"
 #include "mocks/CvManager.h"
 #include <unity.h>
@@ -125,36 +126,49 @@ void test_lights_control_default_behavior(void) {
 
 // Testet das Schalten der Funktionen F0, F1 und F2 über das MM-Protokoll.
 void test_mm_signal_f0_f1_f2(void) {
-  ProtocolHandler protocol(0);
+  RealTimeProtocolDecoder decoder(0);
+  ProtocolHandler         protocol(decoder);
   protocol.setAddress(1);
 
   // Simuliere ein MM2-Signal mit F1 an
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, true);
+  decoder.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                     true);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(1));
 
   // Simuliere ein MM2-Signal mit F1 aus
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, false);
+  decoder.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                     false);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(1));
 
   // Simuliere ein MM2-Signal mit F2 an
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, true);
+  decoder.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                     true);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(2));
 
   // Simuliere ein MM2-Signal mit F2 aus
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, false);
+  decoder.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                     false);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(2));
 
   // Simuliere ein MM-Signal mit F0 an
-  protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable, 0, false);
+  decoder.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable, 0,
+                     false);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(0));
 
   // Simuliere ein MM-Signal mit F0 aus
-  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
+  decoder.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                     0, false);
+  decoder.loop();
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
