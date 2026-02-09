@@ -171,33 +171,37 @@ void test_cv_programming_6021(void) {
   cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
 
   // 4 direction changes to enter programming mode
-  advance_millis(10); // Ensure first change is not at ts=0
-  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Forward, 0, false);
-  protocol.loop();
-  programmer.loop();
-  advance_millis(100);
+  for (int i = 0; i < 4; i++) {
+    advance_millis(300);
+    unsigned long now = millis();
+    // Send packet with changeDir = true
+    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable, 0, false);
+    protocol.loop();
+    TEST_ASSERT_EQUAL(now, protocol.getLastChangeDirTs());
+    programmer.loop();
 
-  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Backward, 0, false);
-  protocol.loop();
-  programmer.loop();
-  advance_millis(100);
+    advance_millis(100);
+    // Send packet with changeDir = false to reset lastChangeDirInput
+    protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
+    protocol.loop();
+    programmer.loop();
+  }
 
-  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Forward, 0, false);
-  protocol.loop();
-  programmer.loop();
+  // Now in programming mode
+  // Set CV 10 (address)
   advance_millis(100);
-
-  protocol.mm.SetData(1, 5, false, false, true, MM2DirectionState_Backward, 0, false);
+  unsigned long now = millis();
+  protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
+  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
 
-  // Set CV 10 to 42
-  protocol.mm.SetData(1, 10, false, false, true, MM2DirectionState_Backward, 0, false);
-  protocol.loop();
-  programmer.loop();
+  // Set Value 42
   advance_millis(100);
-  protocol.mm.SetData(1, 42, false, false, true, MM2DirectionState_Backward, 0, false);
+  now = millis();
+  protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
+  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
 
   TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
