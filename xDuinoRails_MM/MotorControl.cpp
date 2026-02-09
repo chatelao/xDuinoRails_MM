@@ -54,8 +54,13 @@ void MotorControl::setup() {
   pinMode(bemfA_priv, INPUT);
   pinMode(bemfB_priv, INPUT);
 
+#ifdef ARDUINO_ARCH_RP2040
   analogWriteFreq(PWM_FREQ);
   analogWriteRange(PWM_RANGE);
+#elif defined(ARDUINO_ARCH_ESP32)
+  analogWriteFrequency(PWM_FREQ);
+  analogWriteResolution(10);
+#endif
 
   writeMotorHardware(0, MM2DirectionState_Forward);
 }

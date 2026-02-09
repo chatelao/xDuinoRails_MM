@@ -11,9 +11,10 @@
 // ==========================================
 
 // ==========================================
-// PIN DEFINITIONEN (Seeed XIAO RP2040)
+// PIN DEFINITIONEN
 // ==========================================
 
+#ifdef ARDUINO_ARCH_RP2040
 const int DCC_MM_SIGNAL = D2;
 
 const int MOTOR_PIN_A = D7;
@@ -29,6 +30,37 @@ const int PIN_INT_GREEN = 16;
 const int PIN_INT_BLUE  = 25;
 const int NEO_PIN       = 12;
 const int NEO_PWR_PIN   = 11;
+#elif defined(ARDUINO_ARCH_ESP32)
+const int DCC_MM_SIGNAL = D2;
+
+const int MOTOR_PIN_A = D7;
+const int MOTOR_PIN_B = D8;
+const int BEMF_PIN_A  = A0;
+const int BEMF_PIN_B  = A1;
+
+const int LED_F0b = D9;
+const int LED_F0f = D10;
+
+const int PIN_INT_RED   = 15; // User LED on XIAO ESP32-C6
+const int PIN_INT_GREEN = -1;
+const int PIN_INT_BLUE  = -1;
+const int NEO_PIN       = -1;
+const int NEO_PWR_PIN   = -1;
+#else
+// Fallback or other boards
+const int DCC_MM_SIGNAL = 2;
+const int MOTOR_PIN_A   = 7;
+const int MOTOR_PIN_B   = 8;
+const int BEMF_PIN_A    = A0;
+const int BEMF_PIN_B    = A1;
+const int LED_F0b       = 9;
+const int LED_F0f       = 10;
+const int PIN_INT_RED   = -1;
+const int PIN_INT_GREEN = -1;
+const int PIN_INT_BLUE  = -1;
+const int NEO_PIN       = -1;
+const int NEO_PWR_PIN   = -1;
+#endif
 
 const int NUMPIXELS = 1;
 
@@ -57,7 +89,9 @@ void isr_protocol();
 // ==========================================
 #ifndef PIO_UNIT_TESTING
 void setup() {
-  analogReadResolution(12); // Wichtig für RP2040 (0-4095)
+#if defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_ESP32)
+  analogReadResolution(12); // Wichtig für RP2040 & ESP32 (0-4095)
+#endif
   cvManager.setup();
   protocol.setAddress(cvManager.getCv(1));
   protocol.setup();
