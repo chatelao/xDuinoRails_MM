@@ -24,9 +24,10 @@ struct MaerklinMotorolaData {
 
 class MaerklinMotorola {
 public:
-  MaerklinMotorola(int pin){};
+  MaerklinMotorola(int pin);
   void                 PinChange(){};
   void                 Parse(){};
+  bool                 hasChanged();
   MaerklinMotorolaData *GetData();
   void SetData(int address, int speed, bool function, bool changeDir, bool isMM2,
                MM2DirectionState mm2Direction, int mm2FunctionIndex,
@@ -34,6 +35,7 @@ public:
 
 private:
   MaerklinMotorolaData data;
+  bool                 dataAvailable;
 };
 
 #endif // MAERKLIN_MOTOROLA_H
