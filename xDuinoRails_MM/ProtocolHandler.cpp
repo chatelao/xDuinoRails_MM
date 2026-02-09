@@ -40,11 +40,10 @@ void ProtocolHandler::loop() {
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
 
-    bool mm2Locked = (now - lastMM2Seen < mm2LockTime);
-    if (Data->IsMM2)
-      lastMM2Seen = now;
+    bool mm2Locked = (lastMM2Seen > 0 && now - lastMM2Seen < mm2LockTime);
 
-    if (mm2Locked && Data->IsMM2) {
+    if (Data->IsMM2) {
+      lastMM2Seen = now;
       if (Data->MM2Direction != MM2DirectionState_Unavailable) {
         targetDirection = Data->MM2Direction;
       }

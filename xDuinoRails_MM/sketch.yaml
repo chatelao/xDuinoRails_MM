@@ -1,0 +1,5 @@
+default_fqbn: rp2040:rp2040:seeed_xiao_rp2040
+default_platform: rp2040:rp2040
+libraries:
+  - Adafruit NeoPixel
+  - MaerklinMotorola
