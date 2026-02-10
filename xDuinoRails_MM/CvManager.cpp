@@ -1,6 +1,8 @@
 #include "CvManager.h"
 #include <EEPROM.h>
+#ifdef ARDUINO_ARCH_RP2040
 #include <RP2040.h>
+#endif
 
 const uint8_t EEPROM_MAGIC_BYTE      = 0xAF;
 const int     EEPROM_MAGIC_BYTE_ADDR = 0;
@@ -27,7 +29,11 @@ void CvManager::setCv(int cv, uint8_t value) {
   EEPROM.commit();
 
   if (cv == CV_MANUFACTURER_ID) {
+#ifdef ARDUINO_ARCH_RP2040
     rp2040.reboot();
+#elif defined(ARDUINO_ARCH_ESP32)
+    ESP.restart();
+#endif
   }
 }
 

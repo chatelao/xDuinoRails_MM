@@ -17,6 +17,7 @@ private:
   void              setIntLed(int pin, bool on);
   Adafruit_NeoPixel pixels;
   unsigned long     lastVisUpdate;
+  int               neoPin_priv;
   int               neoPwrPin_priv;
   int               redPin_priv;
   int               greenPin_priv;

@@ -1,10 +1,10 @@
 #include "CvManager.h"
+#include "CvManagerMock.h"
 #include "CvProgrammer.h"
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
 #include "RP2040.h"
-#include "CvManagerMock.h"
 #include <unity.h>
 
 void test_mm_signal_f0_f1_f2(void);
@@ -47,7 +47,8 @@ void test_cv_manager_defaults(void) {
   TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
 }
 
-// Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den Reset-Mechanismus.
+// Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den
+// Reset-Mechanismus.
 void test_cv_manager_special(void) {
   CvManager cvManager;
   cvManager.setup();
@@ -74,7 +75,7 @@ void test_motor_speed_control(void) {
   cvManager.setCv(CV_START_VOLTAGE, 1);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   cvManager.setCv(CV_MAXIMUM_SPEED, 200);
-  MotorControl  motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3);
   motor.setup();
 
   // Test: Geschwindigkeit 0
@@ -94,8 +95,10 @@ void test_motor_speed_control(void) {
   motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
   motor.setSpeed(1, MM2DirectionState_Backward);
   advance_millis(101);
-  motor.setSpeed(1, MM2DirectionState_Backward); // Dieser Aufruf stoppt den Motor
-  motor.setSpeed(1, MM2DirectionState_Backward); // Dieser wendet die Leistung an
+  motor.setSpeed(1,
+                 MM2DirectionState_Backward); // Dieser Aufruf stoppt den Motor
+  motor.setSpeed(1,
+                 MM2DirectionState_Backward); // Dieser wendet die Leistung an
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(40, analog_write_values[11]);
 
@@ -131,32 +134,38 @@ void test_mm_signal_f0_f1_f2(void) {
   protocol.setAddress(1);
 
   // Simuliere ein MM2-Signal mit F1 an
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, true);
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                      true);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(1));
 
   // Simuliere ein MM2-Signal mit F1 aus
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1, false);
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                      false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(1));
 
   // Simuliere ein MM2-Signal mit F2 an
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, true);
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                      true);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(2));
 
   // Simuliere ein MM2-Signal mit F2 aus
-  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2, false);
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                      false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(2));
 
   // Simuliere ein MM-Signal mit F0 an
-  protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable,
+                      0, false);
   protocol.loop();
   TEST_ASSERT_TRUE(protocol.getFunctionState(0));
 
   // Simuliere ein MM-Signal mit F0 aus
-  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
@@ -165,7 +174,7 @@ void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
   protocol.setAddress(1);
-  CvProgrammer    programmer(&cvManager, &protocol);
+  CvProgrammer programmer(&cvManager, &protocol);
 
   // Set CV 15 to 7 to enable programming
   cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
@@ -175,14 +184,16 @@ void test_cv_programming_6021(void) {
     advance_millis(300);
     unsigned long now = millis();
     // Send packet with changeDir = true
-    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable, 0, false);
+    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                        0, false);
     protocol.loop();
     TEST_ASSERT_EQUAL(now, protocol.getLastChangeDirTs());
     programmer.loop();
 
     advance_millis(100);
     // Send packet with changeDir = false to reset lastChangeDirInput
-    protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable, 0, false);
+    protocol.mm.SetData(1, 0, false, false, false,
+                        MM2DirectionState_Unavailable, 0, false);
     protocol.loop();
     programmer.loop();
   }
@@ -191,7 +202,8 @@ void test_cv_programming_6021(void) {
   // Set CV 10 (address)
   advance_millis(100);
   unsigned long now = millis();
-  protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
   protocol.loop();
   TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
@@ -199,7 +211,8 @@ void test_cv_programming_6021(void) {
   // Set Value 42
   advance_millis(100);
   now = millis();
-  protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable, 0, false);
+  protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
   protocol.loop();
   TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
