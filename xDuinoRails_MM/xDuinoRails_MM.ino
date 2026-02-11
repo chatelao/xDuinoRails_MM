@@ -11,7 +11,7 @@
 // ==========================================
 
 // ==========================================
-// PIN DEFINITIONEN (Seeed XIAO RP2040)
+// PIN DEFINITIONEN
 // ==========================================
 
 const int DCC_MM_SIGNAL = D2;
@@ -24,11 +24,19 @@ const int BEMF_PIN_B  = A1;
 const int LED_F0b = D9;
 const int LED_F0f = D10;
 
+#ifdef ARDUINO_ARCH_RP2040
 const int PIN_INT_RED   = 17;
 const int PIN_INT_GREEN = 16;
 const int PIN_INT_BLUE  = 25;
 const int NEO_PIN       = 12;
 const int NEO_PWR_PIN   = 11;
+#elif defined(ARDUINO_ARCH_ESP32)
+const int PIN_INT_RED   = -1;
+const int PIN_INT_GREEN = -1;
+const int PIN_INT_BLUE  = 15; // LED_BUILTIN / D4
+const int NEO_PIN       = -1;
+const int NEO_PWR_PIN   = -1;
+#endif
 
 const int NUMPIXELS = 1;
 
@@ -40,7 +48,7 @@ CvManager cvManager;
 ProtocolHandler protocol(DCC_MM_SIGNAL);
 MotorControl motor(cvManager, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl lights(cvManager, LED_F0f, LED_F0b);
-CvProgrammer cvProgrammer(&cvManager, &protocol);
+CvProgrammer  cvProgrammer(&cvManager, &protocol);
 
 DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN,
                     PIN_INT_BLUE);
@@ -57,7 +65,7 @@ void isr_protocol();
 // ==========================================
 #ifndef PIO_UNIT_TESTING
 void setup() {
-  analogReadResolution(12); // Wichtig für RP2040 (0-4095)
+  analogReadResolution(12);
   cvManager.setup();
   protocol.setAddress(cvManager.getCv(1));
   protocol.setup();

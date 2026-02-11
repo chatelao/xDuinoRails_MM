@@ -9,9 +9,7 @@ void pinMode(uint8_t pin, uint8_t mode) {
   // Mock implementation
 }
 
-void digitalWrite(uint8_t pin, uint8_t val) {
-  digital_write_values[pin] = val;
-}
+void digitalWrite(uint8_t pin, uint8_t val) { digital_write_values[pin] = val; }
 
 int analogRead(uint8_t pin) {
   // Mock implementation

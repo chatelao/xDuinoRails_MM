@@ -5,9 +5,7 @@ static std::vector<uint8_t> eeprom_memory;
 
 EEPROMClass EEPROM;
 
-void EEPROMClass::begin(int size) {
-  eeprom_memory.assign(size, 0xFF);
-}
+void EEPROMClass::begin(int size) { eeprom_memory.assign(size, 0xFF); }
 
 void EEPROMClass::commit() {
   // Mock implementation
