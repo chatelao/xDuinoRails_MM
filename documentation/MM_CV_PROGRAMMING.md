@@ -7,7 +7,7 @@ This guide provides a step-by-step process for programming CVs (Configuration Va
 | **Entering Programming Mode** | 1. Reset Central Station | Hold | Hold | | | "99" flashes on display |
 | | 2. Turn Off Track Power | Press | | | | |
 | | 3. Enter Address 80 | | | 80 | | |
-| | 4. Initiate Programming Mode | | Press | | Hold | |
+| | 4. Initiate Programming Mode | | ((2) Press | | (1) Hold | |
 | | 5. Confirmation | | | | | Lights flashing slowly |
 | **Programming CVs** | 1. Enter CV Number | | | CV No. | Press | Lights flash rapidly |
 | | 2. Enter CV Value | | | Value | Press | Lights flash slowly |
