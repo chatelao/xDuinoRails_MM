@@ -4,7 +4,7 @@ This guide provides a step-by-step process for programming CVs (Configuration Va
 
 | Phase | Step | [STOP] | [GO] | Keypad | Direction Change | Result |
 |---|---|:---:|:---:|:---:|:---:|---|
-| **Entering Programming Mode** | | | | | | |
+| **Entering Programming Mode** ||| | | | |
 | 1. | Reset Central Station | Hold | Hold | | | "99" flashes on display |
 | 2. | Turn Off Track Power | Press | | | | |
 | 3. | Enter Address 80 | | | 80 | | |
