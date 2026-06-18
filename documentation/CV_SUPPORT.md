@@ -5,7 +5,7 @@ This document specifies the minimal supported Configuration Variables (CVs) for 
 ## CV Table
 
 | Emoji | CV | Name | Type | Default/Fix | Description |
-|---|---|---|---|---|---|
+|---|---|---|---|:---:|---|
 | 🏷️ | 1 | Base Address | Mandatory | 3 | The short address (1–127). |
 | ⚡ | 2 | Start Voltage | Standard | 1 - 5 | Minimum PWM for the motor to start at speed step 1. |
 | 📈 | 3 | Acceleration | Standard | 5 | "Chart Up": Time factor for smooth acceleration to maximum speed. |
