@@ -1,3 +1,17 @@
+/*
+ * Seeed Studio XIAO RP2040 Pinout for xDuinoRails_MM:
+ *
+ *                             +---USB---+
+ *               (BEMF A)  D0  | [ ] [ ] |  5V
+ *               (BEMF B)  D1  | [ ] [ ] |  GND
+ *            (DCC Input)  D2  | [ ] [ ] |  3V3
+ *                         D3  | [ ] [ ] |  D10 (Front Light)
+ *                         D4  | [ ] [ ] |  D9  (Rear Light)
+ *                         D5  | [ ] [ ] |  D8  (Motor B)
+ *                         D6  | [ ] [ ] |  D7  (Motor A)
+ *                             +---------+
+ */
+
 #include "CvManager.h"
 #include "CvProgrammer.h"
 #include "DebugLeds.h"
