@@ -8,6 +8,7 @@ class CvProgrammer {
 public:
   CvProgrammer(CvManager *cvManager, ProtocolHandler *protocolHandler);
   void loop();
+  bool isInProgrammingMode() const { return programmingMode; }
 
 private:
   CvManager       *cvManager;

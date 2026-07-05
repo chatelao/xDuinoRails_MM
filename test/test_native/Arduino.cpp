@@ -1,7 +1,11 @@
 #include "Arduino.h"
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel *Adafruit_NeoPixel::lastInstance = nullptr;
 
 std::map<uint8_t, int> analog_write_values;
 std::map<uint8_t, int> digital_write_values;
+std::map<uint8_t, int> analog_read_values;
 
 static unsigned long current_millis = 0;
 
@@ -12,7 +16,8 @@ void pinMode(uint8_t pin, uint8_t mode) {
 void digitalWrite(uint8_t pin, uint8_t val) { digital_write_values[pin] = val; }
 
 int analogRead(uint8_t pin) {
-  // Mock implementation
+  if (analog_read_values.count(pin))
+    return analog_read_values[pin];
   return 0;
 }
 
@@ -28,6 +33,8 @@ void analogWriteRange(int range) {
 
 unsigned long millis() { return current_millis; }
 
+void delay(unsigned long ms) { current_millis += ms; }
+
 void advance_millis(unsigned long ms) { current_millis += ms; }
 
 void delayMicroseconds(unsigned int us) {
@@ -37,6 +44,7 @@ void delayMicroseconds(unsigned int us) {
 void reset_arduino_mock() {
   analog_write_values.clear();
   digital_write_values.clear();
+  analog_read_values.clear();
   current_millis = 0;
 }
 
