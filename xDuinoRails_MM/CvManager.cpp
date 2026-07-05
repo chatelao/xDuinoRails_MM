@@ -67,7 +67,7 @@ void CvManager::initCv() {
     EEPROM.write(CV_EXT_ID_HIGH, 1);
     EEPROM.write(CV_EXT_ID_LOW, 10);
     EEPROM.write(CV_PROGRAMMING_LOCK, 0);
-    EEPROM.write(CV_DEBUG_ENABLE, 0);
+    EEPROM.write(CV_DEBUG_ENABLE, 1);
     EEPROM.commit();
   }
 }

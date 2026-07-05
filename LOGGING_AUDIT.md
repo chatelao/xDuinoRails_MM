@@ -8,8 +8,8 @@ The logging system is centralized in the `Logger` class, providing a unified way
 
 ### Configuration
 Logging is controlled by **CV 250 (CV_DEBUG_ENABLE)**.
-- **Value 0:** Logging disabled (default).
-- **Value > 0:** Logging enabled.
+- **Value 0:** Logging disabled.
+- **Value > 0:** Logging enabled (default = 1).
 
 The `Logger` class caches the state of CV 250 during its initialization in `begin()` to minimize EEPROM/flash reads and ensure performance. A change to CV 250 typically requires a reboot to take effect (or re-initialization of the logger).
 
