@@ -46,6 +46,30 @@ void CvManager::setCv(int cv, uint8_t value) {
   }
 }
 
+void CvManager::printAllCvs() {
+  logger.println("--- Current CV Settings ---");
+  logger.printf("CV 1 (Address): %d\n", getCv(CV_BASE_ADDRESS));
+  logger.printf("CV 2 (Vstart): %d\n", getCv(CV_START_VOLTAGE));
+  logger.printf("CV 3 (Acc): %d\n", getCv(CV_ACCELERATION));
+  logger.printf("CV 4 (Dec): %d\n", getCv(CV_BRAKING_TIME));
+  logger.printf("CV 5 (Vhigh): %d\n", getCv(CV_MAXIMUM_SPEED));
+  logger.printf("CV 6 (Vmid): %d\n", getCv(CV_MEDIUM_SPEED));
+  logger.printf("CV 7 (Version): %d\n", getCv(CV_VERSION));
+  logger.printf("CV 8 (Manuf ID): %d\n", getCv(CV_MANUFACTURER_ID));
+  logger.printf("CV 11 (Watchdog): %d\n", getCv(CV_WATCHDOG_TIMEOUT));
+  logger.printf("CV 15 (Prog Lock): %d\n", getCv(CV_PROGRAMMING_LOCK));
+  logger.printf("CV 17/18 (Long Addr): %d\n",
+                (getCv(CV_LONG_ADDRESS_HIGH) << 8) | getCv(CV_LONG_ADDRESS_LOW));
+  logger.printf("CV 29 (Config): %d\n", getCv(CV_CONFIGURATION));
+  logger.printf("CV 33 (F0f): %d\n", getCv(CV_FRONT_LIGHT_F0F));
+  logger.printf("CV 34 (F0r): %d\n", getCv(CV_REAR_LIGHT_F0R));
+  logger.printf("CV 52 (Motor Type): %d\n", getCv(CV_MOTOR_TYPE));
+  logger.printf("CV 107/108 (Ext ID): %d\n",
+                (getCv(CV_EXT_ID_HIGH) << 8) | getCv(CV_EXT_ID_LOW));
+  logger.printf("CV 250 (Debug): %d\n", getCv(CV_DEBUG_ENABLE));
+  logger.println("---------------------------");
+}
+
 void CvManager::initCv() {
   if (EEPROM.read(EEPROM_MAGIC_BYTE_ADDR) != EEPROM_MAGIC_BYTE) {
     EEPROM.write(EEPROM_MAGIC_BYTE_ADDR, EEPROM_MAGIC_BYTE);

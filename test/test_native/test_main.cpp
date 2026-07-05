@@ -14,6 +14,7 @@ void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
+void test_cv_manager_print_all(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -352,6 +353,45 @@ void test_logging(void) {
   TEST_ASSERT_TRUE(foundKickstartStarted);
 }
 
+void test_cv_manager_print_all(void) {
+  CvManager cvManager;
+  cvManager.setup();
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+  Serial.clearLog();
+
+  cvManager.printAllCvs();
+
+  bool foundHeader     = false;
+  bool foundAddress    = false;
+  bool foundVersion    = false;
+  bool foundFooter     = false;
+  bool foundLongAddr   = false;
+  bool foundExtId      = false;
+
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- Current CV Settings ---") != std::string::npos)
+      foundHeader = true;
+    if (line.find("CV 1 (Address): 3") != std::string::npos)
+      foundAddress = true;
+    if (line.find("CV 7 (Version): 10") != std::string::npos)
+      foundVersion = true;
+    if (line.find("CV 17/18 (Long Addr): 49252") != std::string::npos) // (192 << 8) | 100 = 49152 + 100 = 49252
+      foundLongAddr = true;
+    if (line.find("CV 107/108 (Ext ID): 266") != std::string::npos) // (1 << 8) | 10 = 256 + 10 = 266
+      foundExtId = true;
+    if (line.find("---------------------------") != std::string::npos)
+      foundFooter = true;
+  }
+
+  TEST_ASSERT_TRUE(foundHeader);
+  TEST_ASSERT_TRUE(foundAddress);
+  TEST_ASSERT_TRUE(foundVersion);
+  TEST_ASSERT_TRUE(foundLongAddr);
+  TEST_ASSERT_TRUE(foundExtId);
+  TEST_ASSERT_TRUE(foundFooter);
+}
+
 void test_motor_speed_curve(void) {
   CvManagerMock cvManager;
 
@@ -468,5 +508,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
   RUN_TEST(test_logging);
+  RUN_TEST(test_cv_manager_print_all);
   return UNITY_END();
 }

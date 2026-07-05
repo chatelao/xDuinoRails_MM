@@ -30,6 +30,7 @@ public:
   virtual void    setup();
   virtual uint8_t getCv(int cv);
   virtual void    setCv(int cv, uint8_t value);
+  virtual void    printAllCvs();
 
 private:
   void initCv();
