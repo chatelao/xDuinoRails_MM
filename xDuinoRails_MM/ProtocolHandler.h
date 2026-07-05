@@ -42,6 +42,15 @@ private:
   bool              lastChangeDirInput;
   unsigned long     lastChangeDirTs;
   unsigned long     lastSpeedChangeTs;
+
+  // Last reported states for logging
+  int               lastTargetSpeed;
+  MM2DirectionState lastTargetDirection;
+  bool              lastStateF0;
+  bool              lastStateF1;
+  bool              lastStateF2;
+  bool              wasMm2Locked;
+  bool              wasSignalTimeout;
 };
 
 #endif // PROTOCOL_HANDLER_H

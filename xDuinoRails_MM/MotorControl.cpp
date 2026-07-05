@@ -1,4 +1,5 @@
 #include "MotorControl.h"
+#include "Logger.h"
 
 const int PWM_RANGE = 1023;
 
@@ -121,8 +122,9 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
 
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
     isKickstarting_priv = true;
-    kickstartBegin      = now;
-    lastBemfMeasure     = 0;
+    logger.println("Motor: Kickstart started");
+    kickstartBegin  = now;
+    lastBemfMeasure = 0;
   }
   if (targetPwm == 0) {
     isKickstarting_priv = false;
@@ -131,12 +133,14 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (isKickstarting_priv) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
+      logger.println("Motor: Kickstart ended (timeout)");
     } else {
       if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
+          logger.println("Motor: Kickstart ended (BEMF)");
         }
       }
       if (isKickstarting_priv) {

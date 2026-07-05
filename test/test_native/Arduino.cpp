@@ -47,7 +47,20 @@ long map(long x, long in_min, long in_max, long out_min, long out_max) {
 MockSerial Serial;
 
 void MockSerial::begin(unsigned long baud) {}
-void MockSerial::print(const char *s) { printf("%s", s); }
-void MockSerial::print(int n) { printf("%d", n); }
-void MockSerial::println(const char *s) { printf("%s\n", s); }
-void MockSerial::println(int n) { printf("%d\n", n); }
+void MockSerial::print(const char *s) {
+  printf("%s", s);
+  logLines.push_back(std::string(s));
+}
+void MockSerial::print(int n) {
+  printf("%d", n);
+  logLines.push_back(std::to_string(n));
+}
+void MockSerial::println(const char *s) {
+  printf("%s\n", s);
+  logLines.push_back(std::string(s));
+}
+void MockSerial::println(int n) {
+  printf("%d\n", n);
+  logLines.push_back(std::to_string(n));
+}
+void MockSerial::clearLog() { logLines.clear(); }
