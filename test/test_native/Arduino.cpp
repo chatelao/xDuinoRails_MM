@@ -64,3 +64,25 @@ void MockSerial::println(int n) {
   logLines.push_back(std::to_string(n));
 }
 void MockSerial::clearLog() { logLines.clear(); }
+
+int MockSerial::available() { return inputBuffer.size(); }
+
+int MockSerial::read() {
+  if (inputBuffer.empty())
+    return -1;
+  char c = inputBuffer.front();
+  inputBuffer.pop_front();
+  return (uint8_t)c;
+}
+
+size_t MockSerial::write(uint8_t c) {
+  char s[2] = {(char)c, 0};
+  logLines.push_back(std::string(s));
+  return 1;
+}
+
+void MockSerial::pushInput(const std::string &s) {
+  for (char c : s) {
+    inputBuffer.push_back(c);
+  }
+}

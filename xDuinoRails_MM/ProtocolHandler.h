@@ -15,8 +15,11 @@ public:
   unsigned long     getLastSignalTime();
   void              setSignalTimeout(int timeoutMs);
   int               getTargetSpeed();
+  void              setTargetSpeed(int speed);
   MM2DirectionState getTargetDirection();
+  void              setTargetDirection(MM2DirectionState direction);
   bool              getFunctionState(int f);
+  void              setFunctionState(int f, bool state);
   bool              isMm2Locked();
   unsigned long     getLastChangeDirTs();
   unsigned long     getLastSpeedChangeTs();

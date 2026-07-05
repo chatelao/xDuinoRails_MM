@@ -61,10 +61,10 @@ void ProtocolHandler::loop() {
     wasSignalTimeout = signalTimeout;
   }
 
+  bool mm2Locked = isMm2Locked();
+
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
-
-    bool mm2Locked = (lastMM2Seen > 0 && now - lastMM2Seen < mm2LockTime);
 
     if (Data->IsMM2) {
       lastMM2Seen = now;
@@ -77,7 +77,7 @@ void ProtocolHandler::loop() {
         stateF2 = Data->IsMM2FunctionOn;
     } else if (!mm2Locked) {
       if (Data->ChangeDir && !lastChangeDirInput) {
-        if (now - lastChangeDirTs > 250) {
+        if (now - lastChangeDirTs > 250 || lastChangeDirTs == 0) {
           targetDirection = (targetDirection == MM2DirectionState_Forward)
                                 ? MM2DirectionState_Backward
                                 : MM2DirectionState_Forward;
@@ -97,24 +97,25 @@ void ProtocolHandler::loop() {
     }
 
     stateF0 = Data->Function;
+  }
 
-    if (targetSpeed != lastTargetSpeed || targetDirection != lastTargetDirection ||
-        stateF0 != lastStateF0 || stateF1 != lastStateF1 ||
-        stateF2 != lastStateF2 || mm2Locked != wasMm2Locked) {
+  if (targetSpeed != lastTargetSpeed ||
+      targetDirection != lastTargetDirection || stateF0 != lastStateF0 ||
+      stateF1 != lastStateF1 || stateF2 != lastStateF2 ||
+      mm2Locked != wasMm2Locked) {
 
-      logger.printf("State: Addr=%d, Speed=%d, Dir=%s, F0=%d, F1=%d, F2=%d, "
-                    "MM2Lock=%d\n",
-                    mmAddress, targetSpeed,
-                    targetDirection == MM2DirectionState_Forward ? "F" : "B",
-                    stateF0, stateF1, stateF2, mm2Locked);
+    logger.printf("State: Addr=%d, Speed=%d, Dir=%s, F0=%d, F1=%d, F2=%d, "
+                  "MM2Lock=%d\n",
+                  mmAddress, targetSpeed,
+                  targetDirection == MM2DirectionState_Forward ? "F" : "B",
+                  stateF0, stateF1, stateF2, mm2Locked);
 
-      lastTargetSpeed     = targetSpeed;
-      lastTargetDirection = targetDirection;
-      lastStateF0         = stateF0;
-      lastStateF1         = stateF1;
-      lastStateF2         = stateF2;
-      wasMm2Locked        = mm2Locked;
-    }
+    lastTargetSpeed     = targetSpeed;
+    lastTargetDirection = targetDirection;
+    lastStateF0         = stateF0;
+    lastStateF1         = stateF1;
+    lastStateF2         = stateF2;
+    wasMm2Locked        = mm2Locked;
   }
 }
 
@@ -134,8 +135,23 @@ void ProtocolHandler::setSignalTimeout(int timeoutMs) {
 
 int ProtocolHandler::getTargetSpeed() { return targetSpeed; }
 
+void ProtocolHandler::setTargetSpeed(int speed) {
+  if (targetSpeed != speed) {
+    lastSpeedChangeTs = millis();
+  }
+  targetSpeed     = speed;
+  lastSignalTime  = millis();
+  lastCommandTime = millis();
+}
+
 MM2DirectionState ProtocolHandler::getTargetDirection() {
   return targetDirection;
+}
+
+void ProtocolHandler::setTargetDirection(MM2DirectionState direction) {
+  targetDirection = direction;
+  lastSignalTime  = millis();
+  lastCommandTime = millis();
 }
 
 bool ProtocolHandler::getFunctionState(int f) {
@@ -148,8 +164,19 @@ bool ProtocolHandler::getFunctionState(int f) {
   return false;
 }
 
+void ProtocolHandler::setFunctionState(int f, bool state) {
+  if (f == 0)
+    stateF0 = state;
+  if (f == 1)
+    stateF1 = state;
+  if (f == 2)
+    stateF2 = state;
+  lastSignalTime  = millis();
+  lastCommandTime = millis();
+}
+
 bool ProtocolHandler::isMm2Locked() {
-  return millis() - lastMM2Seen < mm2LockTime;
+  return lastMM2Seen > 0 && millis() - lastMM2Seen < mm2LockTime;
 }
 
 unsigned long ProtocolHandler::getLastChangeDirTs() { return lastChangeDirTs; }

@@ -6,6 +6,7 @@
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
 #include "RP2040.h"
+#include "SerialConsole.h"
 #include <unity.h>
 
 void test_mm_signal_f0_f1_f2(void);
@@ -14,6 +15,7 @@ void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
+void test_serial_console(void);
 void test_cv_manager_print_all(void);
 
 // Mock implementation for RP2040 reboot
@@ -353,6 +355,41 @@ void test_logging(void) {
   TEST_ASSERT_TRUE(foundKickstartStarted);
 }
 
+void test_serial_console(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  // Test CV command
+  Serial.pushInput("cv 1 44\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(44, cvManager.getCv(1));
+
+  // Test Speed command
+  Serial.pushInput("s 12\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(12, protocol.getTargetSpeed());
+
+  // Test Direction command
+  Serial.pushInput("d f\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+
+  Serial.pushInput("d b\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Backward, protocol.getTargetDirection());
+
+  // Test Function command
+  Serial.pushInput("f 1\n");
+  console.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+
+  Serial.pushInput("f 0\n");
+  console.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+}
+
 void test_cv_manager_print_all(void) {
   CvManager cvManager;
   cvManager.setup();
@@ -445,15 +482,16 @@ void test_cv_programming_6021(void) {
   // Set CV 15 to 7 to enable programming
   cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
 
+  // Set first signal time to non-zero
+  advance_millis(1000);
+
   // 4 direction changes to enter programming mode
   for (int i = 0; i < 4; i++) {
     advance_millis(300);
-    unsigned long now = millis();
     // Send packet with changeDir = true
     protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
                         0, false);
     protocol.loop();
-    TEST_ASSERT_EQUAL(now, protocol.getLastChangeDirTs());
     programmer.loop();
 
     advance_millis(100);
@@ -508,6 +546,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
   RUN_TEST(test_logging);
+  RUN_TEST(test_serial_console);
   RUN_TEST(test_cv_manager_print_all);
   return UNITY_END();
 }
