@@ -8,21 +8,25 @@ The following pins are used for the decoder functions on the Seeed Xiao RP2040:
 
 | Function | Pin | Description |
 |---|---|---|
-| **DCC/MM Input** | D2 | Connect to the track signal via a suitable optocoupler/schmitt-trigger circuit. |
+| **DCC/MM/SX Input**| D5 | Connect to the track signal via optocoupler. |
+| **DCC-ACK** | D4 | Output for DCC acknowledgment. |
+| **RailCom** | D6 | Output for RailCom signal. |
 | **Motor A** | D7 | Motor output A. |
 | **Motor B** | D8 | Motor output B. |
 | **BEMF A** | A0 | Back-EMF sensing input A. |
 | **BEMF B** | A1 | Back-EMF sensing input B. |
-| **Front Light** | D10 | Forward direction light output (F0f). |
-| **Rear Light** | D9 | Backward direction light output (F0b). |
+| **Motor Shut** | A2 (D2) | Shutdown signal for motor driver. |
+| **Front Light** | D9 | Forward direction light output (F0f). |
+| **Rear Light** | D10 | Backward direction light output (F0b). |
+| **Functions Shut**| A3 (D3) | Shutdown signal for functions. |
 
 ## Status Indicators
 
 The Seeed Xiao RP2040's built-in LEDs and NeoPixel provide visual feedback on the decoder's state:
 
 ### Internal LEDs (RP2040)
-- **Red LED:** Lights up when the decoder has locked onto an MM2 signal.
-- **Blue LED:** Lights up when Function F1 is active.
+- **Red LED (D15):** Lights up when the decoder has locked onto an MM2 signal.
+- **Green LED (D16):** Lights up when Function F1 is active.
 
 ### NeoPixel LED
 - **Pulsing Blue:** Decoder is idle (Speed 0) and receiving signal.
