@@ -11,6 +11,7 @@ void test_mm_signal_f0_f1_f2(void);
 void test_cv_programming_6021(void);
 void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
+void test_motor_speed_curve(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -34,7 +35,7 @@ void test_cv_manager_defaults(void) {
   cvManager.setup();
   // Überprüfe die wichtigsten CVs auf ihre Standardwerte
   TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
-  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_START_VOLTAGE));
+  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_START_VOLTAGE));
   TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_ACCELERATION));
   TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_BRAKING_TIME));
   TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_MAXIMUM_SPEED));
@@ -97,9 +98,9 @@ void test_cv_manager_reset_8(void) {
 void test_motor_speed_control(void) {
   CvManagerMock cvManager;
   // Konfiguriere CVs für den Motor
-  cvManager.setCv(CV_START_VOLTAGE, 1);
+  cvManager.setCv(CV_START_VOLTAGE, 10);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
-  cvManager.setCv(CV_MAXIMUM_SPEED, 200);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
   MotorControl motor(cvManager, 10, 11, 2, 3);
   motor.setup();
 
@@ -113,7 +114,8 @@ void test_motor_speed_control(void) {
   advance_millis(101); // Simuliere Zeitablauf
   motor.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
-  // Überprüfe den erwarteten PWM-Wert
+  // Überprüfe den erwarteten PWM-Wert (Vstart = map(1, 0, 255, 0, 1023) = 4)
+  // Aber wir haben jetzt Standard CV_START_VOLTAGE = 10 -> map(10, 0, 255, 0, 1023) = 40
   TEST_ASSERT_EQUAL(40, analog_write_values[10]);
 
   // Test: Geschwindigkeit 1 in Rückwärtsrichtung
@@ -275,6 +277,50 @@ void test_watchdog_shutdown(void) {
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 }
 
+void test_motor_speed_curve(void) {
+  CvManagerMock cvManager;
+
+  // Case 1: Standard linear curve (Vmid = 0 -> default midpoint)
+  // Vstart = 50 (PWM ~200), Vhigh = 200 (PWM ~803), Vmid = 0 (default ~501)
+  cvManager.setCv(CV_START_VOLTAGE, 50);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 200);
+  cvManager.setCv(CV_MEDIUM_SPEED, 0);
+  MotorControl motor1(cvManager, 10, 11, 2, 3);
+
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 200, analog_write_values[10]);
+
+  motor1.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 501, analog_write_values[10]);
+
+  motor1.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 803, analog_write_values[10]);
+
+  // Case 2: Custom Vmid (Non-linear)
+  // Vstart = 10 (PWM 40), Vmid = 200 (PWM 803), Vhigh = 255 (PWM 1023)
+  cvManager.setCv(CV_START_VOLTAGE, 10);
+  cvManager.setCv(CV_MEDIUM_SPEED, 200);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
+
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+
+  motor1.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(2, 803, analog_write_values[10]);
+
+  motor1.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+
+  // Check an intermediate step (e.g. step 4, halfway between 1 and 7)
+  motor1.setSpeed(4, MM2DirectionState_Forward);
+  // map(4, 1, 7, 40, 803) = 40 + (803-40)/2 = 40 + 381 = 421
+  TEST_ASSERT_INT_WITHIN(2, 421, analog_write_values[10]);
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -345,5 +391,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_mm_signal_f0_f1_f2);
   RUN_TEST(test_cv_programming_6021);
   RUN_TEST(test_watchdog_shutdown);
+  RUN_TEST(test_motor_speed_curve);
   return UNITY_END();
 }

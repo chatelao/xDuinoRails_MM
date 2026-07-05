@@ -19,41 +19,43 @@ The mapping is implemented in `MotorControl::setSpeed(int step, MM2DirectionStat
 
 ### Standard Mapping (Steps 1 to 14)
 
-For steps between 1 and 14, the PWM value is calculated using the Arduino `map` function based on the `CV_START_VOLTAGE` (CV 2).
+For steps between 1 and 14, the PWM value is calculated using a 3-point speed curve based on `CV_START_VOLTAGE` (CV 2), `CV_MEDIUM_SPEED` (CV 6), and `CV_MAXIMUM_SPEED` (CV 5).
 
-**Formula:**
-```cpp
-int pwmMinMoving = CV_START_VOLTAGE * 40;
-if (pwmMinMoving == 0) pwmMinMoving = 1;
-int pwm = map(step, 1, 14, pwmMinMoving, 1023);
-```
+**Formula Logic:**
+1.  **CV to PWM Mapping:** CV values (0-255) are mapped to PWM (0-1023).
+2.  **Vstart:** `map(CV_2, 0, 255, 0, 1023)`. Default (if 0) = 1.
+3.  **Vhigh:** `map(CV_5, 0, 255, 0, 1023)`. Default (if 0) = 1023.
+4.  **Vmid:** `map(CV_6, 0, 255, 0, 1023)`. Default (if 0) = `(Vstart + Vhigh) / 2`.
+5.  **Interpolation:**
+    - Steps 1-7: `map(step, 1, 7, Vstart, Vmid)`
+    - Steps 7-14: `map(step, 7, 14, Vmid, Vhigh)`
 
-### Table of Sample Values (with CV 2 = 1)
+### Table of Sample Values (Defaults: CV 2=10, CV 5=0, CV 6=0)
 
-With `CV_START_VOLTAGE = 1`, `pwmMinMoving = 40`.
+With `CV 2 = 10`, `Vstart ≈ 40`. `CV 5 = 0` (Vhigh = 1023). `CV 6 = 0` (Vmid ≈ 531).
 
 | MM Speed Step | PWM Value (Approx.) |
 | :--- | :--- |
 | 0 | 0 |
 | 1 | 40 |
-| 2 | 115 |
-| 3 | 191 |
-| 4 | 266 |
-| 5 | 342 |
-| 6 | 417 |
-| 7 | 493 |
-| 8 | 569 |
-| 9 | 644 |
-| 10 | 720 |
-| 11 | 795 |
-| 12 | 871 |
-| 13 | 946 |
+| 2 | 121 |
+| 3 | 203 |
+| 4 | 285 |
+| 5 | 367 |
+| 6 | 449 |
+| 7 | 531 |
+| 8 | 601 |
+| 9 | 671 |
+| 10 | 741 |
+| 11 | 812 |
+| 12 | 882 |
+| 13 | 952 |
 | 14 | 1023 |
 
 ## Observed Issues / Notes
 
-1.  **CV 5 (Maximum Speed) is ignored:** Currently, the upper bound of the mapping is always fixed at 1023. `CV_MAXIMUM_SPEED` is defined in `CvManager` but not used in the `MotorControl` scaling logic.
-2.  **CV 2 Multiplier:** The `CV_START_VOLTAGE` is multiplied by 40 to determine the minimum PWM. Since the max CV value is 255, this could lead to values far exceeding the PWM range (255 * 40 = 10200). However, the `map` function will still work, but it might produce unexpected results if `pwmMinMoving >= 1023`.
+1.  **3-Point Curve:** Provides better control over non-linear motor responses.
+2.  **Standardized Scaling:** All speed-related CVs now use the same 0-255 scaling factor.
 3.  **Kickstart:** When starting from a standstill (PWM 0 -> PWM > 0), a "Kickstart" pulse is applied. The PWM value during kickstart depends on the motor type:
     - **Faulhaber:** PWM 1023 for up to 150ms.
     - **Maxon:** PWM 600 for up to 80ms.
