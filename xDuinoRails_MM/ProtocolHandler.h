@@ -11,6 +11,9 @@ public:
   void              loop();
   void              setAddress(int address);
   bool              isTimeout();
+  bool              isSignalTimeout();
+  unsigned long     getLastSignalTime();
+  void              setSignalTimeout(int timeoutMs);
   int               getTargetSpeed();
   MM2DirectionState getTargetDirection();
   bool              getFunctionState(int f);
@@ -26,8 +29,10 @@ private:
   int               mmAddress;
   int               dccMmSignalPin_priv;
   int               mmTimeoutMs;
+  int               signalTimeoutMs;
   int               mm2LockTime;
   unsigned long     lastCommandTime;
+  unsigned long     lastSignalTime;
   unsigned long     lastMM2Seen;
   int               targetSpeed;
   MM2DirectionState targetDirection;

@@ -86,6 +86,7 @@ void setup() {
   analogReadResolution(12);
   cvManager.setup();
   protocol.setAddress(cvManager.getCv(1));
+  protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
   protocol.setup();
   motor.setup();
   lights.setup();
@@ -101,8 +102,18 @@ void loop() {
   protocol.loop();
   cvProgrammer.loop();
 
-  if (protocol.isTimeout()) {
-    motor.stop();
+  if (protocol.isSignalTimeout()) {
+    unsigned long timeSinceLastSignal = millis() - protocol.getLastSignalTime();
+    int           watchdogTimeout     = cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100;
+    unsigned long elapsed             = timeSinceLastSignal - watchdogTimeout;
+
+    if (elapsed >= 500) {
+      motor.stop();
+    } else {
+      int targetSpeed = protocol.getTargetSpeed();
+      int rampSpeed   = map(elapsed, 0, 500, targetSpeed, 0);
+      motor.setSpeed(rampSpeed, protocol.getTargetDirection());
+    }
   } else {
     motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
   }
@@ -110,6 +121,6 @@ void loop() {
   lights.update(motor.getCurrentDirection(), protocol.getFunctionState(0));
   debugLeds.update(protocol.getTargetSpeed(), motor.getCurrentDirection(),
                    protocol.getFunctionState(1), protocol.isMm2Locked(),
-                   motor.isKickstarting(), protocol.isTimeout());
+                   motor.isKickstarting(), protocol.isSignalTimeout());
 }
 #endif

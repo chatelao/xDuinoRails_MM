@@ -7,10 +7,11 @@ void isr_protocol() { protocol.mm.PinChange(); }
 #endif
 
 ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
-    : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS),
+    : mm(dccMmSignalPin), mmTimeoutMs(MM_TIMEOUT_MS), signalTimeoutMs(500),
       mm2LockTime(MM2_LOCK_TIME) {
   dccMmSignalPin_priv = dccMmSignalPin;
   lastCommandTime     = 0;
+  lastSignalTime      = 0;
   lastMM2Seen         = 0;
   targetSpeed         = 0;
   targetDirection     = MM2DirectionState_Forward;
@@ -36,6 +37,10 @@ void ProtocolHandler::loop() {
   mm.Parse();
   MaerklinMotorolaData *Data = mm.GetData();
   unsigned long         now  = millis();
+
+  if (Data) {
+    lastSignalTime = now;
+  }
 
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
@@ -78,6 +83,16 @@ void ProtocolHandler::loop() {
 
 bool ProtocolHandler::isTimeout() {
   return millis() - lastCommandTime > mmTimeoutMs;
+}
+
+bool ProtocolHandler::isSignalTimeout() {
+  return millis() - lastSignalTime > signalTimeoutMs;
+}
+
+unsigned long ProtocolHandler::getLastSignalTime() { return lastSignalTime; }
+
+void ProtocolHandler::setSignalTimeout(int timeoutMs) {
+  signalTimeoutMs = timeoutMs;
 }
 
 int ProtocolHandler::getTargetSpeed() { return targetSpeed; }

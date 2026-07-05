@@ -47,6 +47,7 @@ void CvManager::initCv() {
     setCv(CV_MAXIMUM_SPEED, 0);
     EEPROM.write(CV_VERSION, 10);
     setCv(CV_MANUFACTURER_ID, 13);
+    setCv(CV_WATCHDOG_TIMEOUT, 5);
     setCv(CV_LONG_ADDRESS_HIGH, 192);
     setCv(CV_LONG_ADDRESS_LOW, 100);
     setCv(CV_CONFIGURATION, 6);
