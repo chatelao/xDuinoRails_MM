@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> digital_write_values;
@@ -30,11 +31,13 @@ long          map(long, long, long, long, long);
 
 class MockSerial {
 public:
-  void begin(unsigned long baud);
-  void print(const char *s);
-  void print(int n);
-  void println(const char *s);
-  void println(int n);
+  void                     begin(unsigned long baud);
+  void                     print(const char *s);
+  void                     print(int n);
+  void                     println(const char *s);
+  void                     println(int n);
+  void                     clearLog();
+  std::vector<std::string> logLines;
 };
 
 extern MockSerial Serial;

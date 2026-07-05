@@ -97,6 +97,11 @@ void setup() {
   cvManager.setup();
   logger.begin(&cvManager, 115200);
   logger.println("xDuinoRails_MM starting...");
+  logger.printf("Version: %d\n", cvManager.getCv(CV_VERSION));
+  logger.printf("Address: %d\n", cvManager.getCv(CV_BASE_ADDRESS));
+  logger.printf("Motor Type: %d\n", cvManager.getCv(CV_MOTOR_TYPE));
+  logger.printf("Watchdog: %d ms\n", cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
+
   protocol.setAddress(cvManager.getCv(1));
   protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
   protocol.setup();

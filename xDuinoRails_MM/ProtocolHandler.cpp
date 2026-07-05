@@ -22,6 +22,14 @@ ProtocolHandler::ProtocolHandler(int dccMmSignalPin)
   lastChangeDirInput  = false;
   lastChangeDirTs     = 0;
   lastSpeedChangeTs   = 0;
+
+  lastTargetSpeed     = 0;
+  lastTargetDirection = MM2DirectionState_Forward;
+  lastStateF0         = false;
+  lastStateF1         = false;
+  lastStateF2         = false;
+  wasMm2Locked        = false;
+  wasSignalTimeout    = false;
 }
 
 void ProtocolHandler::setup() {
@@ -43,13 +51,18 @@ void ProtocolHandler::loop() {
     lastSignalTime = now;
   }
 
+  bool signalTimeout = isSignalTimeout();
+  if (signalTimeout != wasSignalTimeout) {
+    if (signalTimeout) {
+      logger.println("MM Signal lost");
+    } else {
+      logger.println("MM Signal recovered");
+    }
+    wasSignalTimeout = signalTimeout;
+  }
+
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
-
-    logger.printf("MM Packet: Addr=%d, Speed=%d, Dir=%s, F0=%d, MM2=%d\n",
-                  Data->Address, Data->Speed,
-                  Data->MM2Direction == MM2DirectionState_Forward ? "F" : "B",
-                  Data->Function, Data->IsMM2);
 
     bool mm2Locked = (lastMM2Seen > 0 && now - lastMM2Seen < mm2LockTime);
 
@@ -84,6 +97,24 @@ void ProtocolHandler::loop() {
     }
 
     stateF0 = Data->Function;
+
+    if (targetSpeed != lastTargetSpeed || targetDirection != lastTargetDirection ||
+        stateF0 != lastStateF0 || stateF1 != lastStateF1 ||
+        stateF2 != lastStateF2 || mm2Locked != wasMm2Locked) {
+
+      logger.printf("State: Addr=%d, Speed=%d, Dir=%s, F0=%d, F1=%d, F2=%d, "
+                    "MM2Lock=%d\n",
+                    mmAddress, targetSpeed,
+                    targetDirection == MM2DirectionState_Forward ? "F" : "B",
+                    stateF0, stateF1, stateF2, mm2Locked);
+
+      lastTargetSpeed     = targetSpeed;
+      lastTargetDirection = targetDirection;
+      lastStateF0         = stateF0;
+      lastStateF1         = stateF1;
+      lastStateF2         = stateF2;
+      wasMm2Locked        = mm2Locked;
+    }
   }
 }
 

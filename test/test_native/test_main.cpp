@@ -2,6 +2,7 @@
 #include "CvManagerMock.h"
 #include "CvProgrammer.h"
 #include "LightsControl.h"
+#include "Logger.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
 #include "RP2040.h"
@@ -12,6 +13,7 @@ void test_cv_programming_6021(void);
 void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
+void test_logging(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -277,6 +279,78 @@ void test_watchdog_shutdown(void) {
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 }
 
+void test_logging(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+  Serial.clearLog();
+
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+
+  // Test state change logging
+  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+                      false);
+  protocol.loop();
+
+  bool foundStateLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("State: Addr=1, Speed=5") != std::string::npos) {
+      foundStateLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundStateLog);
+  Serial.clearLog();
+
+  // Test redundant packet (no log)
+  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+                      false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(0, Serial.logLines.size());
+
+  // Test signal lost
+  advance_millis(600); // Default timeout is 500ms
+  protocol.loop();
+  bool foundSignalLost = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("MM Signal lost") != std::string::npos) {
+      foundSignalLost = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundSignalLost);
+  Serial.clearLog();
+
+  // Test signal recovered
+  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+                      false);
+  protocol.loop();
+  bool foundSignalRecovered = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("MM Signal recovered") != std::string::npos) {
+      foundSignalRecovered = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundSignalRecovered);
+  Serial.clearLog();
+
+  // Test Motor kickstart logging
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+  motor.setSpeed(1, MM2DirectionState_Forward);
+
+  bool foundKickstartStarted = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart started") != std::string::npos) {
+      foundKickstartStarted = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundKickstartStarted);
+}
+
 void test_motor_speed_curve(void) {
   CvManagerMock cvManager;
 
@@ -392,5 +466,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_programming_6021);
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
+  RUN_TEST(test_logging);
   return UNITY_END();
 }
