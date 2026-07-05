@@ -452,7 +452,6 @@ void test_cv_programming_6021(void) {
     protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
                         0, false);
     protocol.loop();
-    printf("DEBUG loop %d: lastChangeDirTs=%lu, lastDirectionChangeTime=%lu\n", i, protocol.getLastChangeDirTs(), 0L);
     programmer.loop();
 
     advance_millis(100);
@@ -470,7 +469,6 @@ void test_cv_programming_6021(void) {
   protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable,
                       0, false);
   protocol.loop();
-  printf("DEBUG: lastSpeedChangeTs=%lu, now=%lu\n", protocol.getLastSpeedChangeTs(), now);
   TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
 
@@ -480,7 +478,6 @@ void test_cv_programming_6021(void) {
   protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable,
                       0, false);
   protocol.loop();
-  printf("DEBUG: lastSpeedChangeTs=%lu, now=%lu\n", protocol.getLastSpeedChangeTs(), now);
   TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
   programmer.loop();
 

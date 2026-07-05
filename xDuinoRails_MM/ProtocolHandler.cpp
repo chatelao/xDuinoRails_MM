@@ -176,7 +176,7 @@ void ProtocolHandler::setFunctionState(int f, bool state) {
 }
 
 bool ProtocolHandler::isMm2Locked() {
-  return millis() - lastMM2Seen < mm2LockTime;
+  return lastMM2Seen > 0 && millis() - lastMM2Seen < mm2LockTime;
 }
 
 unsigned long ProtocolHandler::getLastChangeDirTs() { return lastChangeDirTs; }
