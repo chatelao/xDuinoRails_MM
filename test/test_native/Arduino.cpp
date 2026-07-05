@@ -2,6 +2,7 @@
 
 std::map<uint8_t, int> analog_write_values;
 std::map<uint8_t, int> digital_write_values;
+std::map<uint8_t, int> analog_read_values;
 
 static unsigned long current_millis = 0;
 
@@ -11,10 +12,7 @@ void pinMode(uint8_t pin, uint8_t mode) {
 
 void digitalWrite(uint8_t pin, uint8_t val) { digital_write_values[pin] = val; }
 
-int analogRead(uint8_t pin) {
-  // Mock implementation
-  return 0;
-}
+int analogRead(uint8_t pin) { return analog_read_values[pin]; }
 
 void analogWrite(uint8_t pin, int val) { analog_write_values[pin] = val; }
 
@@ -30,6 +28,8 @@ unsigned long millis() { return current_millis; }
 
 void advance_millis(unsigned long ms) { current_millis += ms; }
 
+void delay(unsigned long ms) { advance_millis(ms); }
+
 void delayMicroseconds(unsigned int us) {
   // Mock implementation
 }
@@ -37,6 +37,7 @@ void delayMicroseconds(unsigned int us) {
 void reset_arduino_mock() {
   analog_write_values.clear();
   digital_write_values.clear();
+  analog_read_values.clear();
   current_millis = 0;
 }
 
