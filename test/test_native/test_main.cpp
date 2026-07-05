@@ -9,6 +9,7 @@
 
 void test_mm_signal_f0_f1_f2(void);
 void test_cv_programming_6021(void);
+void test_watchdog_shutdown(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -170,6 +171,86 @@ void test_mm_signal_f0_f1_f2(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(0));
 }
 
+// Testet die Watchdog-Funktion für die Notabschaltung des Motors bei
+// Signalverlust.
+void test_watchdog_shutdown(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_BASE_ADDRESS, 1);
+  cvManager.setCv(CV_WATCHDOG_TIMEOUT, 5); // 500ms
+
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
+
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  // 1. Normaler Betrieb: Geschwindigkeit auf 14 setzen
+  protocol.mm.SetData(1, 14, false, false, false,
+                      MM2DirectionState_Unavailable, 0, false);
+  protocol.loop();
+  motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+  advance_millis(200); // Über Kickstart hinaus
+  // Letztes gültiges Signal vor dem Verlust
+  protocol.mm.SetData(1, 14, false, false, false,
+                      MM2DirectionState_Unavailable, 0, false);
+  protocol.loop();
+  motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+
+  // 2. Signalverlust simulieren (keine protocol.loop() Aufrufe mit Daten)
+  advance_millis(501); // Watchdog sollte jetzt triggern (> 500ms)
+  TEST_ASSERT_TRUE(protocol.isSignalTimeout());
+
+  // Manuelle Simulation der Ramp-Down-Logik aus der main loop
+  auto simulate_loop = [&]() {
+    if (protocol.isSignalTimeout()) {
+      unsigned long timeSinceLastSignal =
+          millis() - protocol.getLastSignalTime();
+      int           watchdogTimeout = cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100;
+      unsigned long elapsed         = timeSinceLastSignal - watchdogTimeout;
+
+      if (elapsed >= 500) {
+        motor.stop();
+      } else {
+        int targetSpeed = protocol.getTargetSpeed();
+        int rampSpeed   = map(elapsed, 0, 500, targetSpeed, 0);
+        motor.setSpeed(rampSpeed, protocol.getTargetDirection());
+      }
+    } else {
+      motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+    }
+  };
+
+  simulate_loop();
+  // Nach 501ms total (1ms nach Watchdog), sollte die Geschwindigkeit fast noch
+  // 14 sein (1ms/500ms ramp) map(1, 0, 500, 14, 0) -> 13
+  TEST_ASSERT_INT_WITHIN(2, 14, protocol.getTargetSpeed());
+  // Wir prüfen den PWM Wert. targetSpeed=14 -> PWM=1023. rampSpeed = map(1, 0,
+  // 500, 14, 0) = 13. PWM für 13 ist map(13, 1, 14, 40, 1023)
+  int expectedPwm = map(13, 1, 14, 40, 1023);
+  TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
+
+  // 250ms nach Watchdog (750ms total) -> Halbe Geschwindigkeit
+  advance_millis(249);
+  simulate_loop();
+  expectedPwm = map(7, 1, 14, 40, 1023);
+  TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
+
+  // 500ms nach Watchdog (1000ms total) -> Stillstand
+  advance_millis(250);
+  simulate_loop();
+  TEST_ASSERT_EQUAL(0, analog_write_values[10]);
+
+  // 3. Signal kehrt zurück -> Sofortige Wiederaufnahme
+  protocol.mm.SetData(1, 14, false, false, false,
+                      MM2DirectionState_Unavailable, 0, false);
+  protocol.loop();
+  TEST_ASSERT_FALSE(protocol.isSignalTimeout());
+  simulate_loop();
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -238,5 +319,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
   RUN_TEST(test_cv_programming_6021);
+  RUN_TEST(test_watchdog_shutdown);
   return UNITY_END();
 }

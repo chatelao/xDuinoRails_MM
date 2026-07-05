@@ -52,6 +52,7 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | 💨 | 5 | Maximum Speed | Standard | 0 or 255 | Limits the maximum voltage at full speed (scaling). 0 = deactivated (full throttle). |
 | ℹ️ | 7 | Version | Mandatory | 10 | Read-Only. E.g. 10 for version 1.0. |
 | 🏭 | 8 | Manufacturer ID | Mandatory | 13 | Important: NMRA ID for DIY/Public Domain. Writing to 8 triggers a reset. |
+| 🐕 | 11 | Watchdog Timeout | Standard | 5 | Timeout in 100ms steps (Default 5 = 500ms). Shuts down motor if no signal. |
 | 🔢 | 17 | Long Addr. (High) | Standard | 192 | Upper byte of the long address (default 192). |
 | 🔢 | 18 | Long Addr. (Low) | Standard | 100 | Lower byte (Default 192+100 is often address 100 or 3). |
 | ⚙️ | 29 | Configuration | Mandatory | 6 | Default 6 = 28/128 speed steps (2) + analog allowed (4). |
