@@ -6,6 +6,7 @@ A model train decoder firmware for the Seeed Xiao RP2040, using the Märklin Mot
 
 - Supports the Märklin Motorola protocol.
 - Configuration via CVs (Configuration Variables).
+- [User Manual](./USER_MANUAL.md) for setup and operation.
 
 
 ## Hardware
