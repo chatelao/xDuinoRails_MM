@@ -20,6 +20,7 @@ This document tracks the implementation status of Configuration Variables (CVs) 
 | 34 | Rear Light (F0r) | ✅ Implemented | Bit 1 enables rear light output. |
 | 52 | Motor Type | ✅ Implemented | Selects motor characteristics profile in `MotorControl`. |
 | 107/108| Ext. ID | ⚠️ Initialized Only | Metadata for DecoderDB identification. |
+| 250 | Debug Enable | ✅ Implemented | 0 = Disabled, 1 = Enabled (default). |
 
 ## Motor Parameters Detail (CV 52)
 

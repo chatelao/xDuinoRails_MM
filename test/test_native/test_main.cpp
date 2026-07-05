@@ -47,6 +47,7 @@ void test_cv_manager_defaults(void) {
   TEST_ASSERT_EQUAL(2, cvManager.getCv(CV_REAR_LIGHT_F0R));
   TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_EXT_ID_HIGH));
   TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
 }
 
 // Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den
