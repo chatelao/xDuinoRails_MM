@@ -29,7 +29,7 @@ To build and upload the firmware, you will need to have [PlatformIO](https://pla
 
 For detailed information on supported CVs and how to program them, please see the following documents:
 
-- [CV Support and Configuration](./documentation/CV_SUPPORT.md)
+- [CV Support and Configuration](./USER_MANUAL.md#cv-table)
 - [Märklin CV Programming (Step-by-Step)](./documentation/MM_CV_PROGRAMMING.md)
 
 
