@@ -41,4 +41,5 @@ AlignTrailingComments: true
 ```
 
 - **Dependency Injection:** For hardware configurations like pin numbers, use dependency injection by passing them into class constructors from a central configuration point (e.g., the main .ino file) rather than using global definitions via header files. This decouples classes from specific hardware setups.
+- **Test Coverage:** Every feature or logic change, such as the CV 8 reset mechanism, must be accompanied by native test cases in `test/test_native/` which are executed automatically in the CI/CD pipeline.
 - **READMEs:** Add a basic `README.md` file to any new subdirectories to explain the purpose of the code within that directory.

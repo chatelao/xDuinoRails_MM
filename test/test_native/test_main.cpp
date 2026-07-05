@@ -10,6 +10,7 @@
 void test_mm_signal_f0_f1_f2(void);
 void test_cv_programming_6021(void);
 void test_watchdog_shutdown(void);
+void test_cv_manager_reset_8(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -61,11 +62,34 @@ void test_cv_manager_special(void) {
   // Der Wert sollte unverändert sein
   TEST_ASSERT_EQUAL(version, cvManager.getCv(CV_VERSION));
 
-  // Teste den Reset-Mechanismus durch Schreiben auf CV_MANUFACTURER_ID
+  // Teste den Reset-Mechanismus durch Schreiben von 0 auf CV_MANUFACTURER_ID
+  // Ändere einen Wert, um den Reset zu verifizieren
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
   reboot_called = false;
   cvManager.setCv(CV_MANUFACTURER_ID, 0);
   // Überprüfe, ob der Neustart ausgelöst wurde
   TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die Werte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+}
+
+// Testet den Reset-Mechanismus durch Schreiben von 8 auf CV_MANUFACTURER_ID.
+void test_cv_manager_reset_8(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  // Ändere einen Wert, um den Reset zu verifizieren
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 8);
+  // Überprüfe, ob der Neustart ausgelöst wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die Werte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
 }
 
 // Test Motor Control
@@ -315,6 +339,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_get_set);
   RUN_TEST(test_cv_manager_defaults);
   RUN_TEST(test_cv_manager_special);
+  RUN_TEST(test_cv_manager_reset_8);
   RUN_TEST(test_motor_speed_control);
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
