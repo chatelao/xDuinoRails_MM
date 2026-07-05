@@ -19,6 +19,7 @@
 #include "Logger.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
+#include "SerialConsole.h"
 #include <Arduino.h>
 
 // ==========================================
@@ -77,6 +78,7 @@ ProtocolHandler protocol(DCC_MM_SIGNAL);
 MotorControl motor(cvManager, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
 LightsControl lights(cvManager, LED_F0f, LED_F0b);
 CvProgrammer  cvProgrammer(&cvManager, &protocol);
+SerialConsole serialConsole(&cvManager, &protocol);
 
 DebugLeds debugLeds(NEO_PIN, NEO_PWR_PIN, NUMPIXELS, PIN_INT_RED, PIN_INT_GREEN,
                     PIN_INT_BLUE);
@@ -116,6 +118,7 @@ void setup() {
 // ==========================================
 #ifndef PIO_UNIT_TESTING
 void loop() {
+  serialConsole.loop();
   protocol.loop();
   cvProgrammer.loop();
 

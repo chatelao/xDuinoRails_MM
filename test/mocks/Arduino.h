@@ -2,6 +2,7 @@
 #define ARDUINO_H
 
 #include <cstdint>
+#include <deque>
 #include <map>
 #include <string>
 #include <vector>
@@ -37,7 +38,12 @@ public:
   void                     println(const char *s);
   void                     println(int n);
   void                     clearLog();
+  int                      available();
+  int                      read();
+  size_t                   write(uint8_t c);
+  void                     pushInput(const std::string &s);
   std::vector<std::string> logLines;
+  std::deque<char>         inputBuffer;
 };
 
 extern MockSerial Serial;
