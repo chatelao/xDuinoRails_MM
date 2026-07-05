@@ -1,4 +1,5 @@
 #include "CvProgrammer.h"
+#include "Logger.h"
 #include <Arduino.h>
 
 CvProgrammer::CvProgrammer(CvManager       *cvManager,
@@ -17,6 +18,7 @@ void CvProgrammer::loop() {
   if (lastChangeDirTs > 0 && lastChangeDirTs != lastDirectionChangeTime) {
     if (millis() - lastDirectionChangeTime < 2000) {
       directionChangeCount++;
+      logger.printf("Prog: ChangeDir count %d\n", directionChangeCount);
     } else {
       directionChangeCount = 1;
     }
@@ -25,6 +27,8 @@ void CvProgrammer::loop() {
     if (directionChangeCount >= 4) {
       if (cvManager->getCv(CV_PROGRAMMING_LOCK) == 7) {
         programmingMode = !programmingMode;
+        logger.printf("Prog: Programming Mode %s\n",
+                      programmingMode ? "Enabled" : "Disabled");
       }
       directionChangeCount = 0;
     }
@@ -34,10 +38,12 @@ void CvProgrammer::loop() {
     unsigned long lastSpeedTs = protocolHandler->getLastSpeedChangeTs();
     if (lastSpeedTs > 0 && lastSpeedTs != lastSpeedChangeTime) {
       lastSpeedChangeTime = lastSpeedTs;
-      int speed           = protocolHandler->getTargetSpeed();
+      int speed = protocolHandler->getTargetSpeed();
       if (cvAddress == -1) {
         cvAddress = speed;
+        logger.printf("Prog: CV Address %d received\n", cvAddress);
       } else {
+        logger.printf("Prog: Writing CV %d = %d\n", cvAddress, speed);
         cvManager->setCv(cvAddress, speed);
         cvAddress       = -1;
         programmingMode = false;

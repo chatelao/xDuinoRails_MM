@@ -16,6 +16,7 @@
 #include "CvProgrammer.h"
 #include "DebugLeds.h"
 #include "LightsControl.h"
+#include "Logger.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
 #include <Arduino.h>
@@ -34,21 +35,30 @@ const int RAILCOM_PIN   = D6;
 
 const int MOTOR_PIN_A    = D7;
 const int MOTOR_PIN_B    = D8;
+
+#ifdef ARDUINO_ARCH_RP2040
 const int BEMF_PIN_A     = A0;
 const int BEMF_PIN_B     = A1;
 const int MOTOR_SHUT_PIN = A2; // D2
 
-const int LED_F0b        = D10;
-const int LED_F0f        = D9;
-const int FUNC_SHUT_PIN  = A3; // D3
+const int LED_F0b       = D10;
+const int LED_F0f       = D9;
+const int FUNC_SHUT_PIN = A3; // D3
 
-#ifdef ARDUINO_ARCH_RP2040
 const int PIN_INT_RED   = 15;
 const int PIN_INT_GREEN = -1;
 const int PIN_INT_BLUE  = 16;
 const int NEO_PIN       = 12;
 const int NEO_PWR_PIN   = 11;
 #elif defined(ARDUINO_ARCH_ESP32)
+const int BEMF_PIN_A     = D0;
+const int BEMF_PIN_B     = D1;
+const int MOTOR_SHUT_PIN = D2;
+
+const int LED_F0b       = D10;
+const int LED_F0f       = D9;
+const int FUNC_SHUT_PIN = D3;
+
 const int PIN_INT_RED   = -1;
 const int PIN_INT_GREEN = -1;
 const int PIN_INT_BLUE  = 15; // LED_BUILTIN / D4
@@ -85,6 +95,8 @@ void isr_protocol();
 void setup() {
   analogReadResolution(12);
   cvManager.setup();
+  logger.begin(&cvManager, 115200);
+  logger.println("xDuinoRails_MM starting...");
   protocol.setAddress(cvManager.getCv(1));
   protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
   protocol.setup();

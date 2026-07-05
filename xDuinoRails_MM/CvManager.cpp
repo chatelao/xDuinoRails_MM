@@ -1,4 +1,5 @@
 #include "CvManager.h"
+#include "Logger.h"
 #include <EEPROM.h>
 #ifdef ARDUINO_ARCH_RP2040
 #include <RP2040.h>
@@ -27,6 +28,8 @@ void CvManager::setCv(int cv, uint8_t value) {
   }
   EEPROM.write(cv, value);
   EEPROM.commit();
+
+  logger.printf("CV %d set to %d\n", cv, value);
 
   if (cv == CV_MANUFACTURER_ID) {
 #ifdef ARDUINO_ARCH_RP2040
@@ -57,6 +60,7 @@ void CvManager::initCv() {
     setCv(CV_EXT_ID_HIGH, 1);
     setCv(CV_EXT_ID_LOW, 10);
     setCv(CV_PROGRAMMING_LOCK, 0);
+    setCv(CV_DEBUG_ENABLE, 0);
     EEPROM.commit();
   }
 }

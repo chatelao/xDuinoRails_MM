@@ -61,6 +61,7 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | 🏎️ | 52 | Motor Type | Standard | 0 | Selects the motor characteristics curve. 0 = Standard DC, 1 = Faulhaber, 2 = Maxon. |
 | 🆔 | 107 | Ext. ID (High) | Meta | 1 | Identifier for DecoderDB (part 1 of ID 266). |
 | 🆔 | 108 | Ext. ID (Low) | Meta | 10 | Identifier for DecoderDB (part 2 of ID 266). |
+| 🪵 | 250 | Debug Enable | Standard | 0 | 0 = Disabled, 1 = Enabled. Outputs debug info to Serial USB. |
 
 ### Programming Guide
 
