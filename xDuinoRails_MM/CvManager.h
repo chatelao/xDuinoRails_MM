@@ -9,6 +9,7 @@ constexpr int CV_START_VOLTAGE   = 2;
 constexpr int CV_ACCELERATION    = 3;
 constexpr int CV_BRAKING_TIME    = 4;
 constexpr int CV_MAXIMUM_SPEED   = 5;
+constexpr int CV_MEDIUM_SPEED    = 6;
 constexpr int CV_VERSION         = 7;
 constexpr int CV_MANUFACTURER_ID = 8; // Writing 8 to this CV resets the decoder
 constexpr int CV_WATCHDOG_TIMEOUT  = 11;

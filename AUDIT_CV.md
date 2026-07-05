@@ -10,7 +10,8 @@ This document tracks the implementation status of Configuration Variables (CVs) 
 | 2 | Start Voltage | ✅ Implemented | Used in `MotorControl::setSpeed` to define minimum PWM. |
 | 3 | Acceleration | ❌ Not Implemented | Initialized in `CvManager`, but ignored by `MotorControl`. |
 | 4 | Braking Time | ❌ Not Implemented | Initialized in `CvManager`, but ignored by `MotorControl`. |
-| 5 | Maximum Speed | ❌ Not Implemented | Initialized in `CvManager`, but ignored by `MotorControl`. |
+| 5 | Maximum Speed | ✅ Fully Implemented | Maps to Vhigh in the 3-point speed curve. |
+| 6 | Medium Speed  | ✅ Fully Implemented | Maps to Vmid in the 3-point speed curve. |
 | 7 | Version | ✅ Read-Only | Hardcoded to 10 (v1.0). |
 | 8 | Manufacturer ID | ✅ Implemented | Writing 8 triggers a factory reset and reboot. |
 | 15 | Programming Lock | ✅ Implemented | Must be set to 7 to enter programming mode. |
@@ -40,13 +41,11 @@ The `MotorControl` class uses `CV_52` to select between different hardware contr
 ### 1. Acceleration & Braking (CV 3 & 4)
 While these CVs exist in the manager, the `MotorControl::update` method currently applies the target speed almost instantaneously (modulated only by the kickstart logic). A momentum ramp is missing.
 
-### 2. Maximum Speed (CV 5)
-The `setSpeed` logic maps steps 1-14 to `pwmMinMoving` - `PWM_MAX`. It does not currently scale the upper bound based on CV 5.
+### 2. Maximum Speed & Medium Speed (CV 5 & 6)
+Implemented as part of a 3-point speed curve (Vstart, Vmid, Vhigh). If set to 0, they use sensible defaults (Vhigh=1023, Vmid=midpoint).
 
 ### 3. Start Voltage Scaling (CV 2)
-In `MotorControl.cpp`, the start voltage is calculated as:
-`int pwmMinMoving = cvManager.getCv(CV_START_VOLTAGE) * 40;`
-Since the total PWM range is 0-1023, a CV value higher than 25 will effectively set the minimum speed to the maximum possible PWM, leaving no room for speed steps. This scaling factor may need review.
+Standardized to map 0-255 to 0-1023 PWM. The previous `* 40` multiplier was replaced.
 
 ### 4. BEMF Integration
 BEMF sensing is currently only used to terminate the kickstart pulse early if rotation is detected. It is not used for active speed regulation (Load Compensation).

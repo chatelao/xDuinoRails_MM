@@ -74,15 +74,38 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
     update(0, dir);
     return;
   }
-  if (step >= 14) {
-    update(PWM_MAX, dir);
-    return;
+
+  // Map CVs (0-255) to PWM (0-1023)
+  int vStart = map(cvManager.getCv(CV_START_VOLTAGE), 0, 255, 0, PWM_MAX);
+  int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_MAX);
+  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED), 0, 255, 0, PWM_MAX);
+
+  // Defaults if CVs are 0
+  if (vHigh == 0)
+    vHigh = PWM_MAX;
+  if (vStart == 0)
+    vStart = 1;
+
+  // Clamp vStart to vHigh to avoid negative slopes
+  if (vStart > vHigh)
+    vStart = vHigh;
+
+  if (vMid == 0) {
+    vMid = (vStart + vHigh) / 2;
+  } else {
+    // Clamp vMid between vStart and vHigh
+    if (vMid < vStart)
+      vMid = vStart;
+    if (vMid > vHigh)
+      vMid = vHigh;
   }
-  int pwmMinMoving = cvManager.getCv(CV_START_VOLTAGE) * 40;
-  if (pwmMinMoving == 0) {
-    pwmMinMoving = 1; // Ensure motor can move if CV is set to 0
+
+  int pwm;
+  if (step <= 7) {
+    pwm = map(step, 1, 7, vStart, vMid);
+  } else {
+    pwm = map(step, 7, 14, vMid, vHigh);
   }
-  int pwm = map(step, 1, 14, pwmMinMoving, PWM_MAX);
 
   update(pwm, dir);
 }
