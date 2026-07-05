@@ -55,6 +55,15 @@ void MotorControl::setup() {
   pinMode(bemfA_priv, INPUT);
   pinMode(bemfB_priv, INPUT);
 
+  int         motorType = cvManager.getCv(CV_MOTOR_TYPE);
+  const char *typeName;
+  switch (motorType) {
+  case 1: typeName = "Faulhaber"; break;
+  case 2: typeName = "Maxon"; break;
+  default: typeName = "Standard DC"; break;
+  }
+  logger.printf("Motor: Type=%s, PWM Freq=%d Hz\n", typeName, PWM_FREQ);
+
 #ifdef ARDUINO_ARCH_RP2040
   analogWriteFreq(PWM_FREQ);
   analogWriteRange(PWM_RANGE);

@@ -35,6 +35,8 @@ The following areas of the codebase currently implement logging:
 | | Progress of direction change sequences (for entering programming mode). |
 | | Received CV addresses and values during programming. |
 | **Protocol Handler** | Decoded MM packet details: Address, Speed, Direction, F0 state, and MM2 status. |
+| **Motor Control** | Motor type and PWM frequency during `setup()`. |
+| | Kickstart events (start, timeout, BEMF). |
 
 ## Implementation Details
 

@@ -37,7 +37,7 @@ void CvManager::setCv(int cv, uint8_t value) {
 
   logger.printf("CV %d set to %d\n", cv, value);
 
-  if (cv == CV_MANUFACTURER_ID) {
+  if (cv == CV_MANUFACTURER_ID || cv == CV_MOTOR_TYPE) {
 #ifdef ARDUINO_ARCH_RP2040
     rp2040.reboot();
 #elif defined(ARDUINO_ARCH_ESP32)

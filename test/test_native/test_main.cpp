@@ -15,6 +15,8 @@ void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
 void test_cv_manager_print_all(void);
+void test_motor_frequency_logging(void);
+void test_cv_motor_type_reboot(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -353,6 +355,72 @@ void test_logging(void) {
   TEST_ASSERT_TRUE(foundKickstartStarted);
 }
 
+void test_motor_frequency_logging(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+
+  // Case 1: Standard DC (default)
+  {
+    Serial.clearLog();
+    cvManager.setCv(CV_MOTOR_TYPE, 0);
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Standard DC, PWM Freq=20000 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+
+  // Case 2: Faulhaber
+  {
+    Serial.clearLog();
+    cvManager.setCv(CV_MOTOR_TYPE, 1);
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Faulhaber, PWM Freq=400 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+
+  // Case 3: Maxon
+  {
+    Serial.clearLog();
+    cvManager.setCv(CV_MOTOR_TYPE, 2);
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Maxon, PWM Freq=20000 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+}
+
+void test_cv_motor_type_reboot(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  reboot_called = false;
+  cvManager.setCv(CV_MOTOR_TYPE, 1);
+  TEST_ASSERT_TRUE(reboot_called);
+}
+
 void test_cv_manager_print_all(void) {
   CvManager cvManager;
   cvManager.setup();
@@ -508,6 +576,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
   RUN_TEST(test_logging);
+  RUN_TEST(test_motor_frequency_logging);
+  RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_cv_manager_print_all);
   return UNITY_END();
 }
