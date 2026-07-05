@@ -1,4 +1,5 @@
 #include "ProtocolHandler.h"
+#include "Logger.h"
 
 #ifndef PIO_UNIT_TESTING
 extern ProtocolHandler protocol;
@@ -39,6 +40,11 @@ void ProtocolHandler::loop() {
 
   if (Data && !Data->IsMagnet && Data->Address == mmAddress) {
     lastCommandTime = now;
+
+    logger.printf("MM Packet: Addr=%d, Speed=%d, Dir=%s, F0=%d, MM2=%d\n",
+                  Data->Address, Data->Speed,
+                  Data->MM2Direction == MM2DirectionState_Forward ? "F" : "B",
+                  Data->Function, Data->IsMM2);
 
     bool mm2Locked = (lastMM2Seen > 0 && now - lastMM2Seen < mm2LockTime);
 

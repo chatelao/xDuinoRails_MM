@@ -43,3 +43,11 @@ void reset_arduino_mock() {
 long map(long x, long in_min, long in_max, long out_min, long out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
+
+MockSerial Serial;
+
+void MockSerial::begin(unsigned long baud) {}
+void MockSerial::print(const char *s) { printf("%s", s); }
+void MockSerial::print(int n) { printf("%d", n); }
+void MockSerial::println(const char *s) { printf("%s\n", s); }
+void MockSerial::println(int n) { printf("%d\n", n); }

@@ -20,6 +20,7 @@ constexpr int CV_REAR_LIGHT_F0R    = 34;
 constexpr int CV_MOTOR_TYPE        = 52;
 constexpr int CV_EXT_ID_HIGH       = 107;
 constexpr int CV_EXT_ID_LOW        = 108;
+constexpr int CV_DEBUG_ENABLE      = 250;
 
 class CvManager {
 public:

@@ -28,4 +28,15 @@ void          delayMicroseconds(unsigned int us);
 void          reset_arduino_mock();
 long          map(long, long, long, long, long);
 
+class MockSerial {
+public:
+  void begin(unsigned long baud);
+  void print(const char *s);
+  void print(int n);
+  void println(const char *s);
+  void println(int n);
+};
+
+extern MockSerial Serial;
+
 #endif // ARDUINO_H
