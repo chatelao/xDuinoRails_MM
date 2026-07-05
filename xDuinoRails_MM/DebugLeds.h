@@ -10,8 +10,8 @@ public:
   DebugLeds(int neoPin, int neoPwrPin, int numPixels, int redPin, int greenPin,
             int bluePin);
   void setup();
-  void update(int speedStep, bool f1, bool isMm2Locked, bool isKickstarting,
-              bool isTimeout);
+  void update(int speedStep, MM2DirectionState direction, bool f1,
+              bool isMm2Locked, bool isKickstarting, bool isTimeout);
 
 private:
   void              setIntLed(int pin, bool on);

@@ -90,8 +90,8 @@ void loop() {
   }
 
   lights.update(motor.getCurrentDirection(), protocol.getFunctionState(0));
-  debugLeds.update(protocol.getTargetSpeed(), protocol.getFunctionState(1),
-                   protocol.isMm2Locked(), motor.isKickstarting(),
-                   protocol.isTimeout());
+  debugLeds.update(protocol.getTargetSpeed(), motor.getCurrentDirection(),
+                   protocol.getFunctionState(1), protocol.isMm2Locked(),
+                   motor.isKickstarting(), protocol.isTimeout());
 }
 #endif
