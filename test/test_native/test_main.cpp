@@ -60,11 +60,28 @@ void test_cv_manager_special(void) {
   // Der Wert sollte unverändert sein
   TEST_ASSERT_EQUAL(version, cvManager.getCv(CV_VERSION));
 
-  // Teste den Reset-Mechanismus durch Schreiben auf CV_MANUFACTURER_ID
+  // Teste den Reset-Mechanismus durch Schreiben von 8 auf CV_MANUFACTURER_ID
+  // Zuerst eine CV ändern, um zu prüfen, ob sie zurückgesetzt wird
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 8);
+  // Überprüfe, ob der Neustart ausgelöst wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die CV auf den Standardwert zurückgesetzt wurde
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+
+  // Teste den Reset-Mechanismus durch Schreiben von 0 auf CV_MANUFACTURER_ID
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
   reboot_called = false;
   cvManager.setCv(CV_MANUFACTURER_ID, 0);
   // Überprüfe, ob der Neustart ausgelöst wurde
   TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die CV auf den Standardwert zurückgesetzt wurde
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
 }
 
 // Test Motor Control
