@@ -7,6 +7,7 @@
 
 extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> digital_write_values;
+extern std::map<uint8_t, int> analog_read_values;
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -22,6 +23,7 @@ void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(int freq);
 void analogWriteRange(int range);
 
+void          delay(unsigned long ms);
 unsigned long millis();
 void          advance_millis(unsigned long ms);
 void          delayMicroseconds(unsigned int us);

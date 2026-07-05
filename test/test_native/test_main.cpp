@@ -1,6 +1,7 @@
 #include "CvManager.h"
 #include "CvManagerMock.h"
 #include "CvProgrammer.h"
+#include "DebugLeds.h"
 #include "LightsControl.h"
 #include "MotorControl.h"
 #include "ProtocolHandler.h"
@@ -12,6 +13,10 @@ void test_cv_programming_6021(void);
 void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
+void test_debug_leds(void);
+void test_protocol_handler_lock_and_debounce(void);
+void test_motor_bemf_kickstart(void);
+void test_cv_programmer_timeout_and_toggle(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -151,8 +156,34 @@ void test_motor_speed_control(void) {
 // Testet das Standardverhalten der Lichtsteuerung.
 void test_lights_control_default_behavior(void) {
   CvManagerMock cvManager;
-  LightsControl lights(cvManager, 0, 1);
-  // TODO: Behauptungen hinzufügen, um das Standard-Lichtverhalten zu überprüfen
+  LightsControl lights(cvManager, 10, 11); // Front: 10, Rear: 11
+  lights.setup();
+
+  cvManager.setCv(CV_FRONT_LIGHT_F0F, 1); // Bit 0 set
+  cvManager.setCv(CV_REAR_LIGHT_F0R, 2);  // Bit 1 set
+
+  // Case 1: F0 off -> Both off
+  lights.update(MM2DirectionState_Forward, false);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+
+  // Case 2: F0 on, Forward -> Front on, Rear off
+  lights.update(MM2DirectionState_Forward, true);
+  TEST_ASSERT_EQUAL(HIGH, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+
+  // Case 3: F0 on, Backward -> Front off, Rear on
+  lights.update(MM2DirectionState_Backward, true);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(HIGH, digital_write_values[11]);
+
+  // Case 4: CVs disable lights
+  cvManager.setCv(CV_FRONT_LIGHT_F0F, 0);
+  cvManager.setCv(CV_REAR_LIGHT_F0R, 0);
+  lights.update(MM2DirectionState_Forward, true);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  lights.update(MM2DirectionState_Backward, true);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
 }
 
 // Testet das Schalten der Funktionen F0, F1 und F2 über das MM-Protokoll.
@@ -321,6 +352,243 @@ void test_motor_speed_curve(void) {
   TEST_ASSERT_INT_WITHIN(2, 421, analog_write_values[10]);
 }
 
+void test_cv_programmer_timeout_and_toggle(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  CvProgrammer programmer(&cvManager, &protocol);
+
+  cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
+
+  // 1. Direction changes too slow -> count reset
+  advance_millis(300);
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  programmer.loop();
+
+  advance_millis(2100); // > 2000ms
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  programmer.loop();
+
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  programmer.loop();
+  // Count should be 1, not 2
+
+  // 2. Complete 4 changes within time -> Toggle ON
+  for (int i = 0; i < 3; i++) {
+    advance_millis(100);
+    protocol.mm.SetData(1, 0, false, false, false,
+                        MM2DirectionState_Unavailable, 0, false);
+    protocol.loop();
+    programmer.loop();
+
+    advance_millis(300);
+    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                        0, false);
+    protocol.loop();
+    programmer.loop();
+  }
+  TEST_ASSERT_TRUE(programmer.isInProgrammingMode());
+
+  // 3. Complete another 4 changes -> Toggle OFF
+  for (int i = 0; i < 4; i++) {
+    advance_millis(100);
+    protocol.mm.SetData(1, 0, false, false, false,
+                        MM2DirectionState_Unavailable, 0, false);
+    protocol.loop();
+    programmer.loop();
+
+    advance_millis(300);
+    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                        0, false);
+    protocol.loop();
+    programmer.loop();
+  }
+  TEST_ASSERT_FALSE(programmer.isInProgrammingMode());
+}
+
+void test_motor_bemf_kickstart(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_START_VOLTAGE, 10);
+  cvManager.setCv(CV_MOTOR_TYPE, 0); // Standard DC: BEMF_THRESHOLD=100
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  // Start motor from 0 -> Kickstart begins
+  motor.setSpeed(5, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+  TEST_ASSERT_EQUAL(800, analog_write_values[10]); // KICK_PWM for Standard DC
+
+  // Simulate BEMF below threshold
+  advance_millis(20); // > BEMF_SAMPLE_INT (12ms)
+  analog_read_values[2] = 50;
+  analog_read_values[3] = 0; // diff = 50 < 100
+  motor.setSpeed(5, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  // Simulate BEMF above threshold
+  advance_millis(20);
+  analog_read_values[2] = 150;
+  analog_read_values[3] = 0; // diff = 150 > 100
+  motor.setSpeed(5, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+
+  // Normal PWM should be applied now
+  // vStart=40, vHigh=1023, vMid=531
+  // step 5 is map(5, 1, 7, 40, 531) = 40 + (531-40)*4/6 = 40 + 491*2/3 = 40 + 327 = 367
+  TEST_ASSERT_INT_WITHIN(5, 367, analog_write_values[10]);
+}
+
+void test_protocol_handler_lock_and_debounce(void) {
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+
+  // 1. MM2 Lock-in Logic
+  // First packet MUST be MM2 to establish lastMM2Seen > 0
+  advance_millis(1000); // Start at T=1000
+  protocol.mm.SetData(1, 10, false, false, true, MM2DirectionState_Forward, 0,
+                      false); // address=1, speed=10, isMM2=true
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.isMm2Locked());
+
+  // MM1 ChangeDir packet while locked -> should be ignored
+  advance_millis(100);
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+
+  // 2. MM1 Direction Change Debounce
+  // Reset lock by advancing time
+  advance_millis(6000); // MM2_LOCK_TIME is 5000
+  TEST_ASSERT_FALSE(protocol.isMm2Locked());
+
+  // Initial state: Forward
+  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+
+  // First changeDir=true
+  // We need to ensure lastChangeDirInput is false before sending true
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+
+  advance_millis(300);
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Backward, protocol.getTargetDirection());
+  unsigned long firstChangeTs = protocol.getLastChangeDirTs();
+  TEST_ASSERT_EQUAL(millis(), firstChangeTs);
+
+  // Reset changeDir input in next packet
+  advance_millis(10);
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+
+  // Second changeDir=true within 250ms -> should be ignored
+  advance_millis(100);
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Backward, protocol.getTargetDirection());
+  TEST_ASSERT_EQUAL(firstChangeTs, protocol.getLastChangeDirTs());
+
+  // Reset changeDir input
+  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+
+  // Third changeDir=true after > 250ms -> should be accepted
+  advance_millis(200); // 100 + 200 = 300ms total
+  protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+  TEST_ASSERT_GREATER_THAN(firstChangeTs, protocol.getLastChangeDirTs());
+}
+
+void test_debug_leds(void) {
+  DebugLeds leds(0, 1, 1, 2, 3, 4); // Neo:0, NeoPwr:1, R:2, G:3, B:4
+  leds.setup();
+
+  Adafruit_NeoPixel *neo = Adafruit_NeoPixel::lastInstance;
+  TEST_ASSERT_NOT_NULL(neo);
+
+  // 1. Timeout -> Flashing Red
+  advance_millis(250); // now = 250
+  leds.update(0, MM2DirectionState_Forward, false, true, false, true);
+  // (250/250)%2 == 1 -> Red
+  TEST_ASSERT_EQUAL(Adafruit_NeoPixel::Color(255, 0, 0), neo->getPixelColor(0));
+
+  advance_millis(250); // now = 500
+  leds.update(0, MM2DirectionState_Forward, false, true, false, true);
+  // (500/250)%2 == 0 -> 0
+  TEST_ASSERT_EQUAL(0, neo->getPixelColor(0));
+
+  // 2. Kickstarting -> White
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, false, true, true, false);
+  TEST_ASSERT_EQUAL(Adafruit_NeoPixel::Color(255, 255, 255),
+                    neo->getPixelColor(0));
+
+  // 3. Speed 0 -> Breathing Blue
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, false, true, false, false);
+  uint32_t color = neo->getPixelColor(0);
+  TEST_ASSERT_EQUAL(0, (color >> 16) & 0xFF); // R
+  TEST_ASSERT_EQUAL(0, (color >> 8) & 0xFF);  // G
+  TEST_ASSERT_GREATER_THAN(0, color & 0xFF);  // B should be > 0
+
+  // 4. Forward -> Green/White Gradient
+  advance_millis(60);
+  leds.update(1, MM2DirectionState_Forward, false, true, false, false);
+  color = neo->getPixelColor(0);
+  // map(1, 1, 14, 0, 255) = 0 -> Color(0, 255, 0)
+  TEST_ASSERT_EQUAL(Adafruit_NeoPixel::Color(0, 255, 0), color);
+
+  advance_millis(60);
+  leds.update(14, MM2DirectionState_Forward, false, true, false, false);
+  color = neo->getPixelColor(0);
+  // map(14, 1, 14, 0, 255) = 255 -> Color(255, 255, 255)
+  TEST_ASSERT_EQUAL(Adafruit_NeoPixel::Color(255, 255, 255), color);
+
+  // 5. Backward -> Orange/Black Gradient
+  advance_millis(60);
+  leds.update(1, MM2DirectionState_Backward, false, true, false, false);
+  color = neo->getPixelColor(0);
+  // map(1, 1, 14, 255, 0) = 255, map(1, 1, 14, 128, 0) = 128 -> Color(255, 128, 0)
+  TEST_ASSERT_EQUAL(Adafruit_NeoPixel::Color(255, 128, 0), color);
+
+  advance_millis(60);
+  leds.update(14, MM2DirectionState_Backward, false, true, false, false);
+  color = neo->getPixelColor(0);
+  // map(14, 1, 14, 255, 0) = 0, map(14, 1, 14, 128, 0) = 0 -> Color(0, 0, 0)
+  TEST_ASSERT_EQUAL(0, color);
+
+  // 6. Internal LEDs
+  // Red Pin (2) -> MM2 Locked. (LOW is ON)
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, false, true, false, false);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[2]);
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, false, false, false, false);
+  TEST_ASSERT_EQUAL(HIGH, digital_write_values[2]);
+
+  // Blue Pin (4) -> F1
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, true, true, false, false);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[4]);
+  advance_millis(60);
+  leds.update(0, MM2DirectionState_Forward, false, true, false, false);
+  TEST_ASSERT_EQUAL(HIGH, digital_write_values[4]);
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -392,5 +660,9 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_programming_6021);
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
+  RUN_TEST(test_debug_leds);
+  RUN_TEST(test_protocol_handler_lock_and_debounce);
+  RUN_TEST(test_motor_bemf_kickstart);
+  RUN_TEST(test_cv_programmer_timeout_and_toggle);
   return UNITY_END();
 }
