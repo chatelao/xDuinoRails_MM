@@ -283,6 +283,73 @@ void test_watchdog_shutdown(void) {
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 }
 
+void test_pwm_freq_logging(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+
+  // Test Standard DC (Type 0)
+  cvManager.setCv(CV_MOTOR_TYPE, 0);
+  Serial.clearLog();
+  {
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Standard DC, PWM Freq=20000 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+
+  // Test Faulhaber (Type 1)
+  cvManager.setCv(CV_MOTOR_TYPE, 1);
+  Serial.clearLog();
+  {
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Faulhaber, PWM Freq=400 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+
+  // Test Maxon (Type 2)
+  cvManager.setCv(CV_MOTOR_TYPE, 2);
+  Serial.clearLog();
+  {
+    MotorControl motor(cvManager, 10, 11, 2, 3);
+    motor.setup();
+    bool found = false;
+    for (const auto &line : Serial.logLines) {
+      if (line.find("Motor: Type=Maxon, PWM Freq=20000 Hz") !=
+          std::string::npos) {
+        found = true;
+        break;
+      }
+    }
+    TEST_ASSERT_TRUE(found);
+  }
+}
+
+void test_cv_motor_type_reboot(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  reboot_called = false;
+  cvManager.setCv(CV_MOTOR_TYPE, 1);
+  TEST_ASSERT_TRUE(reboot_called);
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_MOTOR_TYPE));
+}
+
 void test_logging(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_DEBUG_ENABLE, 1);
@@ -438,6 +505,7 @@ void test_motor_speed_curve(void) {
   cvManager.setCv(CV_MAXIMUM_SPEED, 200);
   cvManager.setCv(CV_MEDIUM_SPEED, 0);
   MotorControl motor1(cvManager, 10, 11, 2, 3);
+  motor1.setup();
 
   motor1.setSpeed(1, MM2DirectionState_Forward);
   advance_millis(101);
@@ -546,6 +614,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
   RUN_TEST(test_logging);
+  RUN_TEST(test_pwm_freq_logging);
+  RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_serial_console);
   RUN_TEST(test_cv_manager_print_all);
   return UNITY_END();
