@@ -42,3 +42,7 @@ AlignTrailingComments: true
 
 - **Dependency Injection:** For hardware configurations like pin numbers, use dependency injection by passing them into class constructors from a central configuration point (e.g., the main .ino file) rather than using global definitions via header files. This decouples classes from specific hardware setups.
 - **READMEs:** Add a basic `README.md` file to any new subdirectories to explain the purpose of the code within that directory.
+
+## Known Mechanisms
+
+- **CV 8 Reset:** Writing 0 or 8 to CV 8 (Manufacturer ID) triggers a factory reset and a hardware reboot. This feature must be covered by native tests in `test/test_native/`.

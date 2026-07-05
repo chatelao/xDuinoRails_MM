@@ -68,6 +68,44 @@ void test_cv_manager_special(void) {
   TEST_ASSERT_TRUE(reboot_called);
 }
 
+// Testet den Reset-Mechanismus durch Schreiben des Wertes 0 auf CV 8.
+void test_cv_manager_reset(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  // Ändere eine CV auf einen Nicht-Standardwert
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  // Trigger Reset durch Schreiben von 0 auf CV 8
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 0);
+
+  // Überprüfe, ob reboot aufgerufen wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die CVs auf Standardwerte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+}
+
+// Testet den Reset-Mechanismus durch Schreiben des Wertes 8 auf CV 8.
+void test_cv_manager_reset_alt(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  // Ändere eine CV auf einen Nicht-Standardwert
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  // Trigger Reset durch Schreiben von 8 auf CV 8
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 8);
+
+  // Überprüfe, ob reboot aufgerufen wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die CVs auf Standardwerte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+}
+
 // Test Motor Control
 // Testet die Geschwindigkeits- und Richtungsteuerung des Motors.
 void test_motor_speed_control(void) {
@@ -315,6 +353,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_get_set);
   RUN_TEST(test_cv_manager_defaults);
   RUN_TEST(test_cv_manager_special);
+  RUN_TEST(test_cv_manager_reset);
+  RUN_TEST(test_cv_manager_reset_alt);
   RUN_TEST(test_motor_speed_control);
   RUN_TEST(test_lights_control_default_behavior);
   RUN_TEST(test_mm_signal_f0_f1_f2);
