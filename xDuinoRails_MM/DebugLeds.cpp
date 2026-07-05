@@ -37,8 +37,8 @@ void DebugLeds::setup() {
   }
 }
 
-void DebugLeds::update(int speedStep, bool f1, bool isMm2Locked,
-                       bool isKickstarting, bool isTimeout) {
+void DebugLeds::update(int speedStep, MM2DirectionState direction, bool f1,
+                       bool isMm2Locked, bool isKickstarting, bool isTimeout) {
   unsigned long now = millis();
 
   if (now - lastVisUpdate < 50)
@@ -63,9 +63,13 @@ void DebugLeds::update(int speedStep, bool f1, bool isMm2Locked,
       int val    = (now / 20) % 255;
       int breath = (val > 127) ? 255 - val : val;
       pixels.setPixelColor(0, pixels.Color(0, 0, breath * 2));
+    } else if (direction == MM2DirectionState_Forward) {
+      int rb = map(speedStep, 1, 14, 0, 255);
+      pixels.setPixelColor(0, pixels.Color(rb, 255, rb));
     } else {
-      int r = map(speedStep, 0, 14, 0, 255);
-      int g = map(speedStep, 0, 14, 255, 0);
+      // Backward or Unavailable
+      int r = map(speedStep, 1, 14, 255, 0);
+      int g = map(speedStep, 1, 14, 128, 0);
       pixels.setPixelColor(0, pixels.Color(r, g, 0));
     }
     pixels.show();

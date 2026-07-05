@@ -26,7 +26,8 @@ The Seeed Xiao RP2040's built-in LEDs and NeoPixel provide visual feedback on th
 
 ### NeoPixel LED
 - **Pulsing Blue:** Decoder is idle (Speed 0) and receiving signal.
-- **Color Gradient (Green to Red):** Indicates the current speed. Green is slow, Red is fast.
+- **Color Gradient (Forward):** Bright Green (slow) to White (fast).
+- **Color Gradient (Backward):** Bright Orange (slow) to Black/Off (fast).
 - **Flashing Red:** Timeout - No valid signal detected for more than 1 second.
 - **Solid White:** Motor kickstart is active.
 
