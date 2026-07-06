@@ -23,6 +23,7 @@ void test_motor_pwm_mapping_detailed(void);
 void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
 void test_motor_bemf_pi_control(void);
+void test_serial_console_logging_toggle(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -665,6 +666,30 @@ void test_motor_speed_curve(void) {
   TEST_ASSERT_INT_WITHIN(2, 421, analog_write_values[10]);
 }
 
+void test_serial_console_logging_toggle(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  // Initial state (enabled by default)
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+
+  // Toggle OFF
+  Serial.pushInput("L\n");
+  console.loop();
+  TEST_ASSERT_FALSE(logger.isLoggingEnabled());
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_DEBUG_ENABLE));
+
+  // Toggle ON (using lowercase 'l')
+  Serial.pushInput("l\n");
+  console.loop();
+  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -748,5 +773,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_motor_pwm_mapping_new_defaults);
   RUN_TEST(test_debug_leds_heartbeat);
   RUN_TEST(test_motor_bemf_pi_control);
+  RUN_TEST(test_serial_console_logging_toggle);
   return UNITY_END();
 }
