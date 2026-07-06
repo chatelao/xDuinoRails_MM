@@ -32,6 +32,8 @@ private:
   unsigned long     lastBemfMeasure;
   int               lastSpeed;
   int               previousPwm;
+  long              bemfErrorSum;
+  int               lastPwmAdjustment;
 
   // Motor parameters - will be set based on motorType
   int PWM_FREQ;

@@ -7,6 +7,7 @@ This document describes how the Märklin Motorola (MM) speed steps are currently
 - **Input:** MM speed steps (0 to 14).
 - **Output:** PWM duty cycle (0 to 1023).
 - **PWM Frequency:** Depends on motor type (400 Hz or 20 kHz).
+- **Directional Lights:** PWM brightness control (0 to 1023) via CV 63 (0-7).
 
 ## Mapping Logic
 

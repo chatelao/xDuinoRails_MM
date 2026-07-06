@@ -58,7 +58,19 @@ To overcome initial motor friction, the firmware implements a kickstart phase wh
 The kickstart phase ends immediately when either of these conditions is met:
 1. **Timeout:** The elapsed time exceeds `KICK_MAX_TIME` (80-150 ms depending on profile).
 2. **BEMF Threshold:** The measured BEMF value exceeds `BEMF_THRESHOLD` (80-120 depending on profile), indicating the motor has started turning.
-   - **Note:** BEMF-based termination can be disabled via **CV 49 (Bit 0)**. If bit 0 is cleared, only the timeout condition will terminate the kickstart.
+   - **Note:** BEMF-based termination and load compensation are controlled by **CV 49 (Bit 0)**.
+
+## Load Compensation (PI Controller)
+
+When BEMF is enabled, the firmware uses a PI controller to maintain the target speed under load.
+
+### Algorithm
+1. **Target BEMF:** Calculated as `targetPwm * 4` (mapping 10-bit PWM to 12-bit BEMF).
+2. **Sampling:** BEMF is measured every `BEMF_SAMPLE_INT` (10-15ms).
+3. **Control Formula:** `adjustment = (error * K) / 16 + (errorSum * I) / 64`
+   - **K (CV 54):** Proportional gain.
+   - **I (CV 55):** Integral gain.
+4. **Windup Protection:** `errorSum` is clamped to ±10000.
 
 ## Analysis of Motor Behavior (Case Study)
 
