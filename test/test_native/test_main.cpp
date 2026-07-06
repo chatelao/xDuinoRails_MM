@@ -422,6 +422,35 @@ void test_logging(void) {
     }
   }
   TEST_ASSERT_TRUE(foundKickstartStarted);
+  Serial.clearLog();
+
+  // Test Motor PWM logging
+  motor.setSpeed(7, MM2DirectionState_Forward);
+  bool foundPwmLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Step 7 -> PWM") != std::string::npos) {
+      foundPwmLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundPwmLog);
+  Serial.clearLog();
+
+  // Test redundant call (no log)
+  motor.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(0, Serial.logLines.size());
+
+  // Test direction change log
+  motor.setSpeed(7, MM2DirectionState_Backward);
+  foundPwmLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Step 7 -> PWM") != std::string::npos &&
+        line.find("Dir Backward") != std::string::npos) {
+      foundPwmLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundPwmLog);
 }
 
 void test_serial_console(void) {
