@@ -60,6 +60,42 @@ The kickstart phase ends immediately when either of these conditions is met:
 2. **BEMF Threshold:** The measured BEMF value exceeds `BEMF_THRESHOLD` (80-120 depending on profile), indicating the motor has started turning.
    - **Note:** BEMF-based termination can be disabled via **CV 49 (Bit 0)**. If bit 0 is cleared, only the timeout condition will terminate the kickstart.
 
+## Analysis of Motor Behavior (Case Study)
+
+Reported strange behavior:
+- **Speed 5:** Barely moves
+- **Speed 6:** Moves fast
+- **Speed 7:** Moves at maximal speed
+
+### Calculated PWM Mapping (Default CVs: 2=10, 5=0, 6=0)
+
+| MM Step | PWM Value | Duty Cycle | Notes |
+| :--- | :--- | :--- | :--- |
+| 1 | 40 | 3.9% | Vstart |
+| 2 | 121 | 11.8% | |
+| 3 | 203 | 19.8% | |
+| 4 | 285 | 27.8% | |
+| 5 | 367 | 35.9% | Reported: Barely moves |
+| 6 | 449 | 43.9% | Reported: Fast |
+| 7 | 531 | 51.9% | Vmid (Midpoint between 1 and 14) - Reported: Maximal speed |
+| 8 | 601 | 58.7% | |
+| 14 | 1023 | 100.0% | Vhigh |
+
+### Analytic Findings
+
+The observed behavior is a result of the physical motor characteristics interacting with the default 3-point speed curve:
+
+1.  **High Starting Friction:** The motor requires approx. 35-40% PWM (Step 5) to overcome internal friction. This explains why it "barely moves" at Step 5.
+2.  **Early Saturation:** Many model railroad motors reach their perceived maximum physical speed (or the limit of the gear ratio) at around 50-60% duty cycle. In the default configuration, **Step 7** already provides **52% PWM**. To the user, there is no noticeable speed increase between Step 7 and Step 14, leading to the perception that Step 7 is already "maximal speed".
+3.  **Non-Linear Response:** The jump from 36% (Step 5) to 44% (Step 6) and 52% (Step 7) is relatively small in terms of PWM, but happens to be in the most sensitive region of this specific motor's RPM curve.
+
+### Recommendations for Calibration
+
+To fix this for this specific locomotive, the user should:
+1.  **Increase CV 2 (Start Voltage):** Set to approx. 80-90 so that Step 1 already overcomes friction.
+2.  **Decrease CV 5 (Maximum Speed):** Set to approx. 120-150 to map Step 14 to the physical maximum speed, providing better resolution over the lower speed range.
+3.  **Adjust CV 6 (Medium Speed):** Use a value lower than the default midpoint to create a "logarithmic" curve, giving more steps in the slow speed range.
+
 ## Signal Loss Watchdog
 
 The firmware includes a safety watchdog to stop the locomotive if the command signal is lost.
