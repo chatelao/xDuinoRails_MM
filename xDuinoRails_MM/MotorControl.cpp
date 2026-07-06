@@ -75,6 +75,11 @@ const int PWM_MAX = 1023;
 
 void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   if (step == 0) {
+    if (lastSpeed != 0 || dir != targetDirection) {
+      logger.printf("Motor: Step 0 -> PWM 0, Dir %s\n",
+                    dir == MM2DirectionState_Forward ? "Forward" : "Backward");
+      lastSpeed = 0;
+    }
     update(0, dir);
     return;
   }
@@ -109,6 +114,12 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
     pwm = map(step, 1, 7, vStart, vMid);
   } else {
     pwm = map(step, 7, 14, vMid, vHigh);
+  }
+
+  if (step != lastSpeed || dir != targetDirection) {
+    logger.printf("Motor: Step %d -> PWM %d, Dir %s\n", step, pwm,
+                  dir == MM2DirectionState_Forward ? "Forward" : "Backward");
+    lastSpeed = step;
   }
 
   update(pwm, dir);

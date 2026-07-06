@@ -35,6 +35,11 @@ The following areas of the codebase currently implement logging:
 | | Progress of direction change sequences (for entering programming mode). |
 | | Received CV addresses and values during programming. |
 | **Protocol Handler** | Decoded MM packet details: Address, Speed, Direction, F0 state, and MM2 status. |
+| | Signal presence transitions ("MM Signal lost" and "MM Signal recovered"). |
+| **Motor Control** | "Motor: Type=[Type], PWM Freq=[Freq] Hz" (Logged at startup). |
+| | "Motor: Step [Step] -> PWM [PWM], Dir [Dir]" (Logged on speed or direction change). |
+| | "Motor: Kickstart started" (Logged when starting from speed 0). |
+| | "Motor: Kickstart ended (timeout)" or "Motor: Kickstart ended (BEMF)". |
 
 ## Implementation Details
 
