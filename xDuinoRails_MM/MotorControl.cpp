@@ -18,6 +18,8 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastBemfMeasure     = 0;
   lastSpeed           = 0;
   previousPwm         = 0;
+  bemfErrorIntegral   = 0;
+  lastLoadCompUpdate  = 0;
 }
 
 void MotorControl::setup() {
@@ -84,24 +86,14 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_MAX);
   int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED), 0, 255, 0, PWM_MAX);
 
-  // Defaults if CVs are 0
-  if (vHigh == 0)
-    vHigh = PWM_MAX;
-  if (vStart == 0)
-    vStart = 1;
-
-  // Clamp vStart to vHigh to avoid negative slopes
-  if (vStart > vHigh)
-    vStart = vHigh;
-
+  if (vHigh == 0) vHigh = PWM_MAX;
+  if (vStart == 0) vStart = 1;
+  if (vStart > vHigh) vStart = vHigh;
   if (vMid == 0) {
     vMid = (vStart + vHigh) / 2;
   } else {
-    // Clamp vMid between vStart and vHigh
-    if (vMid < vStart)
-      vMid = vStart;
-    if (vMid > vHigh)
-      vMid = vHigh;
+    if (vMid < vStart) vMid = vStart;
+    if (vMid > vHigh) vMid = vHigh;
   }
 
   int pwm;
@@ -115,70 +107,109 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
 }
 
 void MotorControl::update(int pwm, MM2DirectionState dir) {
-  targetPwm         = pwm;
-  targetDirection   = dir;
   unsigned long now = millis();
+  if (now == 0) now = 1;
 
-  // Bei Stillstand Richtung sofort übernehmen
-  if (targetPwm == 0)
-    currDirection = targetDirection;
-
-  if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
-    isKickstarting_priv = true;
-    logger.println("Motor: Kickstart started");
-    kickstartBegin  = now;
-    lastBemfMeasure = 0;
+  MM2DirectionState effectiveDir = dir;
+  if (effectiveDir == MM2DirectionState_Unavailable) {
+    effectiveDir = currDirection;
   }
-  if (targetPwm == 0) {
+
+  // Handle Stop
+  if (pwm == 0) {
+    if (targetPwm != 0 || isKickstarting_priv) {
+      writeMotorHardware(0, effectiveDir);
+    }
+    currDirection = effectiveDir;
+    targetDirection = effectiveDir;
+    targetPwm = 0;
+    previousPwm = 0;
     isKickstarting_priv = false;
+    bemfErrorIntegral = 0;
+    return;
   }
 
+  bool directionChanged = (effectiveDir != currDirection);
+  bool targetPwmChanged = (pwm != targetPwm);
+
+  targetPwm = pwm;
+  targetDirection = effectiveDir;
+
+  // Handle Direction Change
+  if (directionChanged && !isKickstarting_priv) {
+    writeMotorHardware(0, currDirection);
+    currDirection = targetDirection;
+    previousPwm = 0;
+    bemfErrorIntegral = 0;
+    lastLoadCompUpdate = 0;
+    return;
+  }
+
+  // Kickstart trigger
+  if (previousPwm == 0 && !isKickstarting_priv && KICK_MAX_TIME > 0) {
+    isKickstarting_priv = true;
+    kickstartBegin = now;
+    lastBemfMeasure = now;
+    logger.println("Motor: Kickstart started");
+    writeMotorHardware(KICK_PWM, currDirection);
+  }
+
+  bool kickstartEndedNow = false;
   if (isKickstarting_priv) {
-    if (now - kickstartBegin >= KICK_MAX_TIME) {
+    if (now - kickstartBegin >= (unsigned long)KICK_MAX_TIME) {
       isKickstarting_priv = false;
+      kickstartEndedNow = true;
       logger.println("Motor: Kickstart ended (timeout)");
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
-      if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
+      if (bemfEnabled && (now - lastBemfMeasure >= (unsigned long)BEMF_SAMPLE_INT)) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
+          kickstartEndedNow = true;
           logger.println("Motor: Kickstart ended (BEMF)");
         }
-      }
-      if (isKickstarting_priv) {
-        writeMotorHardware(KICK_PWM, currDirection);
       }
     }
   }
 
   if (!isKickstarting_priv) {
-    if (currDirection != targetDirection) {
-      writeMotorHardware(0, currDirection);
-      currDirection = targetDirection;
-    } else {
+    bool loadCompEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+    if (targetPwmChanged) bemfErrorIntegral = 0;
+
+    if (loadCompEnabled) {
+      if (now - lastLoadCompUpdate >= (unsigned long)BEMF_SAMPLE_INT || targetPwmChanged || kickstartEndedNow) {
+        int measuredBEMF = readBEMF();
+        int targetBEMF = targetPwm * 4;
+        int error = targetBEMF - measuredBEMF;
+        float k = cvManager.getCv(CV_BEMF_K) / 32.0f;
+        float i = cvManager.getCv(CV_BEMF_I) / 128.0f;
+        bemfErrorIntegral += error;
+        if (bemfErrorIntegral > 2000) bemfErrorIntegral = 2000;
+        if (bemfErrorIntegral < -2000) bemfErrorIntegral = -2000;
+        int adj = (int)(error * k + bemfErrorIntegral * i);
+        int finalPwm = targetPwm + adj;
+        if (finalPwm > 1023) finalPwm = 1023;
+        if (finalPwm < 0) finalPwm = 0;
+        writeMotorHardware(finalPwm, currDirection);
+        lastLoadCompUpdate = now;
+      }
+    } else if (targetPwmChanged || kickstartEndedNow) {
       writeMotorHardware(targetPwm, currDirection);
     }
   }
+
   previousPwm = targetPwm;
 }
 
-void MotorControl::stop() {
-  targetPwm = 0;
-  writeMotorHardware(0, currDirection);
-}
-
+void MotorControl::stop() { update(0, currDirection); }
 bool MotorControl::isKickstarting() { return isKickstarting_priv; }
-
 MM2DirectionState MotorControl::getCurrentDirection() { return currDirection; }
 
 void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
-  if (pwm > PWM_RANGE)
-    pwm = PWM_RANGE;
-  if (pwm < 0)
-    pwm = 0;
-
+  if (pwm > PWM_RANGE) pwm = PWM_RANGE;
+  if (pwm < 0) pwm = 0;
   if (dir == MM2DirectionState_Forward) {
     digitalWrite(pinB_priv, LOW);
     analogWrite(pinA_priv, pwm);
