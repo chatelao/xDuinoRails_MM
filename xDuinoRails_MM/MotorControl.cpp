@@ -76,6 +76,10 @@ void MotorControl::setup() {
 const int PWM_MAX = 1023;
 
 void MotorControl::setSpeed(int step, MM2DirectionState dir) {
+  
+  //
+  // Special case: Handle stopping
+  //
   if (step == 0) {
     if (lastSpeed != 0 || dir != targetDirection) {
       logger.printf("Motor: Step 0 -> PWM 0, Dir %s\n",
@@ -86,31 +90,27 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
     return;
   }
 
+  //
+  // Regular case: Handling movements
+  //
   // Map CVs (0-255) to PWM (0-1023)
   int vStart = map(cvManager.getCv(CV_START_VOLTAGE), 0, 255, 0, PWM_MAX);
+  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED ), 0, 255, 0, PWM_MAX);
   int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_MAX);
-  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED), 0, 255, 0, PWM_MAX);
 
-  // Defaults if CVs are 0
-  if (vHigh == 0)
-    vHigh = PWM_MAX;
-  if (vStart == 0)
-    vStart = 1;
+  // If CVs are 0, then set defaults (1 / PWM_MAX)
+  if (vStart == 0) vStart = 1;
+  if (vMid   == 0) vMid = (vStart + vHigh) / 2;
+  if (vHigh  == 0) vHigh = PWM_MAX;
 
   // Clamp vStart to vHigh to avoid negative slopes
   if (vStart > vHigh)
     vStart = vHigh;
 
-  if (vMid == 0) {
-    vMid = (vStart + vHigh) / 2;
-  } else {
-    // Clamp vMid between vStart and vHigh
-    if (vMid < vStart)
-      vMid = vStart;
-    if (vMid > vHigh)
-      vMid = vHigh;
-  }
-
+  // Clamp vMid between vStart and vHigh
+  if (vStart > vMid  ) vMid = vStart; // Clamp to >= vStart
+  if (vMid   > vHigh ) vMid = vHigh;  // Clamp to <= vHigh
+  
   int pwm;
   if (step <= 7) {
     pwm = map(step, 1, 7, vStart, vMid);
