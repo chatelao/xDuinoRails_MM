@@ -9,6 +9,7 @@
 
 extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> digital_write_values;
+extern std::map<uint8_t, int> analog_read_values;
 
 #define HIGH 0x1
 #define LOW  0x0

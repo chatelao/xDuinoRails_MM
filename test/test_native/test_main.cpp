@@ -17,6 +17,7 @@ void test_motor_speed_curve(void);
 void test_logging(void);
 void test_serial_console(void);
 void test_cv_manager_print_all(void);
+void test_motor_kickstart_bemf_disabled(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -496,6 +497,56 @@ void test_cv_manager_print_all(void) {
   TEST_ASSERT_TRUE(foundFooter);
 }
 
+void test_motor_kickstart_bemf_disabled(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+
+  // Disable BEMF
+  cvManager.setCv(CV_BEMF_CONFIG, 0);
+
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  Serial.clearLog();
+
+  // Start kickstart
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  // Simulate BEMF detected
+  analog_read_values[2] = 500; // BemfA
+  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+
+  // Update motor - should NOT end kickstart because BEMF is disabled
+  advance_millis(20);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  bool foundBemfLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart ended (BEMF)") != std::string::npos) {
+      foundBemfLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_FALSE(foundBemfLog);
+
+  // Wait for timeout (default 100ms for type 0)
+  advance_millis(100);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+
+  bool foundTimeoutLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart ended (timeout)") != std::string::npos) {
+      foundTimeoutLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundTimeoutLog);
+}
+
 void test_motor_speed_curve(void) {
   CvManagerMock cvManager;
 
@@ -618,5 +669,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_serial_console);
   RUN_TEST(test_cv_manager_print_all);
+  RUN_TEST(test_motor_kickstart_bemf_disabled);
   return UNITY_END();
 }

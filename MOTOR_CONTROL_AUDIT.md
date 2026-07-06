@@ -58,6 +58,7 @@ To overcome initial motor friction, the firmware implements a kickstart phase wh
 The kickstart phase ends immediately when either of these conditions is met:
 1. **Timeout:** The elapsed time exceeds `KICK_MAX_TIME` (80-150 ms depending on profile).
 2. **BEMF Threshold:** The measured BEMF value exceeds `BEMF_THRESHOLD` (80-120 depending on profile), indicating the motor has started turning.
+   - **Note:** BEMF-based termination can be disabled via **CV 49 (Bit 0)**. If bit 0 is cleared, only the timeout condition will terminate the kickstart.
 
 ## Signal Loss Watchdog
 

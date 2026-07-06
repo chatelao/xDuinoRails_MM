@@ -20,6 +20,7 @@ public:
     cvStore[CV_CONFIGURATION]     = 6;
     cvStore[CV_FRONT_LIGHT_F0F]   = 1;
     cvStore[CV_REAR_LIGHT_F0R]    = 2;
+    cvStore[CV_BEMF_CONFIG]       = 1;
     cvStore[CV_EXT_ID_HIGH]       = 1;
     cvStore[CV_EXT_ID_LOW]        = 10;
     cvStore[CV_MOTOR_TYPE]        = 0;

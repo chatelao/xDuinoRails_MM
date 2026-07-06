@@ -19,6 +19,7 @@ constexpr int CV_LONG_ADDRESS_LOW  = 18;
 constexpr int CV_CONFIGURATION     = 29;
 constexpr int CV_FRONT_LIGHT_F0F   = 33;
 constexpr int CV_REAR_LIGHT_F0R    = 34;
+constexpr int CV_BEMF_CONFIG       = 49;
 constexpr int CV_MOTOR_TYPE        = 52;
 constexpr int CV_EXT_ID_HIGH       = 107;
 constexpr int CV_EXT_ID_LOW        = 108;

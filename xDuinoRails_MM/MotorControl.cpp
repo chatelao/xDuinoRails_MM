@@ -138,7 +138,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       isKickstarting_priv = false;
       logger.println("Motor: Kickstart ended (timeout)");
     } else {
-      if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
+      bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+      if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
