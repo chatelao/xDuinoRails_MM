@@ -11,10 +11,17 @@ void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
   cachedEnabled   = isEnabled();
   isInitialized   = true;
-  if (cachedEnabled) {
-    Serial.begin(baudRate);
+  Serial.begin(baudRate);
+}
+
+void Logger::toggleLogging() {
+  cachedEnabled = !cachedEnabled;
+  if (cvManager) {
+    cvManager->setCv(CV_DEBUG_ENABLE, cachedEnabled ? 1 : 0);
   }
 }
+
+bool Logger::isLoggingEnabled() { return cachedEnabled; }
 
 bool Logger::isEnabled() {
   if (cvManager == nullptr)

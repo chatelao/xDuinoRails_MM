@@ -47,5 +47,9 @@ void SerialConsole::parseCommand(char *line) {
     // We assume Function 1 as per request "f 0 : disable function 1", "f 1 : enable function 1"
     protocol->setFunctionState(1, val1 > 0);
     logger.printf("Serial: Function 1 set to %d\n", val1 > 0);
+  } else if (line[0] == 'L' || line[0] == 'l') {
+    logger.toggleLogging();
+    Serial.print("Serial: Logging ");
+    Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
   }
 }

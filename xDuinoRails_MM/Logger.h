@@ -11,6 +11,8 @@ public:
   void print(const char *message);
   void println(const char *message);
   void printf(const char *format, ...);
+  void toggleLogging();
+  bool isLoggingEnabled();
 
 private:
   CvManager *cvManager;
