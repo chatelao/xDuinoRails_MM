@@ -82,6 +82,7 @@ The decoder provides a simple command line interface via the USB Serial port (11
 | Command | Description | Example |
 |---|---|---|
 | `cv <num> <val>` | Sets Configuration Variable `<num>` to value `<val>`. | `cv 1 3` (Sets address to 3) |
+| `cv` | Reads out all current Configuration Variable values. | `cv` |
 | `s <speed>` | Sets the target speed (0–14). | `s 7` (Half speed) |
 | `d f` | Sets the direction to **Forward**. | `d f` |
 | `d b` | Sets the direction to **Backward**. | `d b` |

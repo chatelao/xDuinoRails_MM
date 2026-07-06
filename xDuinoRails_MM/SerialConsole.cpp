@@ -32,6 +32,8 @@ void SerialConsole::parseCommand(char *line) {
   if (sscanf(line, "cv %d %d", &val1, &val2) == 2) {
     cvManager->setCv(val1, (uint8_t)val2);
     logger.printf("Serial: CV %d set to %d\n", val1, val2);
+  } else if (strcmp(line, "cv") == 0) {
+    cvManager->printAllCvs();
   } else if (sscanf(line, "s %d", &val1) == 1) {
     protocol->setTargetSpeed(val1);
     logger.printf("Serial: Speed set to %d\n", val1);
