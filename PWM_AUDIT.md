@@ -30,27 +30,27 @@ For steps between 1 and 14, the PWM value is calculated using a 3-point speed cu
     - Steps 1-7: `map(step, 1, 7, Vstart, Vmid)`
     - Steps 7-14: `map(step, 7, 14, Vmid, Vhigh)`
 
-### Table of Sample Values (Defaults: CV 2=10, CV 5=0, CV 6=0)
+### Table of Sample Values (Defaults: CV 2=85, CV 5=140, CV 6=105)
 
-With `CV 2 = 10`, `Vstart ≈ 40`. `CV 5 = 0` (Vhigh = 1023). `CV 6 = 0` (Vmid ≈ 531).
+With `CV 2 = 85`, `Vstart ≈ 341`. `CV 5 = 140` (Vhigh ≈ 561). `CV 6 = 105` (Vmid ≈ 421).
 
 | MM Speed Step | PWM Value (Approx.) |
 | :--- | :--- |
 | 0 | 0 |
-| 1 | 40 |
-| 2 | 121 |
-| 3 | 203 |
-| 4 | 285 |
-| 5 | 367 |
-| 6 | 449 |
-| 7 | 531 |
-| 8 | 601 |
-| 9 | 671 |
-| 10 | 741 |
-| 11 | 812 |
-| 12 | 882 |
-| 13 | 952 |
-| 14 | 1023 |
+| 1 | 341 |
+| 2 | 354 |
+| 3 | 367 |
+| 4 | 381 |
+| 5 | 394 |
+| 6 | 407 |
+| 7 | 421 |
+| 8 | 441 |
+| 9 | 461 |
+| 10 | 481 |
+| 11 | 501 |
+| 12 | 521 |
+| 13 | 541 |
+| 14 | 561 |
 
 ## Observed Issues / Notes
 
