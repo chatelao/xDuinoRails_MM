@@ -18,8 +18,6 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastBemfMeasure     = 0;
   lastSpeed           = 0;
   previousPwm         = 0;
-  bemfErrorSum        = 0;
-  lastAdjustment      = 0;
 }
 
 void MotorControl::setup() {
@@ -76,10 +74,6 @@ void MotorControl::setup() {
 const int PWM_MAX = 1023;
 
 void MotorControl::setSpeed(int step, MM2DirectionState dir) {
-  
-  //
-  // Special case: Handle stopping
-  //
   if (step == 0) {
     if (lastSpeed != 0 || dir != targetDirection) {
       logger.printf("Motor: Step 0 -> PWM 0, Dir %s\n",
@@ -90,27 +84,31 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
     return;
   }
 
-  //
-  // Regular case: Handling movements
-  //
   // Map CVs (0-255) to PWM (0-1023)
   int vStart = map(cvManager.getCv(CV_START_VOLTAGE), 0, 255, 0, PWM_MAX);
-  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED ), 0, 255, 0, PWM_MAX);
   int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_MAX);
+  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED), 0, 255, 0, PWM_MAX);
 
-  // If CVs are 0, then set defaults (1 / PWM_MAX)
-  if (vStart == 0) vStart = 1;
-  if (vMid   == 0) vMid = (vStart + vHigh) / 2;
-  if (vHigh  == 0) vHigh = PWM_MAX;
+  // Defaults if CVs are 0
+  if (vHigh == 0)
+    vHigh = PWM_MAX;
+  if (vStart == 0)
+    vStart = 1;
 
   // Clamp vStart to vHigh to avoid negative slopes
   if (vStart > vHigh)
     vStart = vHigh;
 
-  // Clamp vMid between vStart and vHigh
-  if (vStart > vMid  ) vMid = vStart; // Clamp to >= vStart
-  if (vMid   > vHigh ) vMid = vHigh;  // Clamp to <= vHigh
-  
+  if (vMid == 0) {
+    vMid = (vStart + vHigh) / 2;
+  } else {
+    // Clamp vMid between vStart and vHigh
+    if (vMid < vStart)
+      vMid = vStart;
+    if (vMid > vHigh)
+      vMid = vHigh;
+  }
+
   int pwm;
   if (step <= 7) {
     pwm = map(step, 1, 7, vStart, vMid);
@@ -133,11 +131,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   unsigned long now = millis();
 
   // Bei Stillstand Richtung sofort übernehmen
-  if (targetPwm == 0) {
+  if (targetPwm == 0)
     currDirection = targetDirection;
-    bemfErrorSum   = 0;
-    lastAdjustment = 0;
-  }
 
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
     isKickstarting_priv = true;
@@ -172,41 +167,9 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (!isKickstarting_priv) {
     if (currDirection != targetDirection) {
       writeMotorHardware(0, currDirection);
-      currDirection  = targetDirection;
-      bemfErrorSum   = 0;
-      lastAdjustment = 0;
+      currDirection = targetDirection;
     } else {
-      int finalPwm = targetPwm;
-
-      bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
-      if (bemfEnabled && targetPwm > 0) {
-        if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
-          int currentBEMF = readBEMF();
-          lastBemfMeasure = now;
-
-          // PI-Regler
-          // Ziel-BEMF: Wir nehmen an, dass BEMF proportional zu PWM ist.
-          // PWM 0-1023 -> BEMF 0-4095 (12-bit ADC).
-          // Ein Ziel-BEMF von targetPwm * 4 ist eine grobe Annäherung.
-          int targetBEMF = targetPwm * 4;
-          int error      = targetBEMF - currentBEMF;
-
-          uint8_t K = cvManager.getCv(CV_BEMF_K);
-          uint8_t I = cvManager.getCv(CV_BEMF_I);
-
-          bemfErrorSum += error;
-          // Begrenzung des Integrals, um Windup zu verhindern
-          if (bemfErrorSum > 10000)
-            bemfErrorSum = 10000;
-          if (bemfErrorSum < -10000)
-            bemfErrorSum = -10000;
-
-          lastAdjustment = (error * K / 16) + (bemfErrorSum * I / 64);
-        }
-        finalPwm += lastAdjustment;
-      }
-
-      writeMotorHardware(finalPwm, currDirection);
+      writeMotorHardware(targetPwm, currDirection);
     }
   }
   previousPwm = targetPwm;
