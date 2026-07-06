@@ -106,6 +106,9 @@ void test_cv_manager_reset_8(void) {
 // Testet die Geschwindigkeits- und Richtungsteuerung des Motors.
 void test_motor_speed_control(void) {
   CvManagerMock cvManager;
+  // Initialize clock to non-zero
+  advance_millis(100);
+
   // Konfiguriere CVs für den Motor
   cvManager.setCv(CV_START_VOLTAGE, 10);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
@@ -119,11 +122,12 @@ void test_motor_speed_control(void) {
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 
   // Test: Geschwindigkeit 1 in Vorwärtsrichtung
+  analog_read_values[2] = 0; // Ensure no BEMF termination
   motor.setSpeed(1, MM2DirectionState_Forward);
+  // During kickstart, it should be KICK_PWM (800)
+  TEST_ASSERT_EQUAL(800, analog_write_values[10]);
+
   advance_millis(120); // Wait for kickstart timeout
-  analog_read_values[2] = 0;
-  analog_read_values[3] = 0;
-  motor.setSpeed(0, MM2DirectionState_Forward); // Ensure it stops kickstart
   motor.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
   // Expected PWM (Vstart = 10 -> map(10, 0, 255, 0, 1023) = 40)
@@ -600,6 +604,7 @@ void test_motor_load_compensation(void) {
   analog_read_values[2] = 0; // Don't end kickstart by BEMF yet
   analog_read_values[3] = 0;
   motor.setSpeed(10, MM2DirectionState_Forward);
+  motor.setSpeed(10, MM2DirectionState_Forward);
   TEST_ASSERT_FALSE(motor.isKickstarting());
   int targetPwm = analog_write_values[10];
   int targetBemf = targetPwm * 4;
@@ -634,6 +639,7 @@ void test_motor_load_compensation(void) {
   motor.setSpeed(0, MM2DirectionState_Forward);
   motor.setSpeed(10, MM2DirectionState_Forward);
   advance_millis(200);
+  motor.setSpeed(10, MM2DirectionState_Forward);
   motor.setSpeed(10, MM2DirectionState_Forward);
 
   // Clear error and reset integral
@@ -672,6 +678,7 @@ void test_motor_speed_curve(void) {
   analog_read_values[2] = 0;
   analog_read_values[3] = 0;
   motor1.setSpeed(1, MM2DirectionState_Forward);
+  motor1.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_INT_WITHIN(5, 200, analog_write_values[10]);
 
   motor1.setSpeed(7, MM2DirectionState_Forward);
@@ -690,6 +697,7 @@ void test_motor_speed_curve(void) {
   advance_millis(120);
   analog_read_values[2] = 0;
   analog_read_values[3] = 0;
+  motor1.setSpeed(1, MM2DirectionState_Forward);
   motor1.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(40, analog_write_values[10]);
 
