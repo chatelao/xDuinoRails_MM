@@ -19,6 +19,7 @@ This document tracks the implementation status of Configuration Variables (CVs) 
 | 29 | Configuration | ⚠️ Initialized Only | Values are stored but not used for logic (e.g., speed steps). |
 | 33 | Front Light (F0f) | ✅ Implemented | Bit 0 enables front light output. |
 | 34 | Rear Light (F0r) | ✅ Implemented | Bit 1 enables rear light output. |
+| 49 | BEMF Config | ✅ Implemented | Bit 0 enables BEMF sensing for kickstart termination. |
 | 52 | Motor Type | ✅ Implemented | Selects motor characteristics profile in `MotorControl`. |
 | 107/108| Ext. ID | ⚠️ Initialized Only | Metadata for DecoderDB identification. |
 | 250 | Debug Enable | ✅ Implemented | 0 = Disabled, 1 = Enabled (default). |
