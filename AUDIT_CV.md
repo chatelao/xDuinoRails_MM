@@ -47,7 +47,7 @@ While these CVs exist in the manager, the `MotorControl::update` method currentl
 Implemented as part of a 3-point speed curve (Vstart, Vmid, Vhigh). If set to 0, they use sensible defaults (Vhigh=1023, Vmid=midpoint).
 
 ### 3. Start Voltage Scaling (CV 2)
-Standardized to map 0-255 to 0-1023 PWM. The previous `* 40` multiplier was replaced.
+Standardized to map 0-255 to 0-1023 PWM. Default set to 85 (approx. 33% duty cycle) to overcome initial friction.
 
 ### 4. BEMF Integration
 BEMF sensing is currently only used to terminate the kickstart pulse early if rotation is detected. It is not used for active speed regulation (Load Compensation).

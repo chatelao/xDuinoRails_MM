@@ -46,10 +46,11 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | Emoji | CV | Name | Type | Default/Fix | Description |
 |---|---|---|---|:---:|---|
 | 🏷️ | 1 | Base Address | Mandatory | 3 | The short address (1–127). |
-| ⚡ | 2 | Start Voltage | Standard | 1 - 5 | Minimum PWM for the motor to start at speed step 1. |
+| ⚡ | 2 | Start Voltage | Standard | 85 | Minimum PWM for the motor to start at speed step 1. |
 | 📈 | 3 | Acceleration | Standard | 5 | "Chart Up": Time factor for smooth acceleration to maximum speed. |
 | 📉 | 4 | Braking Time | Standard | 5 | "Chart Down": Time factor for coasting to a standstill. |
-| 💨 | 5 | Maximum Speed | Standard | 0 or 255 | Limits the maximum voltage at full speed (scaling). 0 = deactivated (full throttle). |
+| 💨 | 5 | Maximum Speed | Standard | 140 | Limits the maximum voltage at full speed (scaling). |
+| ℹ️ | 6 | Medium Speed | Standard | 105 | Mid-point voltage for the speed curve. |
 | ℹ️ | 7 | Version | Mandatory | 10 | Read-Only. E.g. 10 for version 1.0. |
 | 🏭 | 8 | Manufacturer ID | Mandatory | 13 | Important: NMRA ID for DIY/Public Domain. Writing to 8 triggers a reset. |
 | 🐕 | 11 | Watchdog Timeout | Standard | 5 | Timeout in 100ms steps (Default 5 = 500ms). Shuts down motor if no signal. |
