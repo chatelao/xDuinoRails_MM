@@ -72,6 +72,12 @@ void DebugLeds::update(int speedStep, MM2DirectionState direction, bool f1,
       int g = map(speedStep, 1, 14, 128, 0);
       pixels.setPixelColor(0, pixels.Color(r, g, 0));
     }
+
+    // Heartbeat: Darken out for 100ms every second
+    if (now % 1000 < 100) {
+      pixels.setPixelColor(0, 0);
+    }
+
     pixels.show();
   }
 }

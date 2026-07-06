@@ -13,6 +13,10 @@ public:
   void update(int speedStep, MM2DirectionState direction, bool f1,
               bool isMm2Locked, bool isKickstarting, bool isTimeout);
 
+#ifdef PIO_UNIT_TESTING
+  uint32_t getPixelColor(uint16_t n) { return pixels.getPixelColor(n); }
+#endif
+
 private:
   void              setIntLed(int pin, bool on);
   Adafruit_NeoPixel pixels;

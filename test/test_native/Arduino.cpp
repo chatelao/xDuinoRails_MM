@@ -33,6 +33,8 @@ unsigned long millis() { return current_millis; }
 
 void advance_millis(unsigned long ms) { current_millis += ms; }
 
+void delay(unsigned long ms) { advance_millis(ms); }
+
 void delayMicroseconds(unsigned int us) {
   // Mock implementation
 }
