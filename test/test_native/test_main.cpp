@@ -16,6 +16,7 @@ void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
 void test_serial_console(void);
+void test_serial_console_cv_readout(void);
 void test_cv_manager_print_all(void);
 void test_motor_kickstart_bemf_disabled(void);
 void test_motor_kickstart_bemf_enabled(void);
@@ -496,6 +497,32 @@ void test_serial_console(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(1));
 }
 
+void test_serial_console_cv_readout(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+  Serial.clearLog();
+
+  // Test "cv" command for readout
+  Serial.pushInput("cv\n");
+  console.loop();
+
+  bool foundHeader = false;
+  bool foundAddress = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- Current CV Settings ---") != std::string::npos)
+      foundHeader = true;
+    if (line.find("CV 1 (Address): 3") != std::string::npos)
+      foundAddress = true;
+  }
+  TEST_ASSERT_TRUE(foundHeader);
+  TEST_ASSERT_TRUE(foundAddress);
+}
+
 void test_cv_manager_print_all(void) {
   CvManager cvManager;
   cvManager.setup();
@@ -766,6 +793,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_pwm_freq_logging);
   RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_serial_console);
+  RUN_TEST(test_serial_console_cv_readout);
   RUN_TEST(test_cv_manager_print_all);
   RUN_TEST(test_motor_kickstart_bemf_disabled);
   RUN_TEST(test_motor_kickstart_bemf_enabled);
