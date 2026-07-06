@@ -100,8 +100,8 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
 
   // If CVs are 0, then set defaults (1 / PWM_MAX)
   if (vStart == 0) vStart = 1;
-  if (vMid   == 0) vMid = (vStart + vHigh) / 2;
   if (vHigh  == 0) vHigh = PWM_MAX;
+  if (vMid   == 0) vMid = (vStart + vHigh) / 2;
 
   // Clamp vStart to vHigh to avoid negative slopes
   if (vStart > vHigh)
