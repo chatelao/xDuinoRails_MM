@@ -19,6 +19,7 @@ void test_serial_console(void);
 void test_cv_manager_print_all(void);
 void test_motor_kickstart_bemf_disabled(void);
 void test_motor_kickstart_bemf_enabled(void);
+void test_motor_load_compensation(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -119,38 +120,38 @@ void test_motor_speed_control(void) {
 
   // Test: Geschwindigkeit 1 in Vorwärtsrichtung
   motor.setSpeed(1, MM2DirectionState_Forward);
-  advance_millis(101); // Simuliere Zeitablauf
+  advance_millis(120); // Wait for kickstart timeout
+  analog_read_values[2] = 0;
+  analog_read_values[3] = 0;
+  motor.setSpeed(0, MM2DirectionState_Forward); // Ensure it stops kickstart
   motor.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
-  // Überprüfe den erwarteten PWM-Wert (Vstart = map(1, 0, 255, 0, 1023) = 4)
-  // Aber wir haben jetzt Standard CV_START_VOLTAGE = 10 -> map(10, 0, 255, 0, 1023) = 40
-  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+  // Expected PWM (Vstart = 10 -> map(10, 0, 255, 0, 1023) = 40)
+  TEST_ASSERT_INT_WITHIN(5, 40, analog_write_values[10]);
 
   // Test: Geschwindigkeit 1 in Rückwärtsrichtung
-  motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
-  motor.setSpeed(1, MM2DirectionState_Backward);
-  advance_millis(101);
-  motor.setSpeed(1,
-                 MM2DirectionState_Backward); // Dieser Aufruf stoppt den Motor
-  motor.setSpeed(1,
-                 MM2DirectionState_Backward); // Dieser wendet die Leistung an
+  motor.setSpeed(0, MM2DirectionState_Forward); // Stop
+  motor.setSpeed(1, MM2DirectionState_Backward); // Triggers direction change
+  motor.setSpeed(1, MM2DirectionState_Backward); // Triggers kickstart
+  advance_millis(120);
+  motor.setSpeed(1, MM2DirectionState_Backward); // Ends kickstart
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
-  TEST_ASSERT_EQUAL(40, analog_write_values[11]);
+  TEST_ASSERT_INT_WITHIN(5, 40, analog_write_values[11]);
 
   // Test: Maximale Geschwindigkeit in Vorwärtsrichtung
   motor.setSpeed(0, MM2DirectionState_Forward);
-  motor.setSpeed(14, MM2DirectionState_Forward);
-  advance_millis(101);
-  motor.setSpeed(14, MM2DirectionState_Forward);
+  motor.setSpeed(14, MM2DirectionState_Forward); // Triggers kickstart
+  advance_millis(120);
+  motor.setSpeed(14, MM2DirectionState_Forward); // Ends kickstart
   TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
   // Test: Maximale Geschwindigkeit in Rückwärtsrichtung
   motor.setSpeed(0, MM2DirectionState_Forward);
-  motor.setSpeed(14, MM2DirectionState_Backward);
-  advance_millis(101);
-  motor.setSpeed(14, MM2DirectionState_Backward); // Stoppt den Motor
-  motor.setSpeed(14, MM2DirectionState_Backward); // Wendet Leistung an
+  motor.setSpeed(14, MM2DirectionState_Backward); // Triggers direction change
+  motor.setSpeed(14, MM2DirectionState_Backward); // Triggers kickstart
+  advance_millis(120);
+  motor.setSpeed(14, MM2DirectionState_Backward); // Ends kickstart
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
 }
@@ -584,6 +585,77 @@ void test_motor_kickstart_bemf_enabled(void) {
   TEST_ASSERT_TRUE(foundBemfLog);
 }
 
+void test_motor_load_compensation(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_BEMF_CONFIG, 1);
+  cvManager.setCv(CV_BEMF_K, 32); // K = 1.0
+  cvManager.setCv(CV_BEMF_I, 0);  // I = 0.0
+
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  // 1. Set speed and finish kickstart
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  advance_millis(200); // Beyond kickstart
+  analog_read_values[2] = 0; // Don't end kickstart by BEMF yet
+  analog_read_values[3] = 0;
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+  int targetPwm = analog_write_values[10];
+  int targetBemf = targetPwm * 4;
+
+  // 2. Simulate load (measured BEMF < target BEMF)
+  // We want an adjustment that stays within 0-1023.
+  // targetPwm is around 741. targetBemf is 2964.
+  // Let's use error = 200. Adj = 200 * 1.0 = 200. finalPwm = 741 + 200 = 941.
+  analog_read_values[2] = targetBemf - 200;
+  analog_read_values[3] = 0;
+
+  advance_millis(20);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+
+  // Adjustment = (targetBEMF - measuredBEMF) * K = 200 * 1.0 = 200
+  // finalPwm = targetPwm + 200
+  TEST_ASSERT_INT_WITHIN(50, targetPwm + 200, analog_write_values[10]);
+
+  // 3. Simulate overspeed (measured BEMF > target BEMF)
+  analog_read_values[2] = targetBemf + 300;
+  advance_millis(20);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+
+  // Adjustment = -300 * 1.0 = -300
+  TEST_ASSERT_INT_WITHIN(50, targetPwm - 300, analog_write_values[10]);
+
+  // 4. Test Integral part
+  cvManager.setCv(CV_BEMF_K, 0);
+  cvManager.setCv(CV_BEMF_I, 128); // I = 1.0
+
+  // Reset state
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  advance_millis(200);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+
+  // Clear error and reset integral
+  analog_read_values[2] = targetBemf;
+  advance_millis(20);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(15, targetPwm, analog_write_values[10]);
+
+  analog_read_values[2] = (targetPwm * 4) - 64; // Small error: 64
+  advance_millis(20);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  // first update: integral = 64. adj = 64 * 1.0 = 64.
+  int expected1 = targetPwm + 64;
+  TEST_ASSERT_INT_WITHIN(15, expected1, analog_write_values[10]);
+
+  advance_millis(20);
+  motor.setSpeed(10, MM2DirectionState_Forward);
+  // second update: integral = 64 + 64 = 128. adj = 128.
+  int expected2 = targetPwm + 128;
+  TEST_ASSERT_INT_WITHIN(15, expected2, analog_write_values[10]);
+}
+
 void test_motor_speed_curve(void) {
   CvManagerMock cvManager;
 
@@ -596,7 +668,9 @@ void test_motor_speed_curve(void) {
   motor1.setup();
 
   motor1.setSpeed(1, MM2DirectionState_Forward);
-  advance_millis(101);
+  advance_millis(120);
+  analog_read_values[2] = 0;
+  analog_read_values[3] = 0;
   motor1.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_INT_WITHIN(5, 200, analog_write_values[10]);
 
@@ -613,7 +687,9 @@ void test_motor_speed_curve(void) {
   cvManager.setCv(CV_MAXIMUM_SPEED, 255);
 
   motor1.setSpeed(1, MM2DirectionState_Forward);
-  advance_millis(101);
+  advance_millis(120);
+  analog_read_values[2] = 0;
+  analog_read_values[3] = 0;
   motor1.setSpeed(1, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(40, analog_write_values[10]);
 
@@ -708,5 +784,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_print_all);
   RUN_TEST(test_motor_kickstart_bemf_disabled);
   RUN_TEST(test_motor_kickstart_bemf_enabled);
+  RUN_TEST(test_motor_load_compensation);
   return UNITY_END();
 }

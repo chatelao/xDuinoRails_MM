@@ -65,6 +65,8 @@ void CvManager::printAllCvs() {
   logger.printf("CV 34 (F0r): %d\n", getCv(CV_REAR_LIGHT_F0R));
   logger.printf("CV 49 (BEMF Config): %d\n", getCv(CV_BEMF_CONFIG));
   logger.printf("CV 52 (Motor Type): %d\n", getCv(CV_MOTOR_TYPE));
+  logger.printf("CV 54 (BEMF K): %d\n", getCv(CV_BEMF_K));
+  logger.printf("CV 55 (BEMF I): %d\n", getCv(CV_BEMF_I));
   logger.printf("CV 107/108 (Ext ID): %d\n",
                 (getCv(CV_EXT_ID_HIGH) << 8) | getCv(CV_EXT_ID_LOW));
   logger.printf("CV 250 (Debug): %d\n", getCv(CV_DEBUG_ENABLE));
@@ -90,6 +92,8 @@ void CvManager::initCv() {
     EEPROM.write(CV_REAR_LIGHT_F0R, 2);
     EEPROM.write(CV_BEMF_CONFIG, 0);
     EEPROM.write(CV_MOTOR_TYPE, 0);
+    EEPROM.write(CV_BEMF_K, 32);
+    EEPROM.write(CV_BEMF_I, 24);
     EEPROM.write(CV_EXT_ID_HIGH, 1);
     EEPROM.write(CV_EXT_ID_LOW, 10);
     EEPROM.write(CV_PROGRAMMING_LOCK, 0);

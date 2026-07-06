@@ -60,6 +60,25 @@ The kickstart phase ends immediately when either of these conditions is met:
 2. **BEMF Threshold:** The measured BEMF value exceeds `BEMF_THRESHOLD` (80-120 depending on profile), indicating the motor has started turning.
    - **Note:** BEMF-based termination can be disabled via **CV 49 (Bit 0)**. If bit 0 is cleared, only the timeout condition will terminate the kickstart.
 
+## Load Compensation (PI Controller)
+
+Active speed regulation is implemented using a PI controller when **CV 49 (Bit 0)** is enabled.
+
+### Algorithm
+1. **Target BEMF:** The target PWM (0-1023) is scaled to the 12-bit ADC range (`targetBEMF = targetPwm * 4`).
+2. **Measured BEMF:** Obtained via `readBEMF()` at every `BEMF_SAMPLE_INT` interval.
+3. **Error Calculation:** `error = targetBEMF - measuredBEMF`.
+4. **PI Calculation:**
+   - **P-Term:** `error * (CV_54 / 32.0)`
+   - **I-Term:** `integral * (CV_55 / 128.0)`
+   - **Adjustment:** `P-Term + I-Term`
+5. **Output:** `finalPwm = targetPwm + Adjustment` (clamped to 0-1023).
+
+### Parameters
+* **CV 54 (K):** Proportional component (Range 0-63, Default 32).
+* **CV 55 (I):** Integral component (Range 0-63, Default 24).
+* **Anti-Windup:** The integral term is clamped to +/- 2000 to prevent runaway effects.
+
 ## Signal Loss Watchdog
 
 The firmware includes a safety watchdog to stop the locomotive if the command signal is lost.

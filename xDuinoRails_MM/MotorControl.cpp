@@ -18,6 +18,8 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastBemfMeasure     = 0;
   lastSpeed           = 0;
   previousPwm         = 0;
+  bemfErrorIntegral   = 0;
+  lastLoadCompUpdate  = 0;
 }
 
 void MotorControl::setup() {
@@ -123,27 +125,32 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (targetPwm == 0)
     currDirection = targetDirection;
 
-  if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
+  if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0 &&
+      !isKickstarting_priv) {
     isKickstarting_priv = true;
     logger.println("Motor: Kickstart started");
     kickstartBegin  = now;
-    lastBemfMeasure = 0;
+    lastBemfMeasure = now; // Initialize to now
   }
   if (targetPwm == 0) {
     isKickstarting_priv = false;
+    bemfErrorIntegral   = 0;
   }
 
+  bool kickstartJustEnded = false;
   if (isKickstarting_priv) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
+      kickstartJustEnded  = true;
       logger.println("Motor: Kickstart ended (timeout)");
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
-      if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
+      if (bemfEnabled && (now - lastBemfMeasure > (unsigned long)BEMF_SAMPLE_INT)) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
+          kickstartJustEnded  = true;
           logger.println("Motor: Kickstart ended (BEMF)");
         }
       }
@@ -156,9 +163,56 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (!isKickstarting_priv) {
     if (currDirection != targetDirection) {
       writeMotorHardware(0, currDirection);
-      currDirection = targetDirection;
+      currDirection      = targetDirection;
+      bemfErrorIntegral  = 0;
+      lastLoadCompUpdate = 0;
+      previousPwm        = 0;
     } else {
-      writeMotorHardware(targetPwm, currDirection);
+      bool loadCompEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+
+      if (loadCompEnabled && targetPwm > 0) {
+        if (previousPwm != targetPwm || kickstartJustEnded) {
+          // Immediate response to speed change or kickstart end
+          writeMotorHardware(targetPwm, currDirection);
+          lastLoadCompUpdate = now;
+          bemfErrorIntegral  = 0;
+        }
+
+        if (now - lastLoadCompUpdate >= (unsigned long)BEMF_SAMPLE_INT) {
+          int measuredBEMF = readBEMF();
+          // Scale 10-bit targetPwm to 12-bit ADC range (0-4095)
+          int targetBEMF = targetPwm * 4;
+          int error      = targetBEMF - measuredBEMF;
+
+          float k = cvManager.getCv(CV_BEMF_K) / 32.0f;
+          float i = cvManager.getCv(CV_BEMF_I) / 128.0f;
+
+          bemfErrorIntegral += error;
+          // Anti-windup
+          if (bemfErrorIntegral > 2000)
+            bemfErrorIntegral = 2000;
+          if (bemfErrorIntegral < -2000)
+            bemfErrorIntegral = -2000;
+
+          int adjustment = (int)(error * k + bemfErrorIntegral * i);
+          int finalPwm   = targetPwm + adjustment;
+
+          if (finalPwm > 1023)
+            finalPwm = 1023;
+          if (finalPwm < 0)
+            finalPwm = 0;
+
+          writeMotorHardware(finalPwm, currDirection);
+          lastLoadCompUpdate = now;
+        }
+      } else {
+        // Load compensation disabled or targetPwm is 0
+        if (previousPwm != targetPwm || kickstartJustEnded) {
+          writeMotorHardware(targetPwm, currDirection);
+        }
+        bemfErrorIntegral  = 0;
+        lastLoadCompUpdate = 0;
+      }
     }
   }
   previousPwm = targetPwm;
