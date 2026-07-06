@@ -18,35 +18,6 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastBemfMeasure     = 0;
   lastSpeed           = 0;
   previousPwm         = 0;
-
-  int motorType = cvManager.getCv(CV_MOTOR_TYPE);
-
-  switch (motorType) {
-  case 1: // Faulhaber
-    PWM_FREQ = 400;
-    // PWM_MIN_MOVING is set from CV
-    KICK_PWM        = 1023;
-    KICK_MAX_TIME   = 150;
-    BEMF_THRESHOLD  = 120;
-    BEMF_SAMPLE_INT = 15;
-    break;
-  case 2: // Maxon
-    PWM_FREQ = 20000;
-    // PWM_MIN_MOVING is set from CV
-    KICK_PWM        = 600;
-    KICK_MAX_TIME   = 80;
-    BEMF_THRESHOLD  = 80;
-    BEMF_SAMPLE_INT = 10;
-    break;
-  default: // Standard DC
-    PWM_FREQ = 20000;
-    // PWM_MIN_MOVING is set from CV
-    KICK_PWM        = 800;
-    KICK_MAX_TIME   = 100;
-    BEMF_THRESHOLD  = 100;
-    BEMF_SAMPLE_INT = 12;
-    break;
-  }
 }
 
 void MotorControl::setup() {
@@ -54,6 +25,38 @@ void MotorControl::setup() {
   pinMode(pinB_priv, OUTPUT);
   pinMode(bemfA_priv, INPUT);
   pinMode(bemfB_priv, INPUT);
+
+  int         motorType = cvManager.getCv(CV_MOTOR_TYPE);
+  const char *typeName  = "Standard DC";
+
+  switch (motorType) {
+  case 1: // Faulhaber
+    PWM_FREQ        = 400;
+    KICK_PWM        = 1023;
+    KICK_MAX_TIME   = 150;
+    BEMF_THRESHOLD  = 120;
+    BEMF_SAMPLE_INT = 15;
+    typeName        = "Faulhaber";
+    break;
+  case 2: // Maxon
+    PWM_FREQ        = 20000;
+    KICK_PWM        = 600;
+    KICK_MAX_TIME   = 80;
+    BEMF_THRESHOLD  = 80;
+    BEMF_SAMPLE_INT = 10;
+    typeName        = "Maxon";
+    break;
+  default: // Standard DC
+    PWM_FREQ        = 20000;
+    KICK_PWM        = 800;
+    KICK_MAX_TIME   = 100;
+    BEMF_THRESHOLD  = 100;
+    BEMF_SAMPLE_INT = 12;
+    typeName        = "Standard DC";
+    break;
+  }
+
+  logger.printf("Motor: Type=%s, PWM Freq=%d Hz\n", typeName, PWM_FREQ);
 
 #ifdef ARDUINO_ARCH_RP2040
   analogWriteFreq(PWM_FREQ);
