@@ -72,3 +72,20 @@ For step-by-step instructions on how to program these CVs using a Märklin Centr
 ## Safety Instructions
 - Ensure all connections are secure and insulated to prevent short circuits.
 - Do not exceed the voltage and current ratings of the Seeed Xiao RP2040 or your motor driver circuit.
+
+## Command Line Interface (CLI)
+
+The decoder provides a simple command line interface via the USB Serial port (115200 baud). This allows for direct control and configuration without a digital station.
+
+### Available Commands
+
+| Command | Description | Example |
+|---|---|---|
+| `cv <num> <val>` | Sets Configuration Variable `<num>` to value `<val>`. | `cv 1 3` (Sets address to 3) |
+| `s <speed>` | Sets the target speed (0–14). | `s 7` (Half speed) |
+| `d f` | Sets the direction to **Forward**. | `d f` |
+| `d b` | Sets the direction to **Backward**. | `d b` |
+| `f <0/1>` | Sets Function 1 (F1) to Off (0) or On (1). | `f 1` (Turn on F1) |
+| `L` or `l` | Toggles USB Serial logging (On/Off). | `L` |
+
+> **Note:** Commands are executed upon pressing Enter.
