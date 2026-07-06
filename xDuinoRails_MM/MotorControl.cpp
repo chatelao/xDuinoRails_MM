@@ -18,6 +18,8 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   lastBemfMeasure     = 0;
   lastSpeed           = 0;
   previousPwm         = 0;
+  bemfErrorSum        = 0;
+  lastPwmAdjustment   = 0;
 }
 
 void MotorControl::setup() {
@@ -131,8 +133,11 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   unsigned long now = millis();
 
   // Bei Stillstand Richtung sofort übernehmen
-  if (targetPwm == 0)
-    currDirection = targetDirection;
+  if (targetPwm == 0) {
+    currDirection     = targetDirection;
+    bemfErrorSum      = 0;
+    lastPwmAdjustment = 0;
+  }
 
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
     isKickstarting_priv = true;
@@ -167,9 +172,35 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (!isKickstarting_priv) {
     if (currDirection != targetDirection) {
       writeMotorHardware(0, currDirection);
-      currDirection = targetDirection;
+      currDirection     = targetDirection;
+      bemfErrorSum      = 0;
+      lastPwmAdjustment = 0;
     } else {
-      writeMotorHardware(targetPwm, currDirection);
+      int  finalPwm    = targetPwm;
+      bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+      if (bemfEnabled && targetPwm > 0) {
+        if (now - lastBemfMeasure >= (unsigned long)BEMF_SAMPLE_INT) {
+          int currentBEMF = readBEMF();
+          lastBemfMeasure = now;
+
+          // targetBEMF: Scale 10-bit PWM to 12-bit BEMF range
+          int targetBEMF = targetPwm * 4;
+          int error      = targetBEMF - currentBEMF;
+
+          bemfErrorSum += error;
+          // Windup protection
+          if (bemfErrorSum > 10000)
+            bemfErrorSum = 10000;
+          if (bemfErrorSum < -10000)
+            bemfErrorSum = -10000;
+
+          uint8_t k         = cvManager.getCv(CV_BEMF_K);
+          uint8_t i         = cvManager.getCv(CV_BEMF_I);
+          lastPwmAdjustment = (error * k) / 16 + (bemfErrorSum * i) / 64;
+        }
+        finalPwm += lastPwmAdjustment;
+      }
+      writeMotorHardware(finalPwm, currDirection);
     }
   }
   previousPwm = targetPwm;
