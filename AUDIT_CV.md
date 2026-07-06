@@ -19,8 +19,10 @@ This document tracks the implementation status of Configuration Variables (CVs) 
 | 29 | Configuration | ⚠️ Initialized Only | Values are stored but not used for logic (e.g., speed steps). |
 | 33 | Front Light (F0f) | ✅ Implemented | Bit 0 enables front light output. |
 | 34 | Rear Light (F0r) | ✅ Implemented | Bit 1 enables rear light output. |
-| 49 | BEMF Config | ✅ Implemented | Bit 0 enables BEMF sensing for kickstart termination. |
+| 49 | BEMF Config | ✅ Implemented | Bit 0 enables BEMF sensing for load compensation. |
 | 52 | Motor Type | ✅ Implemented | Selects motor characteristics profile in `MotorControl`. |
+| 54 | BEMF K | ✅ Implemented | K-component (Proportional) for BEMF PI controller. |
+| 55 | BEMF I | ✅ Implemented | I-component (Integral) for BEMF PI controller. |
 | 107/108| Ext. ID | ⚠️ Initialized Only | Metadata for DecoderDB identification. |
 | 250 | Debug Enable | ✅ Implemented | 0 = Disabled, 1 = Enabled (default). |
 
@@ -50,4 +52,4 @@ Implemented as part of a 3-point speed curve (Vstart, Vmid, Vhigh). If set to 0,
 Standardized to map 0-255 to 0-1023 PWM. Default set to 85 (approx. 33% duty cycle) to overcome initial friction.
 
 ### 4. BEMF Integration
-BEMF sensing is currently only used to terminate the kickstart pulse early if rotation is detected. It is not used for active speed regulation (Load Compensation).
+BEMF sensing is used to terminate the kickstart pulse early and for active speed regulation (Load Compensation) via a PI controller (CV 54/55).
