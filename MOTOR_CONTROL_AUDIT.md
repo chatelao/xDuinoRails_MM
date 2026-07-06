@@ -67,26 +67,26 @@ Reported strange behavior:
 - **Speed 6:** Moves fast
 - **Speed 7:** Moves at maximal speed
 
-### Calculated PWM Mapping (Default CVs: 2=10, 5=0, 6=0)
+### Calculated PWM Mapping (New Standard Defaults: CV 2=1, 5=255, 6=127)
 
 | MM Step | PWM Value | Duty Cycle | Notes |
 | :--- | :--- | :--- | :--- |
-| 1 | 40 | 3.9% | Vstart |
-| 2 | 121 | 11.8% | |
-| 3 | 203 | 19.8% | |
-| 4 | 285 | 27.8% | |
-| 5 | 367 | 35.9% | Reported: Barely moves |
-| 6 | 449 | 43.9% | Reported: Fast |
-| 7 | 531 | 51.9% | Vmid (Midpoint between 1 and 14) - Reported: Maximal speed |
-| 8 | 601 | 58.7% | |
+| 1 | 4 | 0.4% | Vstart |
+| 4 | 256 | 25.0% | |
+| 7 | 509 | 49.8% | Vmid |
+| 11 | 802 | 78.4% | |
 | 14 | 1023 | 100.0% | Vhigh |
 
 ### Analytic Findings
 
-The observed behavior is a result of the physical motor characteristics interacting with the default 3-point speed curve:
+The previously observed behavior where the motor maxed out at step 7 was due to suboptimal default CV settings (`CV 2=85`, `CV 5=140`, `CV 6=105`). These settings restricted the speed range and resolution.
 
-1.  **High Starting Friction:** The motor requires approx. 35-40% PWM (Step 5) to overcome internal friction. This explains why it "barely moves" at Step 5.
-2.  **Early Saturation:** Many model railroad motors reach their perceived maximum physical speed (or the limit of the gear ratio) at around 50-60% duty cycle. In the default configuration, **Step 7** already provides **52% PWM**. To the user, there is no noticeable speed increase between Step 7 and Step 14, leading to the perception that Step 7 is already "maximal speed".
+The new standard defaults (`CV 2=1`, `CV 5=255`, `CV 6=127`) provide:
+1.  **Full Range:** The motor can be driven from minimum to maximum power.
+2.  **Linear Response:** The default curve is linear, providing consistent speed increments across all 14 steps.
+3.  **Maximum Resolution:** Users can now utilize all 14 Märklin Motorola speed steps effectively.
+
+For motors with high starting friction or early saturation, users can still calibrate the decoder by adjusting CVs 2, 5, and 6.
 3.  **Non-Linear Response:** The jump from 36% (Step 5) to 44% (Step 6) and 52% (Step 7) is relatively small in terms of PWM, but happens to be in the most sensitive region of this specific motor's RPM curve.
 
 ### Recommendations for Calibration

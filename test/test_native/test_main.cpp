@@ -46,11 +46,11 @@ void test_cv_manager_defaults(void) {
   cvManager.setup();
   // Überprüfe die wichtigsten CVs auf ihre Standardwerte
   TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
-  TEST_ASSERT_EQUAL(85, cvManager.getCv(CV_START_VOLTAGE));
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_START_VOLTAGE));
   TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_ACCELERATION));
   TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_BRAKING_TIME));
-  TEST_ASSERT_EQUAL(140, cvManager.getCv(CV_MAXIMUM_SPEED));
-  TEST_ASSERT_EQUAL(105, cvManager.getCv(CV_MEDIUM_SPEED));
+  TEST_ASSERT_EQUAL(255, cvManager.getCv(CV_MAXIMUM_SPEED));
+  TEST_ASSERT_EQUAL(127, cvManager.getCv(CV_MEDIUM_SPEED));
   TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_VERSION));
   TEST_ASSERT_EQUAL(13, cvManager.getCv(CV_MANUFACTURER_ID));
   TEST_ASSERT_EQUAL(192, cvManager.getCv(CV_LONG_ADDRESS_HIGH));
@@ -235,8 +235,8 @@ void test_watchdog_shutdown(void) {
                       MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
   motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
-  // New default CV 5 = 140 -> PWM 561
-  TEST_ASSERT_EQUAL(561, analog_write_values[10]);
+  // New standard default CV 5 = 255 -> PWM 1023
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
   // 2. Signalverlust simulieren (keine protocol.loop() Aufrufe mit Daten)
   advance_millis(501); // Watchdog sollte jetzt triggern (> 500ms)
@@ -266,16 +266,16 @@ void test_watchdog_shutdown(void) {
   // Nach 501ms total (1ms nach Watchdog), sollte die Geschwindigkeit fast noch
   // 14 sein (1ms/500ms ramp) map(1, 0, 500, 14, 0) -> 13
   TEST_ASSERT_INT_WITHIN(2, 14, protocol.getTargetSpeed());
-  // Wir prüfen den PWM Wert. targetSpeed=14 -> PWM=561. rampSpeed = map(1, 0,
-  // 500, 14, 0) = 13. PWM für 13 is map(13, 7, 14, 421, 561) = 541
-  int expectedPwm = 541;
+  // Wir prüfen den PWM Wert. targetSpeed=14 -> PWM=1023. rampSpeed = map(1, 0,
+  // 500, 14, 0) = 13. PWM für 13 is map(13, 7, 14, 509, 1023) = 949
+  int expectedPwm = 949;
   TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
 
   // 250ms nach Watchdog (750ms total) -> Halbe Geschwindigkeit
   advance_millis(249);
   simulate_loop();
-  // Step 7 -> Vmid = 421
-  expectedPwm = 421;
+  // Step 7 -> Vmid = 509
+  expectedPwm = 509;
   TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
 
   // 500ms nach Watchdog (1000ms total) -> Stillstand
@@ -289,7 +289,7 @@ void test_watchdog_shutdown(void) {
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.isSignalTimeout());
   simulate_loop();
-  TEST_ASSERT_EQUAL(561, analog_write_values[10]);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 }
 
 void test_pwm_freq_logging(void) {

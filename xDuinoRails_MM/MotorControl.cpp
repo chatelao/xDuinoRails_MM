@@ -73,8 +73,6 @@ void MotorControl::setup() {
   writeMotorHardware(0, MM2DirectionState_Forward);
 }
 
-const int PWM_MAX = 1023;
-
 void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   
   //
@@ -94,13 +92,13 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   // Regular case: Handling movements
   //
   // Map CVs (0-255) to PWM (0-1023)
-  int vStart = map(cvManager.getCv(CV_START_VOLTAGE), 0, 255, 0, PWM_MAX);
-  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED ), 0, 255, 0, PWM_MAX);
-  int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_MAX);
+  int vStart = map(cvManager.getCv(CV_START_VOLTAGE), 0, 255, 0, PWM_RANGE);
+  int vMid   = map(cvManager.getCv(CV_MEDIUM_SPEED ), 0, 255, 0, PWM_RANGE);
+  int vHigh  = map(cvManager.getCv(CV_MAXIMUM_SPEED), 0, 255, 0, PWM_RANGE);
 
-  // If CVs are 0, then set defaults (1 / PWM_MAX)
+  // If CVs are 0, then set defaults (1 / PWM_RANGE)
   if (vStart == 0) vStart = 1;
-  if (vHigh  == 0) vHigh = PWM_MAX;
+  if (vHigh  == 0) vHigh = PWM_RANGE;
   if (vMid   == 0) vMid = (vStart + vHigh) / 2;
 
   // Clamp vStart to vHigh to avoid negative slopes
