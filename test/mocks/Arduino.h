@@ -27,6 +27,7 @@ void analogWriteRange(int range);
 
 unsigned long millis();
 void          advance_millis(unsigned long ms);
+void          delay(unsigned long ms);
 void          delayMicroseconds(unsigned int us);
 void          reset_arduino_mock();
 long          map(long, long, long, long, long);
