@@ -22,6 +22,7 @@ void test_motor_kickstart_bemf_enabled(void);
 void test_motor_pwm_mapping_detailed(void);
 void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
+void test_motor_bemf_pi_control(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -746,5 +747,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_motor_pwm_mapping_detailed);
   RUN_TEST(test_motor_pwm_mapping_new_defaults);
   RUN_TEST(test_debug_leds_heartbeat);
+  RUN_TEST(test_motor_bemf_pi_control);
   return UNITY_END();
 }
