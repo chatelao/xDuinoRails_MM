@@ -19,6 +19,7 @@ void test_serial_console(void);
 void test_cv_manager_print_all(void);
 void test_motor_kickstart_bemf_disabled(void);
 void test_motor_kickstart_bemf_enabled(void);
+void test_motor_pwm_mapping_detailed(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -737,5 +738,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv_manager_print_all);
   RUN_TEST(test_motor_kickstart_bemf_disabled);
   RUN_TEST(test_motor_kickstart_bemf_enabled);
+  RUN_TEST(test_motor_pwm_mapping_detailed);
   return UNITY_END();
 }
