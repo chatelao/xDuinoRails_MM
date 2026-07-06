@@ -9,11 +9,11 @@ public:
   CvManagerMock() {
     // Seed with default CVs
     cvStore[CV_BASE_ADDRESS]      = 3;
-    cvStore[CV_START_VOLTAGE]     = 85;
+    cvStore[CV_START_VOLTAGE]     = 10;
     cvStore[CV_ACCELERATION]      = 5;
     cvStore[CV_BRAKING_TIME]      = 5;
-    cvStore[CV_MAXIMUM_SPEED]     = 140;
-    cvStore[CV_MEDIUM_SPEED]      = 105;
+    cvStore[CV_MAXIMUM_SPEED]     = 0;
+    cvStore[CV_MEDIUM_SPEED]      = 0;
     cvStore[CV_VERSION]           = 10;
     cvStore[CV_MANUFACTURER_ID]   = 13;
     cvStore[CV_LONG_ADDRESS_HIGH] = 192;
@@ -21,7 +21,7 @@ public:
     cvStore[CV_CONFIGURATION]     = 6;
     cvStore[CV_FRONT_LIGHT_F0F]   = 1;
     cvStore[CV_REAR_LIGHT_F0R]    = 2;
-    cvStore[CV_BEMF_CONFIG]       = 0;
+    cvStore[CV_BEMF_CONFIG]       = 1;
     cvStore[CV_EXT_ID_HIGH]       = 1;
     cvStore[CV_EXT_ID_LOW]        = 10;
     cvStore[CV_MOTOR_TYPE]        = 0;
