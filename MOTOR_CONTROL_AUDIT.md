@@ -75,26 +75,26 @@ Reported strange behavior:
 | 2 | 121 | 11.8% | |
 | 3 | 203 | 19.8% | |
 | 4 | 285 | 27.8% | |
-| 5 | 367 | 35.9% | Reported: Barely moves |
-| 6 | 449 | 43.9% | Reported: Fast |
-| 7 | 531 | 51.9% | Vmid (Midpoint between 1 and 14) - Reported: Maximal speed |
+| 5 | 367 | 35.9% | |
+| 6 | 449 | 43.9% | |
+| 7 | 531 | 51.9% | Vmid (Midpoint between 1 and 14) |
 | 8 | 601 | 58.7% | |
 | 14 | 1023 | 100.0% | Vhigh |
 
 ### Analytic Findings
 
-The observed behavior is a result of the physical motor characteristics interacting with the default 3-point speed curve:
+The default 3-point speed curve provides a linear mapping from speed steps to PWM duty cycle across the full 10-bit range (0-1023).
 
-1.  **High Starting Friction:** The motor requires approx. 35-40% PWM (Step 5) to overcome internal friction. This explains why it "barely moves" at Step 5.
-2.  **Early Saturation:** Many model railroad motors reach their perceived maximum physical speed (or the limit of the gear ratio) at around 50-60% duty cycle. In the default configuration, **Step 7** already provides **52% PWM**. To the user, there is no noticeable speed increase between Step 7 and Step 14, leading to the perception that Step 7 is already "maximal speed".
-3.  **Non-Linear Response:** The jump from 36% (Step 5) to 44% (Step 6) and 52% (Step 7) is relatively small in terms of PWM, but happens to be in the most sensitive region of this specific motor's RPM curve.
+1.  **Low Start Voltage:** Default `CV_START_VOLTAGE` is set to 10 (PWM 40, ~4%) to allow for fine control of high-efficiency motors. Older or less efficient motors may require increasing this value (e.g., to 80-90) to overcome initial friction.
+2.  **Full Speed Range:** Default `CV_MAXIMUM_SPEED` is set to 0 (which maps to 1023, 100%), allowing the motor to reach its full physical speed at Step 14.
+3.  **Linear Progression:** Default `CV_MEDIUM_SPEED` is set to 0 (auto-midpoint), resulting in a linear increase in duty cycle from Step 1 to Step 14.
 
 ### Recommendations for Calibration
 
-To fix this for this specific locomotive, the user should:
-1.  **Increase CV 2 (Start Voltage):** Set to approx. 80-90 so that Step 1 already overcomes friction.
-2.  **Decrease CV 5 (Maximum Speed):** Set to approx. 120-150 to map Step 14 to the physical maximum speed, providing better resolution over the lower speed range.
-3.  **Adjust CV 6 (Medium Speed):** Use a value lower than the default midpoint to create a "logarithmic" curve, giving more steps in the slow speed range.
+To optimize the behavior for specific locomotives:
+1.  **Adjust CV 2 (Start Voltage):** If the locomotive doesn't move at Step 1, increase this value until it just starts crawling.
+2.  **Adjust CV 5 (Maximum Speed):** If the locomotive is too fast at Step 14, decrease this value to limit the top speed.
+3.  **Adjust CV 6 (Medium Speed):** Set a value lower than the midpoint to create a "logarithmic" curve (better resolution at slow speeds) or higher for an "exponential" curve.
 
 ## Signal Loss Watchdog
 
