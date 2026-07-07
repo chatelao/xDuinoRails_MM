@@ -70,5 +70,19 @@ void SerialConsole::parseCommand(char *line) {
       Serial.print("Serial: Logging ");
       Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
     }
+  } else if (line[0] == 'h' || line[0] == '?') {
+    printHelp();
   }
+}
+
+void SerialConsole::printHelp() {
+  Serial.println("--- xDuinoRails CLI Help ---");
+  Serial.println("cv <num> <val> : Set CV value");
+  Serial.println("cv             : Print all CV values");
+  Serial.println("s <speed>      : Set speed (0-14)");
+  Serial.println("d f/b          : Set direction (f: forward, b: backward)");
+  Serial.println("f <0/1>        : Set Function 1 (0: off, 1: on)");
+  Serial.println("L [p/w/c]      : Toggle logging (p: protocol, w: pwm, c: cv)");
+  Serial.println("h/?            : Show this help");
+  Serial.println("----------------------------");
 }

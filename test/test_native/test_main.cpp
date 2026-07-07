@@ -26,6 +26,7 @@ void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
 void test_motor_bemf_pi_control(void);
 void test_serial_console_logging_toggle(void);
+void test_serial_console_help(void);
 void test_repro_watchdog_stop_no_kickstart(void);
 void test_repro_start_backward_kickstart_wrong_dir(void);
 void test_repro_bemf_disabled_leftover_adjustment(void);
@@ -726,6 +727,54 @@ void test_serial_console_logging_toggle(void) {
   TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
 }
 
+void test_serial_console_help(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  Serial.clearLog();
+
+  // Test "h" command
+  Serial.pushInput("h\n");
+  console.loop();
+
+  bool foundHelpHeader = false;
+  bool foundCvCmd      = false;
+  bool foundSpeedCmd   = false;
+  bool foundHelpCmd    = false;
+
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- xDuinoRails CLI Help ---") != std::string::npos)
+      foundHelpHeader = true;
+    if (line.find("cv <num> <val> : Set CV value") != std::string::npos)
+      foundCvCmd = true;
+    if (line.find("s <speed>      : Set speed (0-14)") != std::string::npos)
+      foundSpeedCmd = true;
+    if (line.find("h/?            : Show this help") != std::string::npos)
+      foundHelpCmd = true;
+  }
+  TEST_ASSERT_TRUE(foundHelpHeader);
+  TEST_ASSERT_TRUE(foundCvCmd);
+  TEST_ASSERT_TRUE(foundSpeedCmd);
+  TEST_ASSERT_TRUE(foundHelpCmd);
+
+  Serial.clearLog();
+
+  // Test "?" command
+  Serial.pushInput("?\n");
+  console.loop();
+
+  foundHelpHeader = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- xDuinoRails CLI Help ---") != std::string::npos) {
+      foundHelpHeader = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundHelpHeader);
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -812,6 +861,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_debug_leds_heartbeat);
   RUN_TEST(test_motor_bemf_pi_control);
   RUN_TEST(test_serial_console_logging_toggle);
+  RUN_TEST(test_serial_console_help);
   RUN_TEST(test_repro_watchdog_stop_no_kickstart);
   RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
   RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
