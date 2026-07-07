@@ -33,6 +33,7 @@ void test_repro_bemf_disabled_leftover_adjustment(void);
 void test_repro_direction_change_kickstart(void);
 void test_repro_kickstart_only(void);
 void test_repro_kickstart_only_with_vstart_zero(void);
+void test_cv49_zero_only_kickstart_works(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -870,5 +871,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_direction_change_kickstart);
   RUN_TEST(test_repro_kickstart_only);
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
+  RUN_TEST(test_cv49_zero_only_kickstart_works);
   return UNITY_END();
 }
