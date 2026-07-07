@@ -25,6 +25,10 @@ void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
 void test_motor_bemf_pi_control(void);
 void test_serial_console_logging_toggle(void);
+void test_repro_watchdog_stop_no_kickstart(void);
+void test_repro_start_backward_kickstart_wrong_dir(void);
+void test_repro_bemf_disabled_leftover_adjustment(void);
+void test_repro_direction_change_kickstart(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -137,10 +141,8 @@ void test_motor_speed_control(void) {
   motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
   motor.setSpeed(1, MM2DirectionState_Backward);
   advance_millis(101);
-  motor.setSpeed(1,
-                 MM2DirectionState_Backward); // Dieser Aufruf stoppt den Motor
-  motor.setSpeed(1,
-                 MM2DirectionState_Backward); // Dieser wendet die Leistung an
+  // Mit Korrektur wird hier direkt Kickstart ausgelöst und danach PWM gesetzt
+  motor.setSpeed(1, MM2DirectionState_Backward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(40, analog_write_values[11]);
 
@@ -156,8 +158,7 @@ void test_motor_speed_control(void) {
   motor.setSpeed(0, MM2DirectionState_Forward);
   motor.setSpeed(14, MM2DirectionState_Backward);
   advance_millis(101);
-  motor.setSpeed(14, MM2DirectionState_Backward); // Stoppt den Motor
-  motor.setSpeed(14, MM2DirectionState_Backward); // Wendet Leistung an
+  motor.setSpeed(14, MM2DirectionState_Backward);
   TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
   TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
 }
@@ -290,6 +291,13 @@ void test_watchdog_shutdown(void) {
                       MM2DirectionState_Unavailable, 0, false);
   protocol.loop();
   TEST_ASSERT_FALSE(protocol.isSignalTimeout());
+  simulate_loop();
+
+  // With kickstart triggered after stop(), PWM will be KICK_PWM (800) instead of 1023
+  TEST_ASSERT_EQUAL(800, analog_write_values[10]);
+
+  // After kickstart timeout, it should reach 1023
+  advance_millis(150);
   simulate_loop();
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 }
@@ -802,5 +810,9 @@ int main(int argc, char **argv) {
   RUN_TEST(test_debug_leds_heartbeat);
   RUN_TEST(test_motor_bemf_pi_control);
   RUN_TEST(test_serial_console_logging_toggle);
+  RUN_TEST(test_repro_watchdog_stop_no_kickstart);
+  RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
+  RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
+  RUN_TEST(test_repro_direction_change_kickstart);
   return UNITY_END();
 }
