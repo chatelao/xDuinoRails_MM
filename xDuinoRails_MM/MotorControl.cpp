@@ -285,10 +285,10 @@ bool MotorControl::isKickstarting() { return isKickstarting_priv; }
 MM2DirectionState MotorControl::getCurrentDirection() { return currDirection; }
 
 void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
-  if (pwm > PWM_RANGE)
-    pwm = PWM_RANGE;
-  if (pwm < 0)
-    pwm = 0;
+
+  // Clamp the pwm values between 0 and PWM_RANGE
+  if (pwm > PWM_RANGE) pwm = PWM_RANGE;
+  if (pwm < 0)         pwm = 0;
 
   if (pwm == lastWrittenPwm && dir == lastWrittenDir)
     return;
