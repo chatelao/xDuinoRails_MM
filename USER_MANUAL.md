@@ -87,7 +87,10 @@ The decoder provides a simple command line interface via the USB Serial port (11
 | `d f` | Sets the direction to **Forward**. | `d f` |
 | `d b` | Sets the direction to **Backward**. | `d b` |
 | `f <0/1>` | Sets Function 1 (F1) to Off (0) or On (1). | `f 1` (Turn on F1) |
-| `L` or `l` | Toggles USB Serial logging (On/Off). | `L` |
+| `L` or `l` | Toggles Master USB Serial logging. | `L` |
+| `L p` | Toggles Protocol logging. | `L p` |
+| `L w` | Toggles PWM logging. | `L w` |
+| `L c` | Toggles CV logging. | `L c` |
 | `h` or `?` | Provides help for all available commands. | `h` |
 
 > **Note:** Commands are executed upon pressing Enter.

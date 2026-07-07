@@ -1,0 +1,200 @@
+#include "CvManager.h"
+#include "CvManagerMock.h"
+#include "CvProgrammer.h"
+#include "LightsControl.h"
+#include "Logger.h"
+#include "MotorControl.h"
+#include "ProtocolHandler.h"
+#include "RP2040.h"
+#include "SerialConsole.h"
+#include <unity.h>
+
+void test_mm_signal_f0_f1_f2(void);
+void test_cv_programming_6021(void);
+void test_watchdog_shutdown(void);
+void test_cv_manager_reset_8(void);
+void test_motor_speed_curve(void);
+void test_logging(void);
+void test_serial_console(void);
+void test_serial_console_cv_readout(void);
+void test_cv_manager_print_all(void);
+void test_motor_kickstart_bemf_disabled(void);
+void test_motor_kickstart_bemf_enabled(void);
+void test_motor_pwm_mapping_detailed(void);
+void test_motor_pwm_mapping_new_defaults(void);
+void test_debug_leds_heartbeat(void);
+void test_motor_bemf_pi_control(void);
+void test_serial_console_logging_toggle(void);
+void test_serial_console_help(void);
+void test_repro_watchdog_stop_no_kickstart(void);
+void test_repro_start_backward_kickstart_wrong_dir(void);
+void test_repro_bemf_disabled_leftover_adjustment(void);
+void test_repro_direction_change_kickstart(void);
+
+// Mock implementation for RP2040 reboot
+bool   reboot_called = false;
+RP2040 rp2040;
+void   RP2040::reboot() { reboot_called = true; }
+
+// Test CV Manager
+// Testet das Setzen und Lesen eines CV-Wertes.
+void test_cv_manager_get_set(void) {
+  CvManager cvManager;
+  cvManager.setup();
+  // Setze CV 10 auf den Wert 42
+  cvManager.setCv(10, 42);
+  // Überprüfe, ob CV 10 den Wert 42 hat
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+}
+
+// Testet die Standardwerte der CVs nach der Initialisierung.
+void test_cv_manager_defaults(void) {
+  CvManager cvManager;
+  cvManager.setup();
+  // Überprüfe die wichtigsten CVs auf ihre Standardwerte
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_START_VOLTAGE));
+  TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_ACCELERATION));
+  TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_BRAKING_TIME));
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_MAXIMUM_SPEED));
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_MEDIUM_SPEED));
+  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_VERSION));
+  TEST_ASSERT_EQUAL(13, cvManager.getCv(CV_MANUFACTURER_ID));
+  TEST_ASSERT_EQUAL(192, cvManager.getCv(CV_LONG_ADDRESS_HIGH));
+  TEST_ASSERT_EQUAL(100, cvManager.getCv(CV_LONG_ADDRESS_LOW));
+  TEST_ASSERT_EQUAL(6, cvManager.getCv(CV_CONFIGURATION));
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_FRONT_LIGHT_F0F));
+  TEST_ASSERT_EQUAL(2, cvManager.getCv(CV_REAR_LIGHT_F0R));
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_EXT_ID_HIGH));
+  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
+}
+
+// Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den
+// Reset-Mechanismus.
+void test_cv_manager_special(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  // Teste schreibgeschützte CV (CV_VERSION)
+  uint8_t version = cvManager.getCv(CV_VERSION);
+  // Versuch, die schreibgeschützte CV zu ändern
+  cvManager.setCv(CV_VERSION, version + 1);
+  // Der Wert sollte unverändert sein
+  TEST_ASSERT_EQUAL(version, cvManager.getCv(CV_VERSION));
+
+  // Teste den Reset-Mechanismus durch Schreiben von 0 auf CV_MANUFACTURER_ID
+  // Ändere einen Wert, um den Reset zu verifizieren
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 0);
+  // Überprüfe, ob der Neustart ausgelöst wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die Werte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+}
+
+// Testet den Reset-Mechanismus durch Schreiben von 8 auf CV_MANUFACTURER_ID.
+void test_cv_manager_reset_8(void) {
+  CvManager cvManager;
+  cvManager.setup();
+
+  // Ändere einen Wert, um den Reset zu verifizieren
+  cvManager.setCv(CV_BASE_ADDRESS, 42);
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+
+  reboot_called = false;
+  cvManager.setCv(CV_MANUFACTURER_ID, 8);
+  // Überprüfe, ob der Neustart ausgelöst wurde
+  TEST_ASSERT_TRUE(reboot_called);
+  // Überprüfe, ob die Werte zurückgesetzt wurden
+  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+}
+
+// Test Motor Control
+// Testet die Geschwindigkeits- und Richtungsteuerung des Motors.
+void test_motor_speed_control(void) {
+  CvManagerMock cvManager;
+  // Konfiguriere CVs für den Motor
+  cvManager.setCv(CV_START_VOLTAGE, 10);
+  cvManager.setCv(CV_MOTOR_TYPE, 0);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  // Test: Geschwindigkeit 0
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  TEST_ASSERT_EQUAL(0, analog_write_values[10]);
+
+  // Test: Geschwindigkeit 1 in Vorwärtsrichtung
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101); // Simuliere Zeitablauf
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  // Überprüfe den erwarteten PWM-Wert (Vstart = map(1, 0, 255, 0, 1023) = 4)
+  // Aber wir haben jetzt Standard CV_START_VOLTAGE = 10 -> map(10, 0, 255, 0, 1023) = 40
+  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+
+  // Test: Geschwindigkeit 1 in Rückwärtsrichtung
+  motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
+  motor.setSpeed(1, MM2DirectionState_Backward);
+  advance_millis(101);
+  // Mit Korrektur wird hier direkt Kickstart ausgelöst und danach PWM gesetzt
+  motor.setSpeed(1, MM2DirectionState_Backward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(40, analog_write_values[11]);
+
+  // Test: Maximale Geschwindigkeit in Vorwärtsrichtung
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(14, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+
+  // Test: Maximale Geschwindigkeit in Rückwärtsrichtung
+  motor.setSpeed(0, MM2DirectionState_Forward);
+  motor.setSpeed(14, MM2DirectionState_Backward);
+  advance_millis(101);
+  motor.setSpeed(14, MM2DirectionState_Backward);
+  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
+}
+
+// Test Lights Control
+// Testet das Standardverhalten der Lichtsteuerung.
+void test_lights_control_default_behavior(void) {
+  CvManagerMock cvManager;
+  LightsControl lights(cvManager, 0, 1);
+  // TODO: Behauptungen hinzufügen, um das Standard-Lichtverhalten zu überprüfen
+}
+
+// Testet das Schalten der Funktionen F0, F1 und F2 über das MM-Protokoll.
+void test_mm_signal_f0_f1_f2(void) {
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+
+  // Simuliere ein MM2-Signal mit F1 an
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                      true);
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+
+  // Simuliere ein MM2-Signal mit F1 aus
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+                      false);
+  protocol.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+
+  // Simuliere ein MM2-Signal mit F2 an
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                      true);
+  protocol.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(2));
+
+  // Simuliere ein MM2-Signal mit F2 aus
+  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+                      false);

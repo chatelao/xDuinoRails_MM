@@ -1,0 +1,855 @@
+     1	#include "CvManager.h"
+     2	#include "CvManagerMock.h"
+     3	#include "CvProgrammer.h"
+     4	#include "LightsControl.h"
+     5	#include "Logger.h"
+     6	#include "MotorControl.h"
+     7	#include "ProtocolHandler.h"
+     8	#include "RP2040.h"
+     9	#include "SerialConsole.h"
+    10	#include <unity.h>
+    11
+    12	void test_mm_signal_f0_f1_f2(void);
+    13	void test_cv_programming_6021(void);
+    14	void test_watchdog_shutdown(void);
+    15	void test_cv_manager_reset_8(void);
+    16	void test_motor_speed_curve(void);
+    17	void test_logging(void);
+    18	void test_logger_categories(void);
+    19	void test_serial_console(void);
+    20	void test_serial_console_cv_readout(void);
+    21	void test_cv_manager_print_all(void);
+    22	void test_motor_kickstart_bemf_disabled(void);
+    23	void test_motor_kickstart_bemf_enabled(void);
+    24	void test_motor_pwm_mapping_detailed(void);
+    25	void test_motor_pwm_mapping_new_defaults(void);
+    26	void test_debug_leds_heartbeat(void);
+    27	void test_motor_bemf_pi_control(void);
+    28	void test_serial_console_logging_toggle(void);
+    29	void test_serial_console_help(void);
+    30	void test_repro_watchdog_stop_no_kickstart(void);
+    31	void test_repro_start_backward_kickstart_wrong_dir(void);
+    32	void test_repro_bemf_disabled_leftover_adjustment(void);
+    33	void test_repro_direction_change_kickstart(void);
+    34
+    35	// Mock implementation for RP2040 reboot
+    36	bool   reboot_called = false;
+    37	RP2040 rp2040;
+    38	void   RP2040::reboot() { reboot_called = true; }
+    39
+    40	// Test CV Manager
+    41	// Testet das Setzen und Lesen eines CV-Wertes.
+    42	void test_cv_manager_get_set(void) {
+    43	  CvManager cvManager;
+    44	  cvManager.setup();
+    45	  // Setze CV 10 auf den Wert 42
+    46	  cvManager.setCv(10, 42);
+    47	  // Überprüfe, ob CV 10 den Wert 42 hat
+    48	  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+    49	}
+    50
+    51	// Testet die Standardwerte der CVs nach der Initialisierung.
+    52	void test_cv_manager_defaults(void) {
+    53	  CvManager cvManager;
+    54	  cvManager.setup();
+    55	  // Überprüfe die wichtigsten CVs auf ihre Standardwerte
+    56	  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+    57	  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_START_VOLTAGE));
+    58	  TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_ACCELERATION));
+    59	  TEST_ASSERT_EQUAL(5, cvManager.getCv(CV_BRAKING_TIME));
+    60	  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_MAXIMUM_SPEED));
+    61	  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_MEDIUM_SPEED));
+    62	  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_VERSION));
+    63	  TEST_ASSERT_EQUAL(13, cvManager.getCv(CV_MANUFACTURER_ID));
+    64	  TEST_ASSERT_EQUAL(192, cvManager.getCv(CV_LONG_ADDRESS_HIGH));
+    65	  TEST_ASSERT_EQUAL(100, cvManager.getCv(CV_LONG_ADDRESS_LOW));
+    66	  TEST_ASSERT_EQUAL(6, cvManager.getCv(CV_CONFIGURATION));
+    67	  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_FRONT_LIGHT_F0F));
+    68	  TEST_ASSERT_EQUAL(2, cvManager.getCv(CV_REAR_LIGHT_F0R));
+    69	  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_EXT_ID_HIGH));
+    70	  TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
+    71	  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
+    72	}
+    73
+    74	// Testet spezielle CV-Funktionen wie schreibgeschützte CVs und den
+    75	// Reset-Mechanismus.
+    76	void test_cv_manager_special(void) {
+    77	  CvManager cvManager;
+    78	  cvManager.setup();
+    79
+    80	  // Teste schreibgeschützte CV (CV_VERSION)
+    81	  uint8_t version = cvManager.getCv(CV_VERSION);
+    82	  // Versuch, die schreibgeschützte CV zu ändern
+    83	  cvManager.setCv(CV_VERSION, version + 1);
+    84	  // Der Wert sollte unverändert sein
+    85	  TEST_ASSERT_EQUAL(version, cvManager.getCv(CV_VERSION));
+    86
+    87	  // Teste den Reset-Mechanismus durch Schreiben von 0 auf CV_MANUFACTURER_ID
+    88	  // Ändere einen Wert, um den Reset zu verifizieren
+    89	  cvManager.setCv(CV_BASE_ADDRESS, 42);
+    90	  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+    91
+    92	  reboot_called = false;
+    93	  cvManager.setCv(CV_MANUFACTURER_ID, 0);
+    94	  // Überprüfe, ob der Neustart ausgelöst wurde
+    95	  TEST_ASSERT_TRUE(reboot_called);
+    96	  // Überprüfe, ob die Werte zurückgesetzt wurden
+    97	  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+    98	}
+    99
+   100	// Testet den Reset-Mechanismus durch Schreiben von 8 auf CV_MANUFACTURER_ID.
+   101	void test_cv_manager_reset_8(void) {
+   102	  CvManager cvManager;
+   103	  cvManager.setup();
+   104
+   105	  // Ändere einen Wert, um den Reset zu verifizieren
+   106	  cvManager.setCv(CV_BASE_ADDRESS, 42);
+   107	  TEST_ASSERT_EQUAL(42, cvManager.getCv(CV_BASE_ADDRESS));
+   108
+   109	  reboot_called = false;
+   110	  cvManager.setCv(CV_MANUFACTURER_ID, 8);
+   111	  // Überprüfe, ob der Neustart ausgelöst wurde
+   112	  TEST_ASSERT_TRUE(reboot_called);
+   113	  // Überprüfe, ob die Werte zurückgesetzt wurden
+   114	  TEST_ASSERT_EQUAL(3, cvManager.getCv(CV_BASE_ADDRESS));
+   115	}
+   116
+   117	// Test Motor Control
+   118	// Testet die Geschwindigkeits- und Richtungsteuerung des Motors.
+   119	void test_motor_speed_control(void) {
+   120	  CvManagerMock cvManager;
+   121	  // Konfiguriere CVs für den Motor
+   122	  cvManager.setCv(CV_START_VOLTAGE, 10);
+   123	  cvManager.setCv(CV_MOTOR_TYPE, 0);
+   124	  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
+   125	  MotorControl motor(cvManager, 10, 11, 2, 3);
+   126	  motor.setup();
+   127
+   128	  // Test: Geschwindigkeit 0
+   129	  motor.setSpeed(0, MM2DirectionState_Forward);
+   130	  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+   131	  TEST_ASSERT_EQUAL(0, analog_write_values[10]);
+   132
+   133	  // Test: Geschwindigkeit 1 in Vorwärtsrichtung
+   134	  motor.setSpeed(1, MM2DirectionState_Forward);
+   135	  advance_millis(101); // Simuliere Zeitablauf
+   136	  motor.setSpeed(1, MM2DirectionState_Forward);
+   137	  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+   138	  // Überprüfe den erwarteten PWM-Wert (Vstart = map(1, 0, 255, 0, 1023) = 4)
+   139	  // Aber wir haben jetzt Standard CV_START_VOLTAGE = 10 -> map(10, 0, 255, 0, 1023) = 40
+   140	  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+   141
+   142	  // Test: Geschwindigkeit 1 in Rückwärtsrichtung
+   143	  motor.setSpeed(0, MM2DirectionState_Forward); // Erst anhalten
+   144	  motor.setSpeed(1, MM2DirectionState_Backward);
+   145	  advance_millis(101);
+   146	  // Mit Korrektur wird hier direkt Kickstart ausgelöst und danach PWM gesetzt
+   147	  motor.setSpeed(1, MM2DirectionState_Backward);
+   148	  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+   149	  TEST_ASSERT_EQUAL(40, analog_write_values[11]);
+   150
+   151	  // Test: Maximale Geschwindigkeit in Vorwärtsrichtung
+   152	  motor.setSpeed(0, MM2DirectionState_Forward);
+   153	  motor.setSpeed(14, MM2DirectionState_Forward);
+   154	  advance_millis(101);
+   155	  motor.setSpeed(14, MM2DirectionState_Forward);
+   156	  TEST_ASSERT_EQUAL(LOW, digital_write_values[11]);
+   157	  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+   158
+   159	  // Test: Maximale Geschwindigkeit in Rückwärtsrichtung
+   160	  motor.setSpeed(0, MM2DirectionState_Forward);
+   161	  motor.setSpeed(14, MM2DirectionState_Backward);
+   162	  advance_millis(101);
+   163	  motor.setSpeed(14, MM2DirectionState_Backward);
+   164	  TEST_ASSERT_EQUAL(LOW, digital_write_values[10]);
+   165	  TEST_ASSERT_EQUAL(1023, analog_write_values[11]);
+   166	}
+   167
+   168	// Test Lights Control
+   169	// Testet das Standardverhalten der Lichtsteuerung.
+   170	void test_lights_control_default_behavior(void) {
+   171	  CvManagerMock cvManager;
+   172	  LightsControl lights(cvManager, 0, 1);
+   173	  // TODO: Behauptungen hinzufügen, um das Standard-Lichtverhalten zu überprüfen
+   174	}
+   175
+   176	// Testet das Schalten der Funktionen F0, F1 und F2 über das MM-Protokoll.
+   177	void test_mm_signal_f0_f1_f2(void) {
+   178	  ProtocolHandler protocol(0);
+   179	  protocol.setAddress(1);
+   180
+   181	  // Simuliere ein MM2-Signal mit F1 an
+   182	  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+   183	                      true);
+   184	  protocol.loop();
+   185	  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+   186
+   187	  // Simuliere ein MM2-Signal mit F1 aus
+   188	  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 1,
+   189	                      false);
+   190	  protocol.loop();
+   191	  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+   192
+   193	  // Simuliere ein MM2-Signal mit F2 an
+   194	  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+   195	                      true);
+   196	  protocol.loop();
+   197	  TEST_ASSERT_TRUE(protocol.getFunctionState(2));
+   198
+   199	  // Simuliere ein MM2-Signal mit F2 aus
+   200	  protocol.mm.SetData(1, 0, false, true, true, MM2DirectionState_Forward, 2,
+   201	                      false);
+   202	  protocol.loop();
+   203	  TEST_ASSERT_FALSE(protocol.getFunctionState(2));
+   204
+   205	  // Simuliere ein MM-Signal mit F0 an
+   206	  protocol.mm.SetData(1, 0, true, false, false, MM2DirectionState_Unavailable,
+   207	                      0, false);
+   208	  protocol.loop();
+   209	  TEST_ASSERT_TRUE(protocol.getFunctionState(0));
+   210
+   211	  // Simuliere ein MM-Signal mit F0 aus
+   212	  protocol.mm.SetData(1, 0, false, false, false, MM2DirectionState_Unavailable,
+   213	                      0, false);
+   214	  protocol.loop();
+   215	  TEST_ASSERT_FALSE(protocol.getFunctionState(0));
+   216	}
+   217
+   218	// Testet die Watchdog-Funktion für die Notabschaltung des Motors bei
+   219	// Signalverlust.
+   220	void test_watchdog_shutdown(void) {
+   221	  CvManagerMock cvManager;
+   222	  cvManager.setCv(CV_BASE_ADDRESS, 1);
+   223	  cvManager.setCv(CV_WATCHDOG_TIMEOUT, 5); // 500ms
+   224
+   225	  ProtocolHandler protocol(0);
+   226	  protocol.setAddress(1);
+   227	  protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
+   228
+   229	  MotorControl motor(cvManager, 10, 11, 2, 3);
+   230	  motor.setup();
+   231
+   232	  // 1. Normaler Betrieb: Geschwindigkeit auf 14 setzen
+   233	  protocol.mm.SetData(1, 14, false, false, false,
+   234	                      MM2DirectionState_Unavailable, 0, false);
+   235	  protocol.loop();
+   236	  motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+   237	  advance_millis(200); // Über Kickstart hinaus
+   238	  // Letztes gültiges Signal vor dem Verlust
+   239	  protocol.mm.SetData(1, 14, false, false, false,
+   240	                      MM2DirectionState_Unavailable, 0, false);
+   241	  protocol.loop();
+   242	  motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+   243	  // New default CV 5 = 0 -> PWM 1023
+   244	  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+   245
+   246	  // 2. Signalverlust simulieren (keine protocol.loop() Aufrufe mit Daten)
+   247	  advance_millis(501); // Watchdog sollte jetzt triggern (> 500ms)
+   248	  TEST_ASSERT_TRUE(protocol.isSignalTimeout());
+   249
+   250	  // Manuelle Simulation der Ramp-Down-Logik aus der main loop
+   251	  auto simulate_loop = [&]() {
+   252	    if (protocol.isSignalTimeout()) {
+   253	      unsigned long timeSinceLastSignal =
+   254	          millis() - protocol.getLastSignalTime();
+   255	      int           watchdogTimeout = cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100;
+   256	      unsigned long elapsed         = timeSinceLastSignal - watchdogTimeout;
+   257
+   258	      if (elapsed >= 500) {
+   259	        motor.stop();
+   260	      } else {
+   261	        int targetSpeed = protocol.getTargetSpeed();
+   262	        int rampSpeed   = map(elapsed, 0, 500, targetSpeed, 0);
+   263	        motor.setSpeed(rampSpeed, protocol.getTargetDirection());
+   264	      }
+   265	    } else {
+   266	      motor.setSpeed(protocol.getTargetSpeed(), protocol.getTargetDirection());
+   267	    }
+   268	  };
+   269
+   270	  simulate_loop();
+   271	  // Nach 501ms total (1ms nach Watchdog), sollte die Geschwindigkeit fast noch
+   272	  // 14 sein (1ms/500ms ramp) map(1, 0, 500, 14, 0) -> 13
+   273	  TEST_ASSERT_INT_WITHIN(2, 14, protocol.getTargetSpeed());
+   274	  // Wir prüfen den PWM Wert. targetSpeed=14 -> PWM=1023. rampSpeed = map(1, 0,
+   275	  // 500, 14, 0) = 13. PWM für 13 is map(13, 7, 14, 531, 1023) = 952
+   276	  int expectedPwm = 952;
+   277	  TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
+   278
+   279	  // 250ms nach Watchdog (750ms total) -> Halbe Geschwindigkeit
+   280	  advance_millis(249);
+   281	  simulate_loop();
+   282	  // Step 7 -> Vmid = 531
+   283	  expectedPwm = 531;
+   284	  TEST_ASSERT_INT_WITHIN(100, expectedPwm, analog_write_values[10]);
+   285
+   286	  // 500ms nach Watchdog (1000ms total) -> Stillstand
+   287	  advance_millis(250);
+   288	  simulate_loop();
+   289	  TEST_ASSERT_EQUAL(0, analog_write_values[10]);
+   290
+   291	  // 3. Signal kehrt zurück -> Sofortige Wiederaufnahme
+   292	  protocol.mm.SetData(1, 14, false, false, false,
+   293	                      MM2DirectionState_Unavailable, 0, false);
+   294	  protocol.loop();
+   295	  TEST_ASSERT_FALSE(protocol.isSignalTimeout());
+   296	  simulate_loop();
+   297
+   298	  // With kickstart triggered after stop(), PWM will be KICK_PWM (800) instead of 1023
+   299	  TEST_ASSERT_EQUAL(800, analog_write_values[10]);
+   300
+   301	  // After kickstart timeout, it should reach 1023
+   302	  advance_millis(150);
+   303	  simulate_loop();
+   304	  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+   305	}
+   306
+   307	void test_pwm_freq_logging(void) {
+   308	  CvManagerMock cvManager;
+   309	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   310	  logger.begin(&cvManager);
+   311
+   312	  // Test Standard DC (Type 0)
+   313	  cvManager.setCv(CV_MOTOR_TYPE, 0);
+   314	  Serial.clearLog();
+   315	  {
+   316	    MotorControl motor(cvManager, 10, 11, 2, 3);
+   317	    motor.setup();
+   318	    bool found = false;
+   319	    for (const auto &line : Serial.logLines) {
+   320	      if (line.find("Motor: Type=Standard DC, PWM Freq=20000 Hz") !=
+   321	          std::string::npos) {
+   322	        found = true;
+   323	        break;
+   324	      }
+   325	    }
+   326	    TEST_ASSERT_TRUE(found);
+   327	  }
+   328
+   329	  // Test Faulhaber (Type 1)
+   330	  cvManager.setCv(CV_MOTOR_TYPE, 1);
+   331	  Serial.clearLog();
+   332	  {
+   333	    MotorControl motor(cvManager, 10, 11, 2, 3);
+   334	    motor.setup();
+   335	    bool found = false;
+   336	    for (const auto &line : Serial.logLines) {
+   337	      if (line.find("Motor: Type=Faulhaber, PWM Freq=400 Hz") !=
+   338	          std::string::npos) {
+   339	        found = true;
+   340	        break;
+   341	      }
+   342	    }
+   343	    TEST_ASSERT_TRUE(found);
+   344	  }
+   345
+   346	  // Test Maxon (Type 2)
+   347	  cvManager.setCv(CV_MOTOR_TYPE, 2);
+   348	  Serial.clearLog();
+   349	  {
+   350	    MotorControl motor(cvManager, 10, 11, 2, 3);
+   351	    motor.setup();
+   352	    bool found = false;
+   353	    for (const auto &line : Serial.logLines) {
+   354	      if (line.find("Motor: Type=Maxon, PWM Freq=20000 Hz") !=
+   355	          std::string::npos) {
+   356	        found = true;
+   357	        break;
+   358	      }
+   359	    }
+   360	    TEST_ASSERT_TRUE(found);
+   361	  }
+   362	}
+   363
+   364	void test_cv_motor_type_reboot(void) {
+   365	  CvManager cvManager;
+   366	  cvManager.setup();
+   367
+   368	  reboot_called = false;
+   369	  cvManager.setCv(CV_MOTOR_TYPE, 1);
+   370	  TEST_ASSERT_TRUE(reboot_called);
+   371	  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_MOTOR_TYPE));
+   372	}
+   373
+   374	void test_logging(void) {
+   375	  CvManagerMock cvManager;
+   376	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   377	  logger.begin(&cvManager);
+   378	  Serial.clearLog();
+   379
+   380	  ProtocolHandler protocol(0);
+   381	  protocol.setAddress(1);
+   382
+   383	  // Test state change logging
+   384	  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+   385	                      false);
+   386	  protocol.loop();
+   387
+   388	  bool foundStateLog = false;
+   389	  for (const auto &line : Serial.logLines) {
+   390	    if (line.find("State: Addr=1, Speed=5") != std::string::npos) {
+   391	      foundStateLog = true;
+   392	      break;
+   393	    }
+   394	  }
+   395	  TEST_ASSERT_TRUE(foundStateLog);
+   396	  Serial.clearLog();
+   397
+   398	  // Test redundant packet (no log)
+   399	  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+   400	                      false);
+   401	  protocol.loop();
+   402	  TEST_ASSERT_EQUAL(0, Serial.logLines.size());
+   403
+   404	  // Test signal lost
+   405	  advance_millis(600); // Default timeout is 500ms
+   406	  protocol.loop();
+   407	  bool foundSignalLost = false;
+   408	  for (const auto &line : Serial.logLines) {
+   409	    if (line.find("MM Signal lost") != std::string::npos) {
+   410	      foundSignalLost = true;
+   411	      break;
+   412	    }
+   413	  }
+   414	  TEST_ASSERT_TRUE(foundSignalLost);
+   415	  Serial.clearLog();
+   416
+   417	  // Test signal recovered
+   418	  protocol.mm.SetData(1, 5, true, false, false, MM2DirectionState_Forward, 0,
+   419	                      false);
+   420	  protocol.loop();
+   421	  bool foundSignalRecovered = false;
+   422	  for (const auto &line : Serial.logLines) {
+   423	    if (line.find("MM Signal recovered") != std::string::npos) {
+   424	      foundSignalRecovered = true;
+   425	      break;
+   426	    }
+   427	  }
+   428	  TEST_ASSERT_TRUE(foundSignalRecovered);
+   429	  Serial.clearLog();
+   430
+   431	  // Test Motor kickstart logging
+   432	  MotorControl motor(cvManager, 10, 11, 2, 3);
+   433	  motor.setup();
+   434	  motor.setSpeed(1, MM2DirectionState_Forward);
+   435
+   436	  bool foundKickstartStarted = false;
+   437	  for (const auto &line : Serial.logLines) {
+   438	    if (line.find("Motor: Kickstart started") != std::string::npos) {
+   439	      foundKickstartStarted = true;
+   440	      break;
+   441	    }
+   442	  }
+   443	  TEST_ASSERT_TRUE(foundKickstartStarted);
+   444	  Serial.clearLog();
+   445
+   446	  // Test Motor PWM logging
+   447	  motor.setSpeed(7, MM2DirectionState_Forward);
+   448	  bool foundPwmLog = false;
+   449	  for (const auto &line : Serial.logLines) {
+   450	    if (line.find("Motor: Step 7 -> PWM") != std::string::npos) {
+   451	      foundPwmLog = true;
+   452	      break;
+   453	    }
+   454	  }
+   455	  TEST_ASSERT_TRUE(foundPwmLog);
+   456	  Serial.clearLog();
+   457
+   458	  // Test redundant call (no log)
+   459	  motor.setSpeed(7, MM2DirectionState_Forward);
+   460	  TEST_ASSERT_EQUAL(0, Serial.logLines.size());
+   461
+   462	  // Test direction change log
+   463	  motor.setSpeed(7, MM2DirectionState_Backward);
+   464	  foundPwmLog = false;
+   465	  for (const auto &line : Serial.logLines) {
+   466	    if (line.find("Motor: Step 7 -> PWM") != std::string::npos &&
+   467	        line.find("Dir Backward") != std::string::npos) {
+   468	      foundPwmLog = true;
+   469	      break;
+   470	    }
+   471	  }
+   472	  TEST_ASSERT_TRUE(foundPwmLog);
+   473	}
+   474
+   475	void test_serial_console(void) {
+   476	  CvManagerMock   cvManager;
+   477	  ProtocolHandler protocol(0);
+   478	  protocol.setAddress(1);
+   479	  SerialConsole console(&cvManager, &protocol);
+   480
+   481	  // Test CV command
+   482	  Serial.pushInput("cv 1 44\n");
+   483	  console.loop();
+   484	  TEST_ASSERT_EQUAL(44, cvManager.getCv(1));
+   485
+   486	  // Test Speed command
+   487	  Serial.pushInput("s 12\n");
+   488	  console.loop();
+   489	  TEST_ASSERT_EQUAL(12, protocol.getTargetSpeed());
+   490
+   491	  // Test Direction command
+   492	  Serial.pushInput("d f\n");
+   493	  console.loop();
+   494	  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+   495
+   496	  Serial.pushInput("d b\n");
+   497	  console.loop();
+   498	  TEST_ASSERT_EQUAL(MM2DirectionState_Backward, protocol.getTargetDirection());
+   499
+   500	  // Test Function command
+   501	  Serial.pushInput("f 1\n");
+   502	  console.loop();
+   503	  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+   504
+   505	  Serial.pushInput("f 0\n");
+   506	  console.loop();
+   507	  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+   508	}
+   509
+   510	void test_serial_console_cv_readout(void) {
+   511	  CvManagerMock   cvManager;
+   512	  ProtocolHandler protocol(0);
+   513	  protocol.setAddress(1);
+   514	  SerialConsole console(&cvManager, &protocol);
+   515
+   516	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   517	  logger.begin(&cvManager);
+   518	  Serial.clearLog();
+   519
+   520	  // Test "cv" command for readout
+   521	  Serial.pushInput("cv\n");
+   522	  console.loop();
+   523
+   524	  bool foundHeader = false;
+   525	  bool foundAddress = false;
+   526	  for (const auto &line : Serial.logLines) {
+   527	    if (line.find("--- Current CV Settings ---") != std::string::npos)
+   528	      foundHeader = true;
+   529	    if (line.find("CV 1 (Address): 3") != std::string::npos)
+   530	      foundAddress = true;
+   531	  }
+   532	  TEST_ASSERT_TRUE(foundHeader);
+   533	  TEST_ASSERT_TRUE(foundAddress);
+   534	}
+   535
+   536	void test_cv_manager_print_all(void) {
+   537	  CvManager cvManager;
+   538	  cvManager.setup();
+   539	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   540	  logger.begin(&cvManager);
+   541	  Serial.clearLog();
+   542
+   543	  cvManager.printAllCvs();
+   544
+   545	  bool foundHeader     = false;
+   546	  bool foundAddress    = false;
+   547	  bool foundVersion    = false;
+   548	  bool foundFooter     = false;
+   549	  bool foundLongAddr   = false;
+   550	  bool foundExtId      = false;
+   551
+   552	  for (const auto &line : Serial.logLines) {
+   553	    if (line.find("--- Current CV Settings ---") != std::string::npos)
+   554	      foundHeader = true;
+   555	    if (line.find("CV 1 (Address): 3") != std::string::npos)
+   556	      foundAddress = true;
+   557	    if (line.find("CV 7 (Version): 10") != std::string::npos)
+   558	      foundVersion = true;
+   559	    if (line.find("CV 17/18 (Long Addr): 49252") != std::string::npos) // (192 << 8) | 100 = 49152 + 100 = 49252
+   560	      foundLongAddr = true;
+   561	    if (line.find("CV 107/108 (Ext ID): 266") != std::string::npos) // (1 << 8) | 10 = 256 + 10 = 266
+   562	      foundExtId = true;
+   563	    if (line.find("---------------------------") != std::string::npos)
+   564	      foundFooter = true;
+   565	  }
+   566
+   567	  TEST_ASSERT_TRUE(foundHeader);
+   568	  TEST_ASSERT_TRUE(foundAddress);
+   569	  TEST_ASSERT_TRUE(foundVersion);
+   570	  TEST_ASSERT_TRUE(foundLongAddr);
+   571	  TEST_ASSERT_TRUE(foundExtId);
+   572	  TEST_ASSERT_TRUE(foundFooter);
+   573	}
+   574
+   575	void test_motor_kickstart_bemf_disabled(void) {
+   576	  CvManagerMock cvManager;
+   577	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   578	  logger.begin(&cvManager);
+   579
+   580	  // BEMF is disabled by default, but we set it explicitly here too
+   581	  cvManager.setCv(CV_BEMF_CONFIG, 0);
+   582
+   583	  MotorControl motor(cvManager, 10, 11, 2, 3);
+   584	  motor.setup();
+   585
+   586	  Serial.clearLog();
+   587
+   588	  // Start kickstart
+   589	  motor.setSpeed(1, MM2DirectionState_Forward);
+   590	  TEST_ASSERT_TRUE(motor.isKickstarting());
+   591
+   592	  // Simulate BEMF detected
+   593	  analog_read_values[2] = 500; // BemfA
+   594	  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+   595
+   596	  // Update motor - should NOT end kickstart because BEMF is disabled
+   597	  advance_millis(20);
+   598	  motor.setSpeed(1, MM2DirectionState_Forward);
+   599	  TEST_ASSERT_TRUE(motor.isKickstarting());
+   600
+   601	  bool foundBemfLog = false;
+   602	  for (const auto &line : Serial.logLines) {
+   603	    if (line.find("Motor: Kickstart ended (BEMF)") != std::string::npos) {
+   604	      foundBemfLog = true;
+   605	      break;
+   606	    }
+   607	  }
+   608	  TEST_ASSERT_FALSE(foundBemfLog);
+   609
+   610	  // Wait for timeout (default 100ms for type 0)
+   611	  advance_millis(100);
+   612	  motor.setSpeed(1, MM2DirectionState_Forward);
+   613	  TEST_ASSERT_FALSE(motor.isKickstarting());
+   614
+   615	  bool foundTimeoutLog = false;
+   616	  for (const auto &line : Serial.logLines) {
+   617	    if (line.find("Motor: Kickstart ended (timeout)") != std::string::npos) {
+   618	      foundTimeoutLog = true;
+   619	      break;
+   620	    }
+   621	  }
+   622	  TEST_ASSERT_TRUE(foundTimeoutLog);
+   623	}
+   624
+   625	void test_motor_kickstart_bemf_enabled(void) {
+   626	  CvManagerMock cvManager;
+   627	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   628	  logger.begin(&cvManager);
+   629
+   630	  // Enable BEMF
+   631	  cvManager.setCv(CV_BEMF_CONFIG, 1);
+   632
+   633	  MotorControl motor(cvManager, 10, 11, 2, 3);
+   634	  motor.setup();
+   635
+   636	  Serial.clearLog();
+   637
+   638	  // Start kickstart
+   639	  motor.setSpeed(1, MM2DirectionState_Forward);
+   640	  TEST_ASSERT_TRUE(motor.isKickstarting());
+   641
+   642	  // Simulate BEMF detected
+   643	  analog_read_values[2] = 500; // BemfA
+   644	  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+   645
+   646	  // Update motor - should end kickstart because BEMF is enabled
+   647	  advance_millis(20);
+   648	  motor.setSpeed(1, MM2DirectionState_Forward);
+   649	  TEST_ASSERT_FALSE(motor.isKickstarting());
+   650
+   651	  bool foundBemfLog = false;
+   652	  for (const auto &line : Serial.logLines) {
+   653	    if (line.find("Motor: Kickstart ended (BEMF)") != std::string::npos) {
+   654	      foundBemfLog = true;
+   655	      break;
+   656	    }
+   657	  }
+   658	  TEST_ASSERT_TRUE(foundBemfLog);
+   659	}
+   660
+   661	void test_motor_speed_curve(void) {
+   662	  CvManagerMock cvManager;
+   663
+   664	  // Case 1: Standard linear curve (Vmid = 0 -> default midpoint)
+   665	  // Vstart = 50 (PWM ~200), Vhigh = 200 (PWM ~803), Vmid = 0 (default ~501)
+   666	  cvManager.setCv(CV_START_VOLTAGE, 50);
+   667	  cvManager.setCv(CV_MAXIMUM_SPEED, 200);
+   668	  cvManager.setCv(CV_MEDIUM_SPEED, 0);
+   669	  MotorControl motor1(cvManager, 10, 11, 2, 3);
+   670	  motor1.setup();
+   671
+   672	  motor1.setSpeed(1, MM2DirectionState_Forward);
+   673	  advance_millis(101);
+   674	  motor1.setSpeed(1, MM2DirectionState_Forward);
+   675	  TEST_ASSERT_INT_WITHIN(5, 200, analog_write_values[10]);
+   676
+   677	  motor1.setSpeed(7, MM2DirectionState_Forward);
+   678	  TEST_ASSERT_INT_WITHIN(5, 501, analog_write_values[10]);
+   679
+   680	  motor1.setSpeed(14, MM2DirectionState_Forward);
+   681	  TEST_ASSERT_INT_WITHIN(5, 803, analog_write_values[10]);
+   682
+   683	  // Case 2: Custom Vmid (Non-linear)
+   684	  // Vstart = 10 (PWM 40), Vmid = 200 (PWM 803), Vhigh = 255 (PWM 1023)
+   685	  cvManager.setCv(CV_START_VOLTAGE, 10);
+   686	  cvManager.setCv(CV_MEDIUM_SPEED, 200);
+   687	  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
+   688
+   689	  motor1.setSpeed(1, MM2DirectionState_Forward);
+   690	  advance_millis(101);
+   691	  motor1.setSpeed(1, MM2DirectionState_Forward);
+   692	  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+   693
+   694	  motor1.setSpeed(7, MM2DirectionState_Forward);
+   695	  TEST_ASSERT_INT_WITHIN(2, 803, analog_write_values[10]);
+   696
+   697	  motor1.setSpeed(14, MM2DirectionState_Forward);
+   698	  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+   699
+   700	  // Check an intermediate step (e.g. step 4, halfway between 1 and 7)
+   701	  motor1.setSpeed(4, MM2DirectionState_Forward);
+   702	  // map(4, 1, 7, 40, 803) = 40 + (803-40)/2 = 40 + 381 = 421
+   703	  TEST_ASSERT_INT_WITHIN(2, 421, analog_write_values[10]);
+   704	}
+   705
+   706	void test_serial_console_logging_toggle(void) {
+   707	  CvManagerMock   cvManager;
+   708	  ProtocolHandler protocol(0);
+   709	  protocol.setAddress(1);
+   710	  SerialConsole console(&cvManager, &protocol);
+   711
+   712	  // Initial state (enabled by default)
+   713	  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+   714	  logger.begin(&cvManager);
+   715	  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+   716
+   717	  // Toggle OFF
+   718	  Serial.pushInput("L\n");
+   719	  console.loop();
+   720	  TEST_ASSERT_FALSE(logger.isLoggingEnabled());
+   721	  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_DEBUG_ENABLE));
+   722
+   723	  // Toggle ON (using lowercase 'l')
+   724	  Serial.pushInput("l\n");
+   725	  console.loop();
+   726	  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+   727	  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
+   728	}
+   729
+   730	void test_serial_console_help(void) {
+   731	  CvManagerMock   cvManager;
+   732	  ProtocolHandler protocol(0);
+   733	  protocol.setAddress(1);
+   734	  SerialConsole console(&cvManager, &protocol);
+   735
+   736	  Serial.clearLog();
+   737	  Serial.pushInput("h\n");
+   738	  console.loop();
+   739
+   740	  bool foundHelpHeader = false;
+   741	  for (const auto &line : Serial.logLines) {
+   742	    if (line.find("--- Available Commands ---") != std::string::npos) {
+   743	      foundHelpHeader = true;
+   744	      break;
+   745	    }
+   746	  }
+   747	  TEST_ASSERT_TRUE(foundHelpHeader);
+   748
+   749	  Serial.clearLog();
+   750	  Serial.pushInput("?\n");
+   751	  console.loop();
+   752
+   753	  foundHelpHeader = false;
+   754	  for (const auto &line : Serial.logLines) {
+   755	    if (line.find("--- Available Commands ---") != std::string::npos) {
+   756	      foundHelpHeader = true;
+   757	      break;
+   758	    }
+   759	  }
+   760	  TEST_ASSERT_TRUE(foundHelpHeader);
+   761	}
+   762
+   763	void test_cv_programming_6021(void) {
+   764	  CvManagerMock   cvManager;
+   765	  ProtocolHandler protocol(0);
+   766	  protocol.setAddress(1);
+   767	  CvProgrammer programmer(&cvManager, &protocol);
+   768
+   769	  // Set CV 15 to 7 to enable programming
+   770	  cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
+   771
+   772	  // Set first signal time to non-zero
+   773	  advance_millis(1000);
+   774
+   775	  // 4 direction changes to enter programming mode
+   776	  for (int i = 0; i < 4; i++) {
+   777	    advance_millis(300);
+   778	    // Send packet with changeDir = true
+   779	    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+   780	                        0, false);
+   781	    protocol.loop();
+   782	    programmer.loop();
+   783
+   784	    advance_millis(100);
+   785	    // Send packet with changeDir = false to reset lastChangeDirInput
+   786	    protocol.mm.SetData(1, 0, false, false, false,
+   787	                        MM2DirectionState_Unavailable, 0, false);
+   788	    protocol.loop();
+   789	    programmer.loop();
+   790	  }
+   791
+   792	  // Now in programming mode
+   793	  // Set CV 10 (address)
+   794	  advance_millis(100);
+   795	  unsigned long now = millis();
+   796	  protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable,
+   797	                      0, false);
+   798	  protocol.loop();
+   799	  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
+   800	  programmer.loop();
+   801
+   802	  // Set Value 42
+   803	  advance_millis(100);
+   804	  now = millis();
+   805	  protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable,
+   806	                      0, false);
+   807	  protocol.loop();
+   808	  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
+   809	  programmer.loop();
+   810
+   811	  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+   812	}
+   813
+   814	void setUp(void) {
+   815	  reboot_called = false;
+   816	  reset_arduino_mock();
+   817	}
+   818
+   819	void tearDown(void) {
+   820	  // clean stuff up here
+   821	}
+   822
+   823	int main(int argc, char **argv) {
+   824	  UNITY_BEGIN();
+   825	  RUN_TEST(test_cv_manager_get_set);
+   826	  RUN_TEST(test_cv_manager_defaults);
+   827	  RUN_TEST(test_cv_manager_special);
+   828	  RUN_TEST(test_cv_manager_reset_8);
+   829	  RUN_TEST(test_motor_speed_control);
+   830	  RUN_TEST(test_lights_control_default_behavior);
+   831	  RUN_TEST(test_mm_signal_f0_f1_f2);
+   832	  RUN_TEST(test_cv_programming_6021);
+   833	  RUN_TEST(test_watchdog_shutdown);
+   834	  RUN_TEST(test_motor_speed_curve);
+   835	  RUN_TEST(test_logging);
+   836	  RUN_TEST(test_logger_categories);
+   837	  RUN_TEST(test_pwm_freq_logging);
+   838	  RUN_TEST(test_cv_motor_type_reboot);
+   839	  RUN_TEST(test_serial_console);
+   840	  RUN_TEST(test_serial_console_cv_readout);
+   841	  RUN_TEST(test_cv_manager_print_all);
+   842	  RUN_TEST(test_motor_kickstart_bemf_disabled);
+   843	  RUN_TEST(test_motor_kickstart_bemf_enabled);
+   844	  RUN_TEST(test_motor_pwm_mapping_detailed);
+   845	  RUN_TEST(test_motor_pwm_mapping_new_defaults);
+   846	  RUN_TEST(test_debug_leds_heartbeat);
+   847	  RUN_TEST(test_motor_bemf_pi_control);
+   848	  RUN_TEST(test_serial_console_logging_toggle);
+   849	  RUN_TEST(test_serial_console_help);
+   850	  RUN_TEST(test_repro_watchdog_stop_no_kickstart);
+   851	  RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
+   852	  RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
+   853	  RUN_TEST(test_repro_direction_change_kickstart);
+   854	  return UNITY_END();
+   855	}

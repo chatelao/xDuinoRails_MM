@@ -1,0 +1,253 @@
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart ended (BEMF)") != std::string::npos) {
+      foundBemfLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_FALSE(foundBemfLog);
+
+  // Wait for timeout (default 100ms for type 0)
+  advance_millis(100);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+
+  bool foundTimeoutLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart ended (timeout)") != std::string::npos) {
+      foundTimeoutLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundTimeoutLog);
+}
+
+void test_motor_kickstart_bemf_enabled(void) {
+  CvManagerMock cvManager;
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+
+  // Enable BEMF
+  cvManager.setCv(CV_BEMF_CONFIG, 1);
+
+  MotorControl motor(cvManager, 10, 11, 2, 3);
+  motor.setup();
+
+  Serial.clearLog();
+
+  // Start kickstart
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  // Simulate BEMF detected
+  analog_read_values[2] = 500; // BemfA
+  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+
+  // Update motor - should end kickstart because BEMF is enabled
+  advance_millis(20);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+
+  bool foundBemfLog = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("Motor: Kickstart ended (BEMF)") != std::string::npos) {
+      foundBemfLog = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundBemfLog);
+}
+
+void test_motor_speed_curve(void) {
+  CvManagerMock cvManager;
+
+  // Case 1: Standard linear curve (Vmid = 0 -> default midpoint)
+  // Vstart = 50 (PWM ~200), Vhigh = 200 (PWM ~803), Vmid = 0 (default ~501)
+  cvManager.setCv(CV_START_VOLTAGE, 50);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 200);
+  cvManager.setCv(CV_MEDIUM_SPEED, 0);
+  MotorControl motor1(cvManager, 10, 11, 2, 3);
+  motor1.setup();
+
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 200, analog_write_values[10]);
+
+  motor1.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 501, analog_write_values[10]);
+
+  motor1.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(5, 803, analog_write_values[10]);
+
+  // Case 2: Custom Vmid (Non-linear)
+  // Vstart = 10 (PWM 40), Vmid = 200 (PWM 803), Vhigh = 255 (PWM 1023)
+  cvManager.setCv(CV_START_VOLTAGE, 10);
+  cvManager.setCv(CV_MEDIUM_SPEED, 200);
+  cvManager.setCv(CV_MAXIMUM_SPEED, 255);
+
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  advance_millis(101);
+  motor1.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(40, analog_write_values[10]);
+
+  motor1.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_INT_WITHIN(2, 803, analog_write_values[10]);
+
+  motor1.setSpeed(14, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
+
+  // Check an intermediate step (e.g. step 4, halfway between 1 and 7)
+  motor1.setSpeed(4, MM2DirectionState_Forward);
+  // map(4, 1, 7, 40, 803) = 40 + (803-40)/2 = 40 + 381 = 421
+  TEST_ASSERT_INT_WITHIN(2, 421, analog_write_values[10]);
+}
+
+void test_serial_console_logging_toggle(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  // Initial state (enabled by default)
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+
+  // Toggle OFF
+  Serial.pushInput("L\n");
+  console.loop();
+  TEST_ASSERT_FALSE(logger.isLoggingEnabled());
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_DEBUG_ENABLE));
+
+  // Toggle ON (using lowercase 'l')
+  Serial.pushInput("l\n");
+  console.loop();
+  TEST_ASSERT_TRUE(logger.isLoggingEnabled());
+  TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
+}
+
+void test_serial_console_help(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  Serial.clearLog();
+  Serial.pushInput("h\n");
+  console.loop();
+
+  bool foundHelpHeader = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- Available Commands ---") != std::string::npos) {
+      foundHelpHeader = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundHelpHeader);
+
+  Serial.clearLog();
+  Serial.pushInput("?\n");
+  console.loop();
+
+  foundHelpHeader = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("--- Available Commands ---") != std::string::npos) {
+      foundHelpHeader = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundHelpHeader);
+}
+
+void test_cv_programming_6021(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  CvProgrammer programmer(&cvManager, &protocol);
+
+  // Set CV 15 to 7 to enable programming
+  cvManager.setCv(CV_PROGRAMMING_LOCK, 7);
+
+  // Set first signal time to non-zero
+  advance_millis(1000);
+
+  // 4 direction changes to enter programming mode
+  for (int i = 0; i < 4; i++) {
+    advance_millis(300);
+    // Send packet with changeDir = true
+    protocol.mm.SetData(1, 0, false, true, false, MM2DirectionState_Unavailable,
+                        0, false);
+    protocol.loop();
+    programmer.loop();
+
+    advance_millis(100);
+    // Send packet with changeDir = false to reset lastChangeDirInput
+    protocol.mm.SetData(1, 0, false, false, false,
+                        MM2DirectionState_Unavailable, 0, false);
+    protocol.loop();
+    programmer.loop();
+  }
+
+  // Now in programming mode
+  // Set CV 10 (address)
+  advance_millis(100);
+  unsigned long now = millis();
+  protocol.mm.SetData(1, 10, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
+  programmer.loop();
+
+  // Set Value 42
+  advance_millis(100);
+  now = millis();
+  protocol.mm.SetData(1, 42, false, false, false, MM2DirectionState_Unavailable,
+                      0, false);
+  protocol.loop();
+  TEST_ASSERT_EQUAL(now, protocol.getLastSpeedChangeTs());
+  programmer.loop();
+
+  TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
+}
+
+void setUp(void) {
+  reboot_called = false;
+  reset_arduino_mock();
+}
+
+void tearDown(void) {
+  // clean stuff up here
+}
+
+int main(int argc, char **argv) {
+  UNITY_BEGIN();
+  RUN_TEST(test_cv_manager_get_set);
+  RUN_TEST(test_cv_manager_defaults);
+  RUN_TEST(test_cv_manager_special);
+  RUN_TEST(test_cv_manager_reset_8);
+  RUN_TEST(test_motor_speed_control);
+  RUN_TEST(test_lights_control_default_behavior);
+  RUN_TEST(test_mm_signal_f0_f1_f2);
+  RUN_TEST(test_cv_programming_6021);
+  RUN_TEST(test_watchdog_shutdown);
+  RUN_TEST(test_motor_speed_curve);
+  RUN_TEST(test_logging);
+  RUN_TEST(test_pwm_freq_logging);
+  RUN_TEST(test_cv_motor_type_reboot);
+  RUN_TEST(test_serial_console);
+  RUN_TEST(test_serial_console_cv_readout);
+  RUN_TEST(test_cv_manager_print_all);
+  RUN_TEST(test_motor_kickstart_bemf_disabled);
+  RUN_TEST(test_motor_kickstart_bemf_enabled);
+  RUN_TEST(test_motor_pwm_mapping_detailed);
+  RUN_TEST(test_motor_pwm_mapping_new_defaults);
+  RUN_TEST(test_debug_leds_heartbeat);
+  RUN_TEST(test_motor_bemf_pi_control);
+  RUN_TEST(test_serial_console_logging_toggle);
+  RUN_TEST(test_serial_console_help);
+  RUN_TEST(test_repro_watchdog_stop_no_kickstart);
+  RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
+  RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
+  RUN_TEST(test_repro_direction_change_kickstart);
+  return UNITY_END();
+}
