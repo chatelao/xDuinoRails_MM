@@ -4,7 +4,7 @@
 #include "CvManager.h"
 #include <Arduino.h>
 
-enum class LogCategory { General, Protocol, PWM, CV, BEMF };
+enum class LogCategory { General, Protocol, PWM, CV, BEMF, HighSpeed };
 
 class Logger {
 public:
@@ -17,8 +17,10 @@ public:
   void printf(const char *format, ...); // Overload for General
   void toggleLogging();
   void toggleCategory(LogCategory category);
+  void toggleHighSpeed();
   bool isLoggingEnabled();
   bool isCategoryEnabled(LogCategory category);
+  bool isHighSpeedEnabled();
 
 private:
   CvManager *cvManager;
@@ -28,6 +30,7 @@ private:
   bool       pwmEnabled;
   bool       cvEnabled;
   bool       bemfEnabled;
+  bool       highSpeedEnabled;
   bool       isInitialized;
 };
 

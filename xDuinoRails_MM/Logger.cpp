@@ -7,7 +7,7 @@ Logger logger;
 Logger::Logger()
     : cvManager(nullptr), cachedEnabled(false), protocolEnabled(true),
       pwmEnabled(true), cvEnabled(true), bemfEnabled(true),
-      isInitialized(false) {}
+      highSpeedEnabled(false), isInitialized(false) {}
 
 void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
@@ -37,9 +37,16 @@ void Logger::toggleCategory(LogCategory category) {
   case LogCategory::BEMF:
     bemfEnabled = !bemfEnabled;
     break;
+  case LogCategory::HighSpeed:
+    highSpeedEnabled = !highSpeedEnabled;
+    break;
   default:
     break;
   }
+}
+
+void Logger::toggleHighSpeed() {
+  highSpeedEnabled = !highSpeedEnabled;
 }
 
 bool Logger::isLoggingEnabled() { return cachedEnabled; }
@@ -54,10 +61,14 @@ bool Logger::isCategoryEnabled(LogCategory category) {
     return cvEnabled;
   case LogCategory::BEMF:
     return bemfEnabled;
+  case LogCategory::HighSpeed:
+    return highSpeedEnabled;
   default:
     return true;
   }
 }
+
+bool Logger::isHighSpeedEnabled() { return highSpeedEnabled; }
 
 bool Logger::isEnabled() {
   if (cvManager == nullptr)
