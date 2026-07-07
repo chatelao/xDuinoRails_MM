@@ -8,6 +8,12 @@ xDuinoRails_MM is a model train decoder firmware designed for the Seeed Xiao RP2
 
 The system is designed with a modular architecture that separates protocol decoding, motor control, lighting, and configuration management. This separation of concerns, combined with hardware abstraction layers, enables robust native testing on non-embedded platforms.
 
+## Architecture Diagram
+
+![Architecture Diagram](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/chatelao/xDuinoRails_MM/main/documentation/architecture.puml)
+
+*The diagram above is rendered dynamically from the [architecture.puml](documentation/architecture.puml) file.*
+
 ## Core Components
 
 The firmware is composed of several key modules, each responsible for a specific aspect of the decoder's functionality:

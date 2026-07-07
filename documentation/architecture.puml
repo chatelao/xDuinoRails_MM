@@ -1,0 +1,45 @@
+@startuml
+title xDuinoRails_MM Architecture Diagram
+
+package "Firmware Core" {
+    [ProtocolHandler] <<Module>>
+    [MotorControl] <<Module>>
+    [LightsControl] <<Module>>
+    [CvManager] <<Module>>
+    [CvProgrammer] <<Module>>
+    [SerialConsole] <<Module>>
+    [DebugLeds] <<Module>>
+    [Logger] <<Utility>>
+
+    [ProtocolHandler] -down-> [CvManager] : uses
+    [MotorControl] -down-> [CvManager] : uses
+    [LightsControl] -down-> [CvManager] : uses
+    [CvProgrammer] -right-> [CvManager] : modifies
+    [CvProgrammer] -left-> [ProtocolHandler] : monitors
+    [SerialConsole] -down-> [CvManager] : interacts
+    [SerialConsole] -down-> [ProtocolHandler] : interacts
+    [DebugLeds] -down-> [ProtocolHandler] : status
+    [DebugLeds] -down-> [MotorControl] : status
+
+    [ProtocolHandler] .up.> [Logger] : logs
+    [MotorControl] .up.> [Logger] : logs
+    [CvManager] .up.> [Logger] : logs
+}
+
+node "Hardware Abstraction / Peripherals" {
+    [MM Signal] --> [ProtocolHandler] : External Interrupt
+    [MotorControl] --> [Motor Output (PWM)]
+    [MotorControl] <-- [BEMF Input (ADC)]
+    [LightsControl] --> [Function Outputs]
+    [DebugLeds] --> [RGB LED / NeoPixel]
+    [CvManager] <--> [EEPROM / Flash]
+    [SerialConsole] <--> [USB Serial]
+    [Logger] --> [USB Serial]
+}
+
+legend right
+  Arrows indicate data flow or dependency.
+  Modules are high-level logic components.
+endlegend
+
+@enduml
