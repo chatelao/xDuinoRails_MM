@@ -5,8 +5,7 @@
 Logger logger;
 
 Logger::Logger()
-    : cvManager(nullptr), cachedEnabled(false), protocolEnabled(true),
-      pwmEnabled(true), cvEnabled(true), isInitialized(false) {}
+    : cvManager(nullptr), cachedEnabled(false), isInitialized(false) {}
 
 void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
@@ -22,36 +21,7 @@ void Logger::toggleLogging() {
   }
 }
 
-void Logger::toggleCategory(LogCategory category) {
-  switch (category) {
-  case LogCategory::Protocol:
-    protocolEnabled = !protocolEnabled;
-    break;
-  case LogCategory::PWM:
-    pwmEnabled = !pwmEnabled;
-    break;
-  case LogCategory::CV:
-    cvEnabled = !cvEnabled;
-    break;
-  default:
-    break;
-  }
-}
-
 bool Logger::isLoggingEnabled() { return cachedEnabled; }
-
-bool Logger::isCategoryEnabled(LogCategory category) {
-  switch (category) {
-  case LogCategory::Protocol:
-    return protocolEnabled;
-  case LogCategory::PWM:
-    return pwmEnabled;
-  case LogCategory::CV:
-    return cvEnabled;
-  default:
-    return true;
-  }
-}
 
 bool Logger::isEnabled() {
   if (cvManager == nullptr)
@@ -59,31 +29,20 @@ bool Logger::isEnabled() {
   return cvManager->getCv(CV_DEBUG_ENABLE) != 0;
 }
 
-void Logger::print(const char *message, LogCategory category) {
-  if (isInitialized && cachedEnabled && isCategoryEnabled(category)) {
+void Logger::print(const char *message) {
+  if (isInitialized && cachedEnabled) {
     Serial.print(message);
   }
 }
 
-void Logger::println(const char *message, LogCategory category) {
-  if (isInitialized && cachedEnabled && isCategoryEnabled(category)) {
+void Logger::println(const char *message) {
+  if (isInitialized && cachedEnabled) {
     Serial.println(message);
   }
 }
 
-void Logger::printf(LogCategory category, const char *format, ...) {
-  if (isInitialized && cachedEnabled && isCategoryEnabled(category)) {
-    char    buf[128];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buf, sizeof(buf), format, args);
-    va_end(args);
-    Serial.print(buf);
-  }
-}
-
 void Logger::printf(const char *format, ...) {
-  if (isInitialized && cachedEnabled && isCategoryEnabled(LogCategory::General)) {
+  if (isInitialized && cachedEnabled) {
     char    buf[128];
     va_list args;
     va_start(args, format);

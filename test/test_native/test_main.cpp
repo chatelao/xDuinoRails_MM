@@ -15,7 +15,6 @@ void test_watchdog_shutdown(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
-void test_logger_categories(void);
 void test_serial_console(void);
 void test_serial_console_cv_readout(void);
 void test_cv_manager_print_all(void);
@@ -799,7 +798,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_watchdog_shutdown);
   RUN_TEST(test_motor_speed_curve);
   RUN_TEST(test_logging);
-  RUN_TEST(test_logger_categories);
   RUN_TEST(test_pwm_freq_logging);
   RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_serial_console);
