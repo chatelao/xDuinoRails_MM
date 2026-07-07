@@ -121,8 +121,7 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   if (vMid   == 0) vMid = (vStart + vHigh) / 2;
 
   // Clamp vStart to vHigh to avoid negative slopes
-  if (vStart > vHigh)
-    vStart = vHigh;
+  if (vStart > vHigh)  vStart = vHigh;
 
   // Clamp vMid between vStart and vHigh
   if (vStart > vMid  ) vMid = vStart; // Clamp to >= vStart
