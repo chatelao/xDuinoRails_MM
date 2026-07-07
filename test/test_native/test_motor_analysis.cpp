@@ -18,7 +18,7 @@ void test_motor_pwm_mapping_detailed(void) {
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   cvManager.setCv(CV_BEMF_CONFIG, 0); // Disable BEMF
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Helper to get PWM after kickstart
@@ -58,7 +58,7 @@ void test_motor_pwm_mapping_new_defaults(void) {
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   cvManager.setCv(CV_BEMF_CONFIG, 0); // Disable BEMF
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Helper to get PWM after kickstart
@@ -96,7 +96,7 @@ void test_motor_bemf_pi_control(void) {
   cvManager.setCv(CV_BEMF_I, 64);         // I=64 -> factor 1
   cvManager.setCv(CV_MOTOR_TYPE, 0);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Set speed to step 7 (targetPwm = 531)

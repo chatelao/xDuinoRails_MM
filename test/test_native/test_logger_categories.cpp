@@ -15,7 +15,7 @@ void test_logger_categories(void) {
   ProtocolHandler protocol(0);
   protocol.setAddress(1);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   SerialConsole console(&cvManager, &protocol);

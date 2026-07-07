@@ -4,12 +4,13 @@
 const int PWM_RANGE = 1023;
 
 MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
-                           int bemfB)
+                           int bemfB, int shutPin)
     : cvManager(cvManager) {
   pinA_priv           = pinA;
   pinB_priv           = pinB;
   bemfA_priv          = bemfA;
   bemfB_priv          = bemfB;
+  shutPin_priv        = shutPin;
   targetPwm           = 0;
   currDirection       = MM2DirectionState_Forward;
   targetDirection     = MM2DirectionState_Forward;
@@ -20,6 +21,9 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   previousPwm         = 0;
   bemfErrorSum        = 0;
   lastAdjustment      = 0;
+
+  lastWrittenPwm      = -1;
+  lastWrittenDir      = MM2DirectionState_Unavailable;
 
   lastTelemetryTime = 0;
   bemfSum           = 0;
@@ -35,6 +39,11 @@ void MotorControl::setup() {
   pinMode(pinB_priv, OUTPUT);
   pinMode(bemfA_priv, INPUT);
   pinMode(bemfB_priv, INPUT);
+
+  if (shutPin_priv != -1) {
+    pinMode(shutPin_priv, OUTPUT);
+    digitalWrite(shutPin_priv, LOW); // Active high shutdown -> LOW = enabled
+  }
 
   int         motorType = cvManager.getCv(CV_MOTOR_TYPE);
   const char *typeName  = "Standard DC";
@@ -282,13 +291,25 @@ void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
   if (pwm < 0)
     pwm = 0;
 
+  if (pwm == lastWrittenPwm && dir == lastWrittenDir)
+    return;
+
   if (dir == MM2DirectionState_Forward) {
     digitalWrite(pinB_priv, LOW);
     analogWrite(pinA_priv, pwm);
+    if (lastWrittenDir == MM2DirectionState_Backward) {
+      analogWrite(pinB_priv, 0); // Ensure other pin is off
+    }
   } else {
     digitalWrite(pinA_priv, LOW);
     analogWrite(pinB_priv, pwm);
+    if (lastWrittenDir == MM2DirectionState_Forward) {
+      analogWrite(pinA_priv, 0); // Ensure other pin is off
+    }
   }
+
+  lastWrittenPwm = pwm;
+  lastWrittenDir = dir;
 }
 
 int MotorControl::readBEMF() {
@@ -297,5 +318,9 @@ int MotorControl::readBEMF() {
   delayMicroseconds(500);
   int valA = analogRead(bemfA_priv);
   int valB = analogRead(bemfB_priv);
+
+  // Since we touched the pins, invalidate the write cache
+  lastWrittenPwm = -1;
+
   return (valA > valB) ? (valA - valB) : (valB - valA);
 }
