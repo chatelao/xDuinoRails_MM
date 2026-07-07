@@ -52,8 +52,6 @@ jobs:
           sudo apt-get install -y libgtk2.0-0 libglib2.0-0 libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxrender1 libxtst6
       - name: Run Renode Simulation
         run: ./run_renode_tests.sh
-      - name: Build firmware
-        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6
 
   arduino-cli-build:
     runs-on: ubuntu-latest
@@ -65,18 +63,12 @@ jobs:
         run: |
           arduino-cli core update-index --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
           arduino-cli core install rp2040:rp2040 --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-      - name: Install ESP32 Core
-        run: |
-          arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-          arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
       - name: Install Libraries
         run: |
           arduino-cli lib install "Adafruit NeoPixel"
           arduino-cli lib install "MaerklinMotorola"
       - name: Compile
-        run: |
-          arduino-cli compile --fqbn rp2040:rp2040:seeed_xiao_rp2040 xDuinoRails_MM
-          arduino-cli compile --fqbn esp32:esp32:XIAO_ESP32C6 xDuinoRails_MM
+        run: arduino-cli compile xDuinoRails_MM
 
   release:
     needs: [build, arduino-cli-build, renode-simulation]
@@ -98,12 +90,9 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
       - name: Build firmware
-        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6
+        run: pio run -e seeed_xiao_rp2040
       - name: Upload release asset
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: |
-            .pio/build/seeed_xiao_rp2040/firmware.uf2
-            .pio/build/seeed_xiao_esp32c6/firmware.bin
-            .pio/build/seeed_xiao_esp32c6/firmware.factory.bin
+          files: ".pio/build/seeed_xiao_rp2040/firmware.uf2"
           repo-token: ${{ secrets.GITHUB_TOKEN }}

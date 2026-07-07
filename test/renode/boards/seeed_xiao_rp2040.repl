@@ -1,4 +1,4 @@
-using "test/renode/boards/rp2040.repl"
+using "@rp2040.repl"
 
 // Mapping for xDuinoRails_MM on Seeed XIAO RP2040
 // D7  -> GPIO 0  (Motor A)

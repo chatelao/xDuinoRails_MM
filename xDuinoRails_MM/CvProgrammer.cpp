@@ -18,8 +18,7 @@ void CvProgrammer::loop() {
   if (lastChangeDirTs > 0 && lastChangeDirTs != lastDirectionChangeTime) {
     if (millis() - lastDirectionChangeTime < 2000) {
       directionChangeCount++;
-      logger.printf(LogCategory::CV, "Prog: ChangeDir count %d\n",
-                    directionChangeCount);
+      logger.printf("Prog: ChangeDir count %d\n", directionChangeCount);
     } else {
       directionChangeCount = 1;
     }
@@ -28,7 +27,7 @@ void CvProgrammer::loop() {
     if (directionChangeCount >= 4) {
       if (cvManager->getCv(CV_PROGRAMMING_LOCK) == 7) {
         programmingMode = !programmingMode;
-        logger.printf(LogCategory::CV, "Prog: Programming Mode %s\n",
+        logger.printf("Prog: Programming Mode %s\n",
                       programmingMode ? "Enabled" : "Disabled");
       }
       directionChangeCount = 0;
@@ -42,11 +41,9 @@ void CvProgrammer::loop() {
       int speed = protocolHandler->getTargetSpeed();
       if (cvAddress == -1) {
         cvAddress = speed;
-        logger.printf(LogCategory::CV, "Prog: CV Address %d received\n",
-                      cvAddress);
+        logger.printf("Prog: CV Address %d received\n", cvAddress);
       } else {
-        logger.printf(LogCategory::CV, "Prog: Writing CV %d = %d\n", cvAddress,
-                      speed);
+        logger.printf("Prog: Writing CV %d = %d\n", cvAddress, speed);
         cvManager->setCv(cvAddress, speed);
         cvAddress       = -1;
         programmingMode = false;
