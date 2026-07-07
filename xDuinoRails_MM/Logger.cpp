@@ -5,7 +5,10 @@
 Logger logger;
 
 Logger::Logger()
-    : cvManager(nullptr), cachedEnabled(false), isInitialized(false) {}
+    : cvManager(nullptr),
+      cachedEnabled(false),
+      isInitialized(false),
+      bemfLoggingEnabled(true) {}
 
 void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
@@ -22,6 +25,14 @@ void Logger::toggleLogging() {
 }
 
 bool Logger::isLoggingEnabled() { return cachedEnabled; }
+
+void Logger::toggleBemfLogging() {
+  bemfLoggingEnabled = !bemfLoggingEnabled;
+  Serial.print("Serial: BEMF Logging ");
+  Serial.println(bemfLoggingEnabled ? "ON" : "OFF");
+}
+
+bool Logger::isBemfLoggingEnabled() { return bemfLoggingEnabled; }
 
 bool Logger::isEnabled() {
   if (cvManager == nullptr)
@@ -43,6 +54,17 @@ void Logger::println(const char *message) {
 
 void Logger::printf(const char *format, ...) {
   if (isInitialized && cachedEnabled) {
+    char    buf[128];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buf, sizeof(buf), format, args);
+    va_end(args);
+    Serial.print(buf);
+  }
+}
+
+void Logger::rawPrintf(const char *format, ...) {
+  if (isInitialized) {
     char    buf[128];
     va_list args;
     va_start(args, format);

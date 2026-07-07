@@ -11,14 +11,18 @@ public:
   void print(const char *message);
   void println(const char *message);
   void printf(const char *format, ...);
+  void rawPrintf(const char *format, ...);
   void toggleLogging();
   bool isLoggingEnabled();
+  void toggleBemfLogging();
+  bool isBemfLoggingEnabled();
 
 private:
   CvManager *cvManager;
   bool       isEnabled();
   bool       cachedEnabled;
   bool       isInitialized;
+  bool       bemfLoggingEnabled;
 };
 
 extern Logger logger;

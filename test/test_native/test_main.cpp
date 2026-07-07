@@ -12,6 +12,8 @@
 void test_mm_signal_f0_f1_f2(void);
 void test_cv_programming_6021(void);
 void test_watchdog_shutdown(void);
+void test_bemf_logging_toggle(void);
+void test_bemf_logging_accumulation(void);
 void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
@@ -814,5 +816,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
   RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
   RUN_TEST(test_repro_direction_change_kickstart);
+  RUN_TEST(test_bemf_logging_toggle);
+  RUN_TEST(test_bemf_logging_accumulation);
   return UNITY_END();
 }

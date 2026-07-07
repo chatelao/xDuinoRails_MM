@@ -43,6 +43,7 @@ public:
   int                      available();
   int                      read();
   size_t                   write(uint8_t c);
+  void                     printf(const char *format, ...);
   void                     pushInput(const std::string &s);
   std::vector<std::string> logLines;
   std::deque<char>         inputBuffer;

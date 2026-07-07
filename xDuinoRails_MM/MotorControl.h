@@ -35,6 +35,14 @@ private:
   long              bemfErrorSum;
   int               lastAdjustment;
 
+  // BEMF & PWM logging statistics
+  int           lastMeasuredBemf;
+  int           lastMeasuredPwm;
+  long          bemfSum;
+  long          pwmSum;
+  int           sampleCount;
+  unsigned long lastLogTime;
+
   // Motor parameters - will be set based on motorType
   int PWM_FREQ;
   int KICK_PWM;

@@ -87,6 +87,17 @@ size_t MockSerial::write(uint8_t c) {
   return 1;
 }
 
+#include <stdarg.h>
+void MockSerial::printf(const char *format, ...) {
+  char    buf[256];
+  va_list args;
+  va_start(args, format);
+  vsnprintf(buf, sizeof(buf), format, args);
+  va_end(args);
+  ::printf("%s", buf);
+  logLines.push_back(std::string(buf));
+}
+
 void MockSerial::pushInput(const std::string &s) {
   for (char c : s) {
     inputBuffer.push_back(c);

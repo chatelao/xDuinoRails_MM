@@ -20,6 +20,13 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   previousPwm         = 0;
   bemfErrorSum        = 0;
   lastAdjustment      = 0;
+
+  lastMeasuredBemf = 0;
+  lastMeasuredPwm  = 0;
+  bemfSum          = 0;
+  pwmSum           = 0;
+  sampleCount      = 0;
+  lastLogTime      = 0;
 }
 
 void MotorControl::setup() {
@@ -130,6 +137,9 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   targetDirection   = dir;
   unsigned long now = millis();
 
+  int currentBEMF   = -1;
+  int pwmForLogging = 0;
+
   // Bei Stillstand Richtung sofort übernehmen
   if (targetPwm == 0) {
     currDirection = targetDirection;
@@ -155,7 +165,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
       if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
-        int currentBEMF = readBEMF();
+        currentBEMF     = readBEMF();
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
@@ -163,7 +173,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         }
       }
       if (isKickstarting_priv) {
-        writeMotorHardware(KICK_PWM, currDirection);
+        pwmForLogging = KICK_PWM;
+        writeMotorHardware(pwmForLogging, currDirection);
       }
     }
   }
@@ -181,7 +192,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
       if (bemfEnabled && targetPwm > 0) {
         if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
-          int currentBEMF = readBEMF();
+          currentBEMF     = readBEMF();
           lastBemfMeasure = now;
 
           // PI-Regler
@@ -209,9 +220,39 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         bemfErrorSum   = 0;
       }
 
-      writeMotorHardware(finalPwm, currDirection);
+      pwmForLogging = finalPwm;
+      writeMotorHardware(pwmForLogging, currDirection);
     }
   }
+
+  // Statistics logging
+  if (logger.isBemfLoggingEnabled()) {
+    if (currentBEMF == -1 && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
+      currentBEMF     = readBEMF();
+      lastBemfMeasure = now;
+    }
+
+    if (currentBEMF != -1) {
+      bemfSum += currentBEMF;
+      pwmSum += pwmForLogging;
+      sampleCount++;
+      lastMeasuredBemf = currentBEMF;
+      lastMeasuredPwm  = pwmForLogging;
+    }
+
+    if (now - lastLogTime >= 1000) {
+      if (sampleCount > 0) {
+        logger.rawPrintf("BEMF: Avg %ld, Last %d | PWM: Avg %ld, Last %d\n",
+                         bemfSum / sampleCount, lastMeasuredBemf,
+                         pwmSum / sampleCount, lastMeasuredPwm);
+      }
+      bemfSum     = 0;
+      pwmSum      = 0;
+      sampleCount = 0;
+      lastLogTime = now;
+    }
+  }
+
   previousPwm = targetPwm;
 }
 
