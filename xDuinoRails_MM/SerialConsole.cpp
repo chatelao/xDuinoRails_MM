@@ -53,5 +53,20 @@ void SerialConsole::parseCommand(char *line) {
     logger.toggleLogging();
     Serial.print("Serial: Logging ");
     Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
+  } else if (line[0] == 'h' || line[0] == '?') {
+    printHelp();
   }
+}
+
+void SerialConsole::printHelp() {
+  Serial.println("--- Available Commands ---");
+  Serial.println("cv <num> <val> : Set CV <num> to <val>");
+  Serial.println("cv             : Print all CVs");
+  Serial.println("s <speed>      : Set target speed (0-14)");
+  Serial.println("d f            : Set direction to Forward");
+  Serial.println("d b            : Set direction to Backward");
+  Serial.println("f <0/1>        : Set Function 1 (F1) Off/On");
+  Serial.println("L or l         : Toggle USB Serial logging");
+  Serial.println("h or ?         : Provide this help");
+  Serial.println("--------------------------");
 }
