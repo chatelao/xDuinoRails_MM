@@ -1,0 +1,29 @@
+bootrom: Memory.MappedMemory @ sysbus 0x00000000
+    size: 0x4000
+
+flash: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x200000
+
+sram0: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x40000
+
+cpu0: CPU.CortexM @ sysbus
+    cpuType: "cortex-m0+"
+    cpuId: 0
+    nvic: nvic
+
+nvic: IRQControllers.NVIC @ sysbus 0xe000e000
+    -> cpu0@0
+
+uart0: UART.PL011 @ sysbus 0x40034000
+    IRQ -> nvic@20
+
+sysbus:
+    init:
+        // Mock RP2040 registers to satisfy bootloader/SDK
+        Tag <0x40008000 4> "CLOCKS_BASE" 0xFFFFFFFF
+        Tag <0x4000C000 4> "RESETS_BASE" 0xFFFFFFFF
+        Tag <0x40014000 4> "IO_BANK0_BASE" 0xFFFFFFFF
+        Tag <0x4001C000 4> "PADS_BANK0_BASE" 0xFFFFFFFF
+        Tag <0x40024000 4> "XOSC_BASE" 0xFFFFFFFF
+        Tag <0x40028000 4> "PLL_SYS_BASE" 0xFFFFFFFF

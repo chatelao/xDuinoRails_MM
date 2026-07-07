@@ -9,8 +9,8 @@ SerialConsole::SerialConsole(CvManager *cvManager, ProtocolHandler *protocol)
 }
 
 void SerialConsole::loop() {
-  while (Serial.available() > 0) {
-    char c = Serial.read();
+  while (DEBUG_SERIAL.available() > 0) {
+    char c = DEBUG_SERIAL.read();
     if (c == '\n' || c == '\r') {
       if (bufferIndex > 0) {
         inputBuffer[bufferIndex] = '\0';
@@ -54,25 +54,25 @@ void SerialConsole::parseCommand(char *line) {
       char sub = line[2];
       if (sub == 'p') {
         logger.toggleCategory(LogCategory::Protocol);
-        Serial.print("Serial: Protocol Logging ");
-        Serial.println(logger.isCategoryEnabled(LogCategory::Protocol) ? "ON" : "OFF");
+        DEBUG_SERIAL.print("Serial: Protocol Logging ");
+        DEBUG_SERIAL.println(logger.isCategoryEnabled(LogCategory::Protocol) ? "ON" : "OFF");
       } else if (sub == 'w') {
         logger.toggleCategory(LogCategory::PWM);
-        Serial.print("Serial: PWM Logging ");
-        Serial.println(logger.isCategoryEnabled(LogCategory::PWM) ? "ON" : "OFF");
+        DEBUG_SERIAL.print("Serial: PWM Logging ");
+        DEBUG_SERIAL.println(logger.isCategoryEnabled(LogCategory::PWM) ? "ON" : "OFF");
       } else if (sub == 'c') {
         logger.toggleCategory(LogCategory::CV);
-        Serial.print("Serial: CV Logging ");
-        Serial.println(logger.isCategoryEnabled(LogCategory::CV) ? "ON" : "OFF");
+        DEBUG_SERIAL.print("Serial: CV Logging ");
+        DEBUG_SERIAL.println(logger.isCategoryEnabled(LogCategory::CV) ? "ON" : "OFF");
       } else if (sub == 'b') {
         logger.toggleCategory(LogCategory::BEMF);
-        Serial.print("Serial: BEMF Logging ");
-        Serial.println(logger.isCategoryEnabled(LogCategory::BEMF) ? "ON" : "OFF");
+        DEBUG_SERIAL.print("Serial: BEMF Logging ");
+        DEBUG_SERIAL.println(logger.isCategoryEnabled(LogCategory::BEMF) ? "ON" : "OFF");
       }
     } else {
       logger.toggleLogging();
-      Serial.print("Serial: Logging ");
-      Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
+      DEBUG_SERIAL.print("Serial: Logging ");
+      DEBUG_SERIAL.println(logger.isLoggingEnabled() ? "ON" : "OFF");
     }
   } else if (line[0] == 'h' || line[0] == '?') {
     printHelp();
@@ -80,13 +80,13 @@ void SerialConsole::parseCommand(char *line) {
 }
 
 void SerialConsole::printHelp() {
-  Serial.println("--- xDuinoRails CLI Help ---");
-  Serial.println("cv <num> <val> : Set CV value");
-  Serial.println("cv             : Print all CV values");
-  Serial.println("s <speed>      : Set speed (0-14)");
-  Serial.println("d f/b          : Set direction (f: forward, b: backward)");
-  Serial.println("f <0/1>        : Set Function 1 (0: off, 1: on)");
-  Serial.println("L [p/w/c]      : Toggle logging (p: protocol, w: pwm, c: cv)");
-  Serial.println("h/?            : Show this help");
-  Serial.println("----------------------------");
+  DEBUG_SERIAL.println("--- xDuinoRails CLI Help ---");
+  DEBUG_SERIAL.println("cv <num> <val> : Set CV value");
+  DEBUG_SERIAL.println("cv             : Print all CV values");
+  DEBUG_SERIAL.println("s <speed>      : Set speed (0-14)");
+  DEBUG_SERIAL.println("d f/b          : Set direction (f: forward, b: backward)");
+  DEBUG_SERIAL.println("f <0/1>        : Set Function 1 (0: off, 1: on)");
+  DEBUG_SERIAL.println("L [p/w/c]      : Toggle logging (p: protocol, w: pwm, c: cv)");
+  DEBUG_SERIAL.println("h/?            : Show this help");
+  DEBUG_SERIAL.println("----------------------------");
 }

@@ -2,6 +2,7 @@
 #define SERIAL_CONSOLE_H
 
 #include "CvManager.h"
+#include "Logger.h" // For DEBUG_SERIAL
 #include "ProtocolHandler.h"
 #include <Arduino.h>
 
