@@ -1,23 +1,12 @@
+using "@rp2040.repl"
+
 // Seeed Studio XIAO RP2040 Pin Mapping:
-// D0: GPIO 26 (BEMF A) -> ADC 0
-// D1: GPIO 27 (BEMF B) -> ADC 1
-// D2: GPIO 28 (Motor Shut) -> ADC 2
-// D3: GPIO 29 (Func Shut) -> ADC 3
-// D4: GPIO 6  (DCC-ACK)
-// D5: GPIO 7  (DCC/MM Input)
-// D6: GPIO 21 (RailCom)
-// D7: GPIO 0  (Motor A) -> PWM 0A
-// D8: GPIO 1  (Motor B) -> PWM 0B
-// D9: GPIO 2  (Front Light) -> PWM 1A
-// D10: GPIO 4 (Rear Light) -> PWM 2A
+// D7: GPIO 0  (Motor A)
+// D8: GPIO 1  (Motor B)
+// D9: GPIO 2  (Front Light)
+// D10: GPIO 4 (Rear Light)
 
-motorA: Miscellaneous.LED @ gpio 0
-motorB: Miscellaneous.LED @ gpio 1
-lightFront: Miscellaneous.LED @ gpio 2
-lightRear: Miscellaneous.LED @ gpio 4
-
-gpio:
-    0 -> motorA@0
-    1 -> motorB@0
-    2 -> lightFront@0
-    4 -> lightRear@0
+motorA: Miscellaneous.LED @ sysbus
+motorB: Miscellaneous.LED @ sysbus
+lightFront: Miscellaneous.LED @ sysbus
+lightRear: Miscellaneous.LED @ sysbus

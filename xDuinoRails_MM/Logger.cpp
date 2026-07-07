@@ -13,7 +13,7 @@ void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
   cachedEnabled   = isEnabled();
   isInitialized   = true;
-  Serial.begin(baudRate);
+  DEBUG_SERIAL.begin(baudRate);
 }
 
 void Logger::toggleLogging() {
@@ -67,13 +67,13 @@ bool Logger::isEnabled() {
 
 void Logger::print(const char *message, LogCategory category) {
   if (isInitialized && cachedEnabled && isCategoryEnabled(category)) {
-    Serial.print(message);
+    DEBUG_SERIAL.print(message);
   }
 }
 
 void Logger::println(const char *message, LogCategory category) {
   if (isInitialized && cachedEnabled && isCategoryEnabled(category)) {
-    Serial.println(message);
+    DEBUG_SERIAL.println(message);
   }
 }
 
@@ -84,7 +84,7 @@ void Logger::printf(LogCategory category, const char *format, ...) {
     va_start(args, format);
     vsnprintf(buf, sizeof(buf), format, args);
     va_end(args);
-    Serial.print(buf);
+    DEBUG_SERIAL.print(buf);
   }
 }
 
@@ -95,6 +95,6 @@ void Logger::printf(const char *format, ...) {
     va_start(args, format);
     vsnprintf(buf, sizeof(buf), format, args);
     va_end(args);
-    Serial.print(buf);
+    DEBUG_SERIAL.print(buf);
   }
 }

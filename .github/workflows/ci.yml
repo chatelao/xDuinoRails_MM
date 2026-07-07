@@ -42,7 +42,7 @@ jobs:
       - name: Install PlatformIO
         run: pip install --upgrade platformio
       - name: Build firmware for Renode
-        run: pio run -e seeed_xiao_rp2040
+        run: pio run -e seeed_xiao_rp2040_renode
       - name: Run Renode tests
         run: ./run_renode_tests.sh
 

@@ -18,10 +18,10 @@ Should Show Help Menu
     Wait For Line On Uart     xDuinoRails_MM starting...
 
     Write Char On Uart        h
-    Wait For Line On Uart     --- xDuinoRails_MM Serial Console ---
-    Wait For Line On Uart     cv <num> <val> : Set CV
-    Wait For Line On Uart     s <speed>     : Set Speed (0-14)
-    Wait For Line On Uart     d f/b         : Set Direction
+    Wait For Line On Uart     --- xDuinoRails CLI Help ---
+    Wait For Line On Uart     cv <num> <val> : Set CV value
+    Wait For Line On Uart     s <speed>      : Set speed (0-14)
+    Wait For Line On Uart     d f/b          : Set direction
 
 Should Set Speed and Change PWM
     [Documentation]           Verifies that setting speed via CLI updates the motor state.
@@ -33,6 +33,7 @@ Should Set Speed and Change PWM
 
     # Set speed to 7
     Write Line On Uart        s 7
+    Wait For Line On Uart     Serial: Speed set to 7
     Wait For Line On Uart     Motor: Step 7 -> PWM
 
 *** Keywords ***

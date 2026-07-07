@@ -3,10 +3,10 @@ using sysbus
 $name?="xDuinoRails_MM"
 mach create $name
 
-machine LoadPlatformDescription @test/renode/rp2040.repl
-machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl
+path add $CWD/test/renode
+machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
 
-$bin?=@.pio/build/seeed_xiao_rp2040/firmware.elf
+$bin?=@.pio/build/seeed_xiao_rp2040_renode/firmware.elf
 
 sysbus LoadELF $bin
 
