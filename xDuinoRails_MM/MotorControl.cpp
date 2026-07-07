@@ -139,6 +139,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
 
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
     isKickstarting_priv = true;
+    currDirection       = targetDirection; // Ensure correct dir for kickstart
     logger.println("Motor: Kickstart started");
     kickstartBegin  = now;
     lastBemfMeasure = 0;
@@ -173,6 +174,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       currDirection  = targetDirection;
       bemfErrorSum   = 0;
       lastAdjustment = 0;
+      targetPwm      = 0; // Force previousPwm to 0 for next call to trigger kickstart
     } else {
       int finalPwm = targetPwm;
 
@@ -202,6 +204,9 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
           lastAdjustment = (error * K / 16) + (bemfErrorSum * I / 64);
         }
         finalPwm += lastAdjustment;
+      } else {
+        lastAdjustment = 0;
+        bemfErrorSum   = 0;
       }
 
       writeMotorHardware(finalPwm, currDirection);
@@ -210,10 +215,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   previousPwm = targetPwm;
 }
 
-void MotorControl::stop() {
-  targetPwm = 0;
-  writeMotorHardware(0, currDirection);
-}
+void MotorControl::stop() { update(0, currDirection); }
 
 bool MotorControl::isKickstarting() { return isKickstarting_priv; }
 
