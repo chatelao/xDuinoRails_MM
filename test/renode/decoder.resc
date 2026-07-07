@@ -1,0 +1,15 @@
+using sysbus
+
+$name?="xDuinoRails_MM"
+mach create $name
+
+path add $CWD/test/renode
+machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
+
+$bin?=@.pio/build/seeed_xiao_rp2040/firmware.elf
+
+sysbus LoadELF $bin
+
+cpu0 VectorTableOffset 0x10000000
+
+showAnalyzer sysbus.uart0

@@ -31,6 +31,21 @@ jobs:
       - name: Build firmware
         run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6
 
+  renode-simulation:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+      - name: Build firmware for Renode
+        run: pio run -e seeed_xiao_rp2040
+      - name: Run Renode tests
+        run: ./run_renode_tests.sh
+
   arduino-cli-build:
     runs-on: ubuntu-latest
     steps:
@@ -55,7 +70,7 @@ jobs:
           arduino-cli compile --fqbn esp32:esp32:XIAO_ESP32C6 xDuinoRails_MM
 
   release:
-    needs: [build, arduino-cli-build]
+    needs: [build, arduino-cli-build, renode-simulation]
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:

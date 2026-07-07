@@ -1,0 +1,1176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.4.2 (Python 3.12.13 on linux)" generated="2026-07-07T18:49:54.206753" rpa="false" schemaversion="5">
+<suite id="s1" name="Test Suite" source="/app/test/renode/decoder_test.robot">
+<kw name="Setup" owner="renode-keywords" type="SETUP">
+<msg time="2026-07-07T18:49:51.709190" level="TRACE">Arguments: [  ]</msg>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-07-07T18:49:51.710700" level="TRACE">Arguments: [ 'platform.system()' | modules='platform' ]</msg>
+<msg time="2026-07-07T18:49:51.710997" level="TRACE">Return: 'Linux'</msg>
+<msg time="2026-07-07T18:49:51.711139" level="INFO">${SYSTEM} = Linux</msg>
+<var>${SYSTEM}</var>
+<arg>platform.system()</arg>
+<arg>modules=platform</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-07-07T18:49:51.709957" elapsed="0.001229"/>
+</kw>
+<kw name="Set Variable If" owner="BuiltIn">
+<msg time="2026-07-07T18:49:51.711910" level="TRACE">Arguments: [ 'not True and False' | 'Debug' | '${CONFIGURATION}' ]</msg>
+<msg time="2026-07-07T18:49:51.712114" level="TRACE">Return: 'Release'</msg>
+<msg time="2026-07-07T18:49:51.712220" level="INFO">${CONFIGURATION} = Release</msg>
+<var>${CONFIGURATION}</var>
+<arg>not ${SKIP_RUNNING_SERVER} and ${SERVER_REMOTE_DEBUG}</arg>
+<arg>Debug</arg>
+<arg>${CONFIGURATION}</arg>
+<doc>Sets variable based on the given condition.</doc>
+<status status="PASS" start="2026-07-07T18:49:51.711413" elapsed="0.000842"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<msg time="2026-07-07T18:49:51.712782" level="TRACE">Arguments: [ '--robot-server-port' | '49152' | '--hide-log' ]</msg>
+<msg time="2026-07-07T18:49:51.712979" level="TRACE">Return: ['--robot-server-port', '49152', '--hide-log']</msg>
+<msg time="2026-07-07T18:49:51.713113" level="INFO">@{PARAMS} = [ --robot-server-port | 49152 | --hide-log ]</msg>
+<var>@{PARAMS}</var>
+<arg>--robot-server-port</arg>
+<arg>${PORT_NUMBER}</arg>
+<arg>--hide-log</arg>
+<doc>Returns a list containing given items.</doc>
+<status status="PASS" start="2026-07-07T18:49:51.712420" elapsed="0.000725"/>
+</kw>
+<if>
+<branch type="IF" condition="${DISABLE_GUI}">
+<kw name="Insert Into List" owner="Collections">
+<arg>${PARAMS}</arg>
+<arg>0</arg>
+<arg>--disable-gui</arg>
+<doc>Inserts ``value`` into ``list`` to the position specified with ``index``.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.713599" elapsed="0.000038"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.713304" elapsed="0.000388"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.713252" elapsed="0.000483"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER}">
+<kw name="File Should Exist" owner="OperatingSystem">
+<arg>${DIRECTORY}/${BINARY_NAME}</arg>
+<arg>msg=Robot Framework remote server binary not found (${DIRECTORY}/${BINARY_NAME}). Did you forget to build it in ${CONFIGURATION} configuration?</arg>
+<doc>Fails unless the given ``path`` points to an existing file.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.714063" elapsed="0.000027"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.713829" elapsed="0.000305"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.713802" elapsed="0.000363"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER} and not ${SERVER_REMOTE_DEBUG} and not '${SYSTEM}' == 'Windows' and not ${NET_PLATFORM}">
+<kw name="Start Process" owner="Process">
+<arg>mono</arg>
+<arg>${BINARY_NAME}</arg>
+<arg>@{PARAMS}</arg>
+<arg>cwd=${DIRECTORY}</arg>
+<doc>Starts a new process on background.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.714647" elapsed="0.000030"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.714252" elapsed="0.000478"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.714230" elapsed="0.000535"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER} and not ${SERVER_REMOTE_DEBUG} and '${SYSTEM}' == 'Windows'">
+<kw name="Start Process" owner="Process">
+<arg>${BINARY_NAME}</arg>
+<arg>@{PARAMS}</arg>
+<arg>cwd=${DIRECTORY}</arg>
+<arg>shell=true</arg>
+<doc>Starts a new process on background.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.715128" elapsed="0.000026"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.714841" elapsed="0.000394"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.714820" elapsed="0.000447"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER} and not ${SERVER_REMOTE_DEBUG} and ${NET_PLATFORM}">
+<kw name="Start Process" owner="Process">
+<arg>dotnet ${BINARY_NAME}</arg>
+<arg>@{PARAMS}</arg>
+<arg>cwd=${DIRECTORY}</arg>
+<arg>shell=true</arg>
+<doc>Starts a new process on background.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.715736" elapsed="0.000047"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.715346" elapsed="0.000492"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.715324" elapsed="0.000545"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER} and ${SERVER_REMOTE_DEBUG} and not '${SYSTEM}' == 'Windows' and not ${NET_PLATFORM}">
+<kw name="Start Process" owner="Process">
+<arg>mono</arg>
+<arg>--debug</arg>
+<arg>--debugger-agent\=transport\=dt_socket,address\=0.0.0.0:${SERVER_REMOTE_PORT},server\=y,suspend\=${SERVER_REMOTE_SUSPEND}</arg>
+<arg>${BINARY_NAME}</arg>
+<arg>@{PARAMS}</arg>
+<arg>cwd=${DIRECTORY}</arg>
+<doc>Starts a new process on background.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.716536" elapsed="0.000039"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.715944" elapsed="0.000691"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.715923" elapsed="0.000746"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER} and ${SERVER_REMOTE_DEBUG} and '${SYSTEM}' == 'Windows'">
+<kw name="Fatal Error" owner="BuiltIn">
+<arg>Windows doesn't support server remote debug option.</arg>
+<doc>Stops the whole test execution.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:51.717411" elapsed="0.000028"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:51.717095" elapsed="0.000442"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.717059" elapsed="0.000511"/>
+</if>
+<if>
+<branch type="IF" condition="not '${SYSTEM}' == 'Windows'">
+<kw name="Wait Until Keyword Succeeds" owner="BuiltIn">
+<msg time="2026-07-07T18:49:51.718411" level="TRACE">Arguments: [ '60s' | '1s' | 'Import Library' | 'Remote' | 'http://127.0.0.1:${PORT_NUMBER}/' ]</msg>
+<kw name="Import Library" owner="BuiltIn">
+<msg time="2026-07-07T18:49:51.719051" level="TRACE">Arguments: [ 'Remote' | 'http://127.0.0.1:${PORT_NUMBER}/' ]</msg>
+<msg time="2026-07-07T18:49:52.458699" level="TRACE">Return: None</msg>
+<arg>Remote</arg>
+<arg>http://127.0.0.1:${PORT_NUMBER}/</arg>
+<doc>Imports a library with the given name and optional arguments.</doc>
+<status status="PASS" start="2026-07-07T18:49:51.718797" elapsed="0.740001"/>
+</kw>
+<msg time="2026-07-07T18:49:52.458889" level="TRACE">Return: None</msg>
+<arg>60s</arg>
+<arg>1s</arg>
+<arg>Import Library</arg>
+<arg>Remote</arg>
+<arg>http://127.0.0.1:${PORT_NUMBER}/</arg>
+<doc>Runs the specified keyword and retries if it fails.</doc>
+<status status="PASS" start="2026-07-07T18:49:51.718035" elapsed="0.740899"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:51.717647" elapsed="0.741346"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:51.717626" elapsed="0.741418"/>
+</if>
+<if>
+<branch type="IF" condition="'${SYSTEM}' == 'Windows'">
+<kw name="Wait Until Keyword Succeeds" owner="BuiltIn">
+<arg>60s</arg>
+<arg>1s</arg>
+<arg>Import Library</arg>
+<arg>Remote</arg>
+<arg>http://localhost:${PORT_NUMBER}/</arg>
+<doc>Runs the specified keyword and retries if it fails.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:52.459734" elapsed="0.000043"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:52.459164" elapsed="0.000675"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:52.459132" elapsed="0.000742"/>
+</if>
+<kw name="Setup Renode" owner="renode-keywords">
+<msg time="2026-07-07T18:49:52.460821" level="TRACE">Arguments: [  ]</msg>
+<kw name="Set Default Uart Timeout" owner="Remote">
+<msg time="2026-07-07T18:49:52.461369" level="TRACE">Arguments: [ '8' ]</msg>
+<msg time="2026-07-07T18:49:52.497678" level="TRACE">Return: ''</msg>
+<arg>${DEFAULT_UART_TIMEOUT}</arg>
+<status status="PASS" start="2026-07-07T18:49:52.461200" elapsed="0.036612"/>
+</kw>
+<if>
+<branch type="IF" condition="${SAVE_LOGS}">
+<kw name="Enable Logging To Cache" owner="Remote">
+<msg time="2026-07-07T18:49:52.498562" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:52.505496" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:52.498445" elapsed="0.007185"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:52.497971" elapsed="0.007723"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:52.497928" elapsed="0.007815"/>
+</if>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:52.506309" level="TRACE">Arguments: [ 'abcdefghijklmnopqrstuvwxyz01234567890_-' ]</msg>
+<msg time="2026-07-07T18:49:52.506469" level="TRACE">Return: 'abcdefghijklmnopqrstuvwxyz01234567890_-'</msg>
+<msg time="2026-07-07T18:49:52.506611" level="INFO">${allowed_chars} = abcdefghijklmnopqrstuvwxyz01234567890_-</msg>
+<var>${allowed_chars}</var>
+<arg>abcdefghijklmnopqrstuvwxyz01234567890_-</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:52.505951" elapsed="0.000693"/>
+</kw>
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2026-07-07T18:49:52.506994" level="TRACE">Arguments: [ 'decoder_test' ]</msg>
+<msg time="2026-07-07T18:49:52.507074" level="TRACE">Return: 'decoder_test'</msg>
+<msg time="2026-07-07T18:49:52.507155" level="INFO">${metrics_fname} = decoder_test</msg>
+<var>${metrics_fname}</var>
+<arg>${SUITE_NAME}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2026-07-07T18:49:52.506818" elapsed="0.000366"/>
+</kw>
+<kw name="Replace String" owner="String">
+<msg time="2026-07-07T18:49:52.507591" level="TRACE">Arguments: [ 'decoder_test' | ' ' | '_' ]</msg>
+<msg time="2026-07-07T18:49:52.507694" level="TRACE">Return: 'decoder_test'</msg>
+<msg time="2026-07-07T18:49:52.507775" level="INFO">${metrics_fname} = decoder_test</msg>
+<var>${metrics_fname}</var>
+<arg>${metrics_fname}</arg>
+<arg>${SPACE}</arg>
+<arg>_</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:52.507320" elapsed="0.000484"/>
+</kw>
+<kw name="Replace String Using Regexp" owner="String">
+<msg time="2026-07-07T18:49:52.508739" level="TRACE">Arguments: [ 'decoder_test' | '[^abcdefghijklmnopqrstuvwxyz01234567890_-]+' | '' ]</msg>
+<msg time="2026-07-07T18:49:52.509095" level="TRACE">Return: 'decoder_test'</msg>
+<msg time="2026-07-07T18:49:52.509209" level="INFO">${metrics_fname} = decoder_test</msg>
+<var>${metrics_fname}</var>
+<arg>${metrics_fname}</arg>
+<arg>[^${allowed_chars}]+</arg>
+<arg>${EMPTY}</arg>
+<doc>Replaces ``pattern`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:52.507954" elapsed="0.001287"/>
+</kw>
+<kw name="Join Path" owner="OperatingSystem">
+<msg time="2026-07-07T18:49:52.509648" level="TRACE">Arguments: [ '/app/' | 'profiler-decoder_test' ]</msg>
+<msg time="2026-07-07T18:49:52.509753" level="TRACE">Return: '/app/profiler-decoder_test'</msg>
+<msg time="2026-07-07T18:49:52.509832" level="INFO">${metrics_path} = /app/profiler-decoder_test</msg>
+<var>${metrics_path}</var>
+<arg>${RESULTS_DIRECTORY}</arg>
+<arg>profiler-${metrics_fname}</arg>
+<doc>Joins the given path part(s) to the given base path.</doc>
+<status status="PASS" start="2026-07-07T18:49:52.509450" elapsed="0.000411"/>
+</kw>
+<if>
+<branch type="IF" condition="${CREATE_EXECUTION_METRICS}">
+<kw name="Execute Command" owner="Remote">
+<arg>EnableProfilerGlobally "${metrics_path}"</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:52.510241" elapsed="0.000027"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:52.509973" elapsed="0.000334"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:52.509941" elapsed="0.000402"/>
+</if>
+<kw name="Reset Emulation" owner="Remote">
+<msg time="2026-07-07T18:49:52.510595" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:52.542845" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:52.510526" elapsed="0.032453"/>
+</kw>
+<msg time="2026-07-07T18:49:52.543129" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:52.460640" elapsed="0.082552"/>
+</kw>
+<msg time="2026-07-07T18:49:52.543260" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:51.708965" elapsed="0.834340"/>
+</kw>
+<test id="s1-t1" name="Should Show Help Menu" line="12">
+<kw name="Reset Emulation" owner="Remote" type="SETUP">
+<msg time="2026-07-07T18:49:52.546710" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:52.547259" level="DEBUG">Test timeout 30 seconds active. 29.996 seconds left.</msg>
+<msg time="2026-07-07T18:49:52.552540" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:52.546596" elapsed="0.006038"/>
+</kw>
+<kw name="Create Machine">
+<msg time="2026-07-07T18:49:52.553311" level="TRACE">Arguments: [  ]</msg>
+<kw name="Execute Script" owner="Remote">
+<msg time="2026-07-07T18:49:52.553716" level="TRACE">Arguments: [ '/app/test/renode/decoder.resc' ]</msg>
+<msg time="2026-07-07T18:49:52.553850" level="DEBUG">Test timeout 30 seconds active. 29.990 seconds left.</msg>
+<msg time="2026-07-07T18:49:53.295384" level="FAIL">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</msg>
+<msg time="2026-07-07T18:49:53.295475" level="DEBUG">KeywordException:   at (wrapper managed-to-native) System.Reflection.MonoMethod.InternalInvoke(System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in &lt;aeea2e33ea654cfabae63b60ba0e127a&gt;:0
+</msg>
+<arg>${RESC}</arg>
+<status status="FAIL" start="2026-07-07T18:49:52.553577" elapsed="0.741941">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</status>
+</kw>
+<kw name="Create Terminal Tester" owner="Remote">
+<arg>${UART}</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.295813" elapsed="0.000280"/>
+</kw>
+<status status="FAIL" start="2026-07-07T18:49:52.553047" elapsed="0.743220">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</status>
+</kw>
+<kw name="Start Emulation" owner="Remote">
+<status status="NOT RUN" start="2026-07-07T18:49:53.296499" elapsed="0.000043"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>xDuinoRails_MM starting...</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.296666" elapsed="0.000026"/>
+</kw>
+<kw name="Write Char On Uart" owner="Remote">
+<arg>h</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.296811" elapsed="0.000085"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>--- xDuinoRails_MM Serial Console ---</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.297045" elapsed="0.000026"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>cv &lt;num&gt; &lt;val&gt; : Set CV</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.297189" elapsed="0.000023"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>s &lt;speed&gt;</arg>
+<arg>: Set Speed (0-14)</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.297372" elapsed="0.000041"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>d f/b</arg>
+<arg>: Set Direction</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:53.297548" elapsed="0.000129"/>
+</kw>
+<kw name="Test Teardown" owner="renode-keywords" type="TEARDOWN">
+<msg time="2026-07-07T18:49:53.298730" level="TRACE">Arguments: [  ]</msg>
+<kw name="Stop Profiler" owner="renode-keywords">
+<msg time="2026-07-07T18:49:53.299147" level="TRACE">Arguments: [  ]</msg>
+<if>
+<branch type="IF" condition="${PROFILER_PROCESS}">
+<kw name="Terminate Process" owner="Process">
+<arg>${PROFILER_PROCESS}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:53.299582" elapsed="0.000031"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<arg>${PROFILER_PROCESS}</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:53.299762" elapsed="0.000026"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:53.299261" elapsed="0.000567"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.299226" elapsed="0.000640"/>
+</if>
+<msg time="2026-07-07T18:49:53.299923" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:53.298961" elapsed="0.001021"/>
+</kw>
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.300494" level="TRACE">Arguments: [ 'Set Variable' | 'True' ]</msg>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.301026" level="TRACE">Arguments: [ 'True' ]</msg>
+<msg time="2026-07-07T18:49:53.301131" level="TRACE">Return: 'True'</msg>
+<arg>True</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.300705" elapsed="0.000471"/>
+</kw>
+<msg time="2026-07-07T18:49:53.301231" level="TRACE">Return: 'True'</msg>
+<msg time="2026-07-07T18:49:53.301370" level="INFO">${failed} = True</msg>
+<var>${failed}</var>
+<arg>Set Variable</arg>
+<arg>True</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.300111" elapsed="0.001295"/>
+</kw>
+<if>
+<branch type="IF" condition="${failed}">
+<kw name="Strip String" owner="String">
+<msg time="2026-07-07T18:49:53.301985" level="TRACE">Arguments: [ "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.\n" | mode='right' ]</msg>
+<msg time="2026-07-07T18:49:53.302089" level="TRACE">Return: "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'."</msg>
+<msg time="2026-07-07T18:49:53.302173" level="INFO">${message} = KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/see...</msg>
+<var>${message}</var>
+<arg>${TEST_MESSAGE}</arg>
+<arg>mode=right</arg>
+<doc>Remove leading and/or trailing whitespaces from the given string.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.301767" elapsed="0.000436"/>
+</kw>
+<kw name="Set Test Message" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.302720" level="TRACE">Arguments: [ "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'." ]</msg>
+<msg time="2026-07-07T18:49:53.302886" level="INFO">Set test message to:
+KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.</msg>
+<msg time="2026-07-07T18:49:53.302934" level="TRACE">Return: None</msg>
+<arg>${message}</arg>
+<doc>Sets message for the current test case.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.302397" elapsed="0.000578"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:53.301522" elapsed="0.001496"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.301482" elapsed="0.001588"/>
+</if>
+<kw name="Run Keyword If Timeout Occurred" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.303672" level="TRACE">Arguments: [ 'Set Variable' | 'True' ]</msg>
+<msg time="2026-07-07T18:49:53.303758" level="TRACE">Return: None</msg>
+<msg time="2026-07-07T18:49:53.303847" level="INFO">${timed_out} = None</msg>
+<var>${timed_out}</var>
+<arg>Set Variable</arg>
+<arg>True</arg>
+<doc>Runs the given keyword if either a test or a keyword timeout has occurred.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.303392" elapsed="0.000484"/>
+</kw>
+<if>
+<branch type="IF" condition="${timed_out}">
+<return>
+<status status="NOT RUN" start="2026-07-07T18:49:53.304102" elapsed="0.000033"/>
+</return>
+<status status="NOT RUN" start="2026-07-07T18:49:53.303975" elapsed="0.000200"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.303946" elapsed="0.000258"/>
+</if>
+<if>
+<branch type="IF" condition="${CREATE_SNAPSHOT_ON_FAIL}">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.304820" level="TRACE">Arguments: [ 'Create Snapshot Of Failed Test' ]</msg>
+<kw name="Create Snapshot Of Failed Test" owner="renode-keywords">
+<msg time="2026-07-07T18:49:53.305614" level="TRACE">Arguments: [  ]</msg>
+<kw name="Return From Keyword If" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.306093" level="TRACE">Arguments: [ "'skipped' in []" ]</msg>
+<msg time="2026-07-07T18:49:53.306225" level="TRACE">Return: None</msg>
+<arg>'skipped' in @{TEST TAGS}</arg>
+<doc>Returns from the enclosing user keyword if ``condition`` is true.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.305780" elapsed="0.000494"/>
+</kw>
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.306727" level="TRACE">Arguments: [ '\\${RETRYFAILED_RETRY_INDEX}' | '0' ]</msg>
+<msg time="2026-07-07T18:49:53.307756" level="TRACE">Return: '0'</msg>
+<msg time="2026-07-07T18:49:53.307865" level="INFO">${retry_index} = 0</msg>
+<var>${retry_index}</var>
+<arg>\${RETRYFAILED_RETRY_INDEX}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.306485" elapsed="0.001413"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.308935" level="TRACE">Arguments: [ 'decoder_test.Should Show Help Menu.fail0.save' ]</msg>
+<msg time="2026-07-07T18:49:53.309052" level="TRACE">Return: 'decoder_test.Should Show Help Menu.fail0.save'</msg>
+<msg time="2026-07-07T18:49:53.309146" level="INFO">${test_name} = decoder_test.Should Show Help Menu.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${SUITE NAME}.${TEST NAME}.fail${retry_index}.save</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.308277" elapsed="0.000906"/>
+</kw>
+<kw name="Sanitize Test Name" owner="renode-keywords">
+<msg time="2026-07-07T18:49:53.309797" level="TRACE">Arguments: [ ${test_name}='decoder_test.Should Show Help Menu.fail0.save' ]</msg>
+<kw name="Replace String" owner="String">
+<msg time="2026-07-07T18:49:53.310234" level="TRACE">Arguments: [ 'decoder_test.Should Show Help Menu.fail0.save' | ' ' | '_' ]</msg>
+<msg time="2026-07-07T18:49:53.310395" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0.save'</msg>
+<msg time="2026-07-07T18:49:53.310490" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>${SPACE}</arg>
+<arg>_</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.310012" elapsed="0.000516"/>
+</kw>
+<kw name="Replace String Using Regexp" owner="String">
+<msg time="2026-07-07T18:49:53.310898" level="TRACE">Arguments: [ 'decoder_test.Should_Show_Help_Menu.fail0.save' | '[/""]' | '-' ]</msg>
+<msg time="2026-07-07T18:49:53.311179" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0.save'</msg>
+<msg time="2026-07-07T18:49:53.311274" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>[/""]</arg>
+<arg>-</arg>
+<doc>Replaces ``pattern`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.310703" elapsed="0.000654"/>
+</kw>
+<return>
+<value>${test_name}</value>
+<status status="PASS" start="2026-07-07T18:49:53.311446" elapsed="0.000076"/>
+</return>
+<msg time="2026-07-07T18:49:53.311656" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0.save'</msg>
+<msg time="2026-07-07T18:49:53.311740" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<status status="PASS" start="2026-07-07T18:49:53.309510" elapsed="0.002259"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.312230" level="TRACE">Arguments: [ '/app//snapshots' ]</msg>
+<msg time="2026-07-07T18:49:53.312362" level="TRACE">Return: '/app//snapshots'</msg>
+<msg time="2026-07-07T18:49:53.312457" level="INFO">${snapshots_dir} = /app//snapshots</msg>
+<var>${snapshots_dir}</var>
+<arg>${RESULTS_DIRECTORY}/snapshots</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.311926" elapsed="0.000563"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2026-07-07T18:49:53.312777" level="TRACE">Arguments: [ '/app//snapshots' ]</msg>
+<msg time="2026-07-07T18:49:53.313050" level="INFO" html="true">Directory '&lt;a href="file:///app/snapshots"&gt;/app/snapshots&lt;/a&gt;' already exists.</msg>
+<msg time="2026-07-07T18:49:53.313112" level="TRACE">Return: None</msg>
+<arg>${snapshots_dir}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.312648" elapsed="0.000509"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.313700" level="TRACE">Arguments: [ '"/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:53.313783" level="TRACE">Return: '"/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"'</msg>
+<msg time="2026-07-07T18:49:53.313883" level="INFO">${snapshot_path} = "/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"</msg>
+<var>${snapshot_path}</var>
+<arg>"${snapshots_dir}/${test_name}"</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.313354" elapsed="0.000560"/>
+</kw>
+<kw name="Execute Command" owner="Remote">
+<msg time="2026-07-07T18:49:53.314205" level="TRACE">Arguments: [ 'Save "/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:53.970455" level="TRACE">Return: ''</msg>
+<arg>Save ${snapshot_path}</arg>
+<status status="PASS" start="2026-07-07T18:49:53.314074" elapsed="0.656512"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.971492" level="TRACE">Arguments: [ '!!!!! Emulation\'s state saved to "/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:53.971712" level="TRACE">Return: None</msg>
+<arg>!!!!! Emulation's state saved to ${snapshot_path}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.970818" elapsed="0.000955"/>
+</kw>
+<msg time="2026-07-07T18:49:53.971863" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:53.305366" elapsed="0.666541"/>
+</kw>
+<msg time="2026-07-07T18:49:53.971964" level="TRACE">Return: None</msg>
+<arg>Create Snapshot Of Failed Test</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.304572" elapsed="0.667433"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:53.304271" elapsed="0.667774"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.304252" elapsed="0.667838"/>
+</if>
+<if>
+<branch type="IF" condition="${SAVE_LOGS}">
+<if>
+<branch type="IF" condition="&quot;${SAVE_LOGS_WHEN}&quot; == &quot;Always&quot;">
+<kw name="Save Test Log" owner="renode-keywords">
+<status status="NOT RUN" start="2026-07-07T18:49:53.972905" elapsed="0.000060"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:53.972466" elapsed="0.000541"/>
+</branch>
+<branch type="ELSE IF" condition="&quot;${SAVE_LOGS_WHEN}&quot; == &quot;Fail&quot;">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.973875" level="TRACE">Arguments: [ 'Save Test Log' ]</msg>
+<kw name="Save Test Log" owner="renode-keywords">
+<msg time="2026-07-07T18:49:53.974443" level="TRACE">Arguments: [  ]</msg>
+<kw name="Return From Keyword If" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.974963" level="TRACE">Arguments: [ "'skipped' in []" ]</msg>
+<msg time="2026-07-07T18:49:53.975099" level="TRACE">Return: None</msg>
+<arg>'skipped' in @{TEST TAGS}</arg>
+<doc>Returns from the enclosing user keyword if ``condition`` is true.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.974631" elapsed="0.000518"/>
+</kw>
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.975597" level="TRACE">Arguments: [ '\\${RETRYFAILED_RETRY_INDEX}' | '0' ]</msg>
+<msg time="2026-07-07T18:49:53.976628" level="TRACE">Return: '0'</msg>
+<msg time="2026-07-07T18:49:53.976742" level="INFO">${retry_index} = 0</msg>
+<var>${retry_index}</var>
+<arg>\${RETRYFAILED_RETRY_INDEX}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.975356" elapsed="0.001419"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.977423" level="TRACE">Arguments: [ 'decoder_test.Should Show Help Menu.fail0' ]</msg>
+<msg time="2026-07-07T18:49:53.977519" level="TRACE">Return: 'decoder_test.Should Show Help Menu.fail0'</msg>
+<msg time="2026-07-07T18:49:53.977602" level="INFO">${test_name} = decoder_test.Should Show Help Menu.fail0</msg>
+<var>${test_name}</var>
+<arg>${SUITE NAME}.${TEST NAME}.fail${retry_index}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.977008" elapsed="0.000624"/>
+</kw>
+<kw name="Sanitize Test Name" owner="renode-keywords">
+<msg time="2026-07-07T18:49:53.978155" level="TRACE">Arguments: [ ${test_name}='decoder_test.Should Show Help Menu.fail0' ]</msg>
+<kw name="Replace String" owner="String">
+<msg time="2026-07-07T18:49:53.978607" level="TRACE">Arguments: [ 'decoder_test.Should Show Help Menu.fail0' | ' ' | '_' ]</msg>
+<msg time="2026-07-07T18:49:53.978705" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0'</msg>
+<msg time="2026-07-07T18:49:53.978786" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>${SPACE}</arg>
+<arg>_</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.978402" elapsed="0.000413"/>
+</kw>
+<kw name="Replace String Using Regexp" owner="String">
+<msg time="2026-07-07T18:49:53.979137" level="TRACE">Arguments: [ 'decoder_test.Should_Show_Help_Menu.fail0' | '[/""]' | '-' ]</msg>
+<msg time="2026-07-07T18:49:53.979229" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0'</msg>
+<msg time="2026-07-07T18:49:53.979363" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>[/""]</arg>
+<arg>-</arg>
+<doc>Replaces ``pattern`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.978973" elapsed="0.000420"/>
+</kw>
+<return>
+<value>${test_name}</value>
+<status status="PASS" start="2026-07-07T18:49:53.979465" elapsed="0.000060"/>
+</return>
+<msg time="2026-07-07T18:49:53.979728" level="TRACE">Return: 'decoder_test.Should_Show_Help_Menu.fail0'</msg>
+<msg time="2026-07-07T18:49:53.979812" level="INFO">${test_name} = decoder_test.Should_Show_Help_Menu.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<status status="PASS" start="2026-07-07T18:49:53.977867" elapsed="0.001973"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.980373" level="TRACE">Arguments: [ '/app//logs' ]</msg>
+<msg time="2026-07-07T18:49:53.980462" level="TRACE">Return: '/app//logs'</msg>
+<msg time="2026-07-07T18:49:53.980541" level="INFO">${logs_dir} = /app//logs</msg>
+<var>${logs_dir}</var>
+<arg>${RESULTS_DIRECTORY}/logs</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.979993" elapsed="0.000577"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2026-07-07T18:49:53.980889" level="TRACE">Arguments: [ '/app//logs' ]</msg>
+<msg time="2026-07-07T18:49:53.981039" level="INFO" html="true">Directory '&lt;a href="file:///app/logs"&gt;/app/logs&lt;/a&gt;' already exists.</msg>
+<msg time="2026-07-07T18:49:53.981089" level="TRACE">Return: None</msg>
+<arg>${logs_dir}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.980711" elapsed="0.000420"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.981769" level="TRACE">Arguments: [ '/app//logs/decoder_test.Should_Show_Help_Menu.fail0.log' ]</msg>
+<msg time="2026-07-07T18:49:53.981899" level="TRACE">Return: '/app//logs/decoder_test.Should_Show_Help_Menu.fail0.log'</msg>
+<msg time="2026-07-07T18:49:53.982041" level="INFO">${log_path} = /app//logs/decoder_test.Should_Show_Help_Menu.fail0.log</msg>
+<var>${log_path}</var>
+<arg>${logs_dir}/${test_name}.log</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.981318" elapsed="0.000776"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<msg time="2026-07-07T18:49:53.982892" level="TRACE">Arguments: [ '!!!!! Log saved to "/app//logs/decoder_test.Should_Show_Help_Menu.fail0.log"' ]</msg>
+<msg time="2026-07-07T18:49:53.983133" level="TRACE">Return: None</msg>
+<arg>!!!!! Log saved to "${log_path}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.982397" elapsed="0.000834"/>
+</kw>
+<kw name="Save Cached Log" owner="Remote">
+<msg time="2026-07-07T18:49:53.983693" level="TRACE">Arguments: [ '/app//logs/decoder_test.Should_Show_Help_Menu.fail0.log' ]</msg>
+<msg time="2026-07-07T18:49:53.991109" level="TRACE">Return: ''</msg>
+<arg>${log_path}</arg>
+<status status="PASS" start="2026-07-07T18:49:53.983559" elapsed="0.007660"/>
+</kw>
+<msg time="2026-07-07T18:49:53.991407" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:53.974169" elapsed="0.017301"/>
+</kw>
+<msg time="2026-07-07T18:49:53.991520" level="TRACE">Return: None</msg>
+<arg>Save Test Log</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:53.973558" elapsed="0.018004"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:53.973043" elapsed="0.018560"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.972444" elapsed="0.019206"/>
+</if>
+<status status="PASS" start="2026-07-07T18:49:53.972192" elapsed="0.019496"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.972161" elapsed="0.019556"/>
+</if>
+<if>
+<branch type="IF" condition="${HOLD_ON_ERROR}">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<var>${res}</var>
+<arg>Run Keyword And Ignore Error</arg>
+<arg>Import Library</arg>
+<arg>Dialogs</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:53.992189" elapsed="0.000032"/>
+</kw>
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<arg>Run Keywords</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' == 'FAIL'</arg>
+<arg>Log</arg>
+<arg>Couldn't load the Dialogs library - interactive debugging is not possible</arg>
+<arg>console=True</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Open GUI</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Pause Execution</arg>
+<arg>Test failed. Press OK once done debugging.</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Close GUI</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:53.992461" elapsed="0.000031"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:53.991815" elapsed="0.000756"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:53.991784" elapsed="0.000821"/>
+</if>
+<kw name="Reset Emulation" owner="Remote">
+<msg time="2026-07-07T18:49:53.992822" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:54.028404" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:53.992737" elapsed="0.035887"/>
+</kw>
+<kw name="Clear Cached Log" owner="Remote">
+<msg time="2026-07-07T18:49:54.029136" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:54.044509" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:54.029008" elapsed="0.015646"/>
+</kw>
+<msg time="2026-07-07T18:49:54.044762" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:53.298451" elapsed="0.746364"/>
+</kw>
+<doc>Verifies that the help command 'h' returns the command summary.</doc>
+<timeout value="30 seconds"/>
+<status status="FAIL" start="2026-07-07T18:49:52.543541" elapsed="1.501428">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.</status>
+</test>
+<test id="s1-t2" name="Should Set Speed and Change PWM" line="26">
+<kw name="Reset Emulation" owner="Remote" type="SETUP">
+<msg time="2026-07-07T18:49:54.049286" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:54.049418" level="DEBUG">Test timeout 30 seconds active. 29.998 seconds left.</msg>
+<msg time="2026-07-07T18:49:54.055018" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:54.049134" elapsed="0.005973"/>
+</kw>
+<kw name="Create Machine">
+<msg time="2026-07-07T18:49:54.055702" level="TRACE">Arguments: [  ]</msg>
+<kw name="Execute Script" owner="Remote">
+<msg time="2026-07-07T18:49:54.056028" level="TRACE">Arguments: [ '/app/test/renode/decoder.resc' ]</msg>
+<msg time="2026-07-07T18:49:54.056152" level="DEBUG">Test timeout 30 seconds active. 29.991 seconds left.</msg>
+<msg time="2026-07-07T18:49:54.065850" level="FAIL">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</msg>
+<msg time="2026-07-07T18:49:54.065926" level="DEBUG">KeywordException:   at (wrapper managed-to-native) System.Reflection.MonoMethod.InternalInvoke(System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in &lt;aeea2e33ea654cfabae63b60ba0e127a&gt;:0
+</msg>
+<arg>${RESC}</arg>
+<status status="FAIL" start="2026-07-07T18:49:54.055895" elapsed="0.010076">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</status>
+</kw>
+<kw name="Create Terminal Tester" owner="Remote">
+<arg>${UART}</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:54.066270" elapsed="0.000053"/>
+</kw>
+<status status="FAIL" start="2026-07-07T18:49:54.055449" elapsed="0.011046">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.
+</status>
+</kw>
+<kw name="Start Emulation" owner="Remote">
+<status status="NOT RUN" start="2026-07-07T18:49:54.066749" elapsed="0.000031"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>xDuinoRails_MM starting...</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:54.066900" elapsed="0.000028"/>
+</kw>
+<kw name="Write Line On Uart">
+<arg>s 7</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:54.067124" elapsed="0.000033"/>
+</kw>
+<kw name="Wait For Line On Uart" owner="Remote">
+<arg>Motor: Step 7 -&gt; PWM</arg>
+<status status="NOT RUN" start="2026-07-07T18:49:54.067344" elapsed="0.000031"/>
+</kw>
+<kw name="Test Teardown" owner="renode-keywords" type="TEARDOWN">
+<msg time="2026-07-07T18:49:54.068720" level="TRACE">Arguments: [  ]</msg>
+<kw name="Stop Profiler" owner="renode-keywords">
+<msg time="2026-07-07T18:49:54.069336" level="TRACE">Arguments: [  ]</msg>
+<if>
+<branch type="IF" condition="${PROFILER_PROCESS}">
+<kw name="Terminate Process" owner="Process">
+<arg>${PROFILER_PROCESS}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:54.069720" elapsed="0.000028"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<arg>${PROFILER_PROCESS}</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:54.069884" elapsed="0.000024"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:54.069472" elapsed="0.000481"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.069437" elapsed="0.000554"/>
+</if>
+<msg time="2026-07-07T18:49:54.070046" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:54.069052" elapsed="0.001050"/>
+</kw>
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.070611" level="TRACE">Arguments: [ 'Set Variable' | 'True' ]</msg>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.071033" level="TRACE">Arguments: [ 'True' ]</msg>
+<msg time="2026-07-07T18:49:54.071214" level="TRACE">Return: 'True'</msg>
+<arg>True</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.070802" elapsed="0.000515"/>
+</kw>
+<msg time="2026-07-07T18:49:54.071378" level="TRACE">Return: 'True'</msg>
+<msg time="2026-07-07T18:49:54.071484" level="INFO">${failed} = True</msg>
+<var>${failed}</var>
+<arg>Set Variable</arg>
+<arg>True</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.070269" elapsed="0.001245"/>
+</kw>
+<if>
+<branch type="IF" condition="${failed}">
+<kw name="Strip String" owner="String">
+<msg time="2026-07-07T18:49:54.072062" level="TRACE">Arguments: [ "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.\n" | mode='right' ]</msg>
+<msg time="2026-07-07T18:49:54.072164" level="TRACE">Return: "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'."</msg>
+<msg time="2026-07-07T18:49:54.072300" level="INFO">${message} = KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/see...</msg>
+<var>${message}</var>
+<arg>${TEST_MESSAGE}</arg>
+<arg>mode=right</arg>
+<doc>Remove leading and/or trailing whitespaces from the given string.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.071849" elapsed="0.000487"/>
+</kw>
+<kw name="Set Test Message" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.073062" level="TRACE">Arguments: [ "KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'." ]</msg>
+<msg time="2026-07-07T18:49:54.073270" level="INFO">Set test message to:
+KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.</msg>
+<msg time="2026-07-07T18:49:54.073328" level="TRACE">Return: None</msg>
+<arg>${message}</arg>
+<doc>Sets message for the current test case.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.072489" elapsed="0.000884"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:54.071617" elapsed="0.001810"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.071587" elapsed="0.001882"/>
+</if>
+<kw name="Run Keyword If Timeout Occurred" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.073865" level="TRACE">Arguments: [ 'Set Variable' | 'True' ]</msg>
+<msg time="2026-07-07T18:49:54.073948" level="TRACE">Return: None</msg>
+<msg time="2026-07-07T18:49:54.074038" level="INFO">${timed_out} = None</msg>
+<var>${timed_out}</var>
+<arg>Set Variable</arg>
+<arg>True</arg>
+<doc>Runs the given keyword if either a test or a keyword timeout has occurred.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.073614" elapsed="0.000452"/>
+</kw>
+<if>
+<branch type="IF" condition="${timed_out}">
+<return>
+<status status="NOT RUN" start="2026-07-07T18:49:54.074339" elapsed="0.000026"/>
+</return>
+<status status="NOT RUN" start="2026-07-07T18:49:54.074180" elapsed="0.000230"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.074151" elapsed="0.000298"/>
+</if>
+<if>
+<branch type="IF" condition="${CREATE_SNAPSHOT_ON_FAIL}">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.074985" level="TRACE">Arguments: [ 'Create Snapshot Of Failed Test' ]</msg>
+<kw name="Create Snapshot Of Failed Test" owner="renode-keywords">
+<msg time="2026-07-07T18:49:54.075536" level="TRACE">Arguments: [  ]</msg>
+<kw name="Return From Keyword If" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.076173" level="TRACE">Arguments: [ "'skipped' in []" ]</msg>
+<msg time="2026-07-07T18:49:54.076377" level="TRACE">Return: None</msg>
+<arg>'skipped' in @{TEST TAGS}</arg>
+<doc>Returns from the enclosing user keyword if ``condition`` is true.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.075773" elapsed="0.000669"/>
+</kw>
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.076822" level="TRACE">Arguments: [ '\\${RETRYFAILED_RETRY_INDEX}' | '0' ]</msg>
+<msg time="2026-07-07T18:49:54.077985" level="TRACE">Return: '0'</msg>
+<msg time="2026-07-07T18:49:54.078097" level="INFO">${retry_index} = 0</msg>
+<var>${retry_index}</var>
+<arg>\${RETRYFAILED_RETRY_INDEX}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.076596" elapsed="0.001533"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.078720" level="TRACE">Arguments: [ 'decoder_test.Should Set Speed and Change PWM.fail0.save' ]</msg>
+<msg time="2026-07-07T18:49:54.078810" level="TRACE">Return: 'decoder_test.Should Set Speed and Change PWM.fail0.save'</msg>
+<msg time="2026-07-07T18:49:54.078897" level="INFO">${test_name} = decoder_test.Should Set Speed and Change PWM.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${SUITE NAME}.${TEST NAME}.fail${retry_index}.save</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.078346" elapsed="0.000584"/>
+</kw>
+<kw name="Sanitize Test Name" owner="renode-keywords">
+<msg time="2026-07-07T18:49:54.079476" level="TRACE">Arguments: [ ${test_name}='decoder_test.Should Set Speed and Change PWM.fail0.save' ]</msg>
+<kw name="Replace String" owner="String">
+<msg time="2026-07-07T18:49:54.080003" level="TRACE">Arguments: [ 'decoder_test.Should Set Speed and Change PWM.fail0.save' | ' ' | '_' ]</msg>
+<msg time="2026-07-07T18:49:54.080101" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save'</msg>
+<msg time="2026-07-07T18:49:54.080182" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>${SPACE}</arg>
+<arg>_</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.079789" elapsed="0.000423"/>
+</kw>
+<kw name="Replace String Using Regexp" owner="String">
+<msg time="2026-07-07T18:49:54.080606" level="TRACE">Arguments: [ 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save' | '[/""]' | '-' ]</msg>
+<msg time="2026-07-07T18:49:54.080704" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save'</msg>
+<msg time="2026-07-07T18:49:54.080779" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>[/""]</arg>
+<arg>-</arg>
+<doc>Replaces ``pattern`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.080428" elapsed="0.000380"/>
+</kw>
+<return>
+<value>${test_name}</value>
+<status status="PASS" start="2026-07-07T18:49:54.080956" elapsed="0.000062"/>
+</return>
+<msg time="2026-07-07T18:49:54.081141" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save'</msg>
+<msg time="2026-07-07T18:49:54.081223" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<status status="PASS" start="2026-07-07T18:49:54.079149" elapsed="0.002153"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.081748" level="TRACE">Arguments: [ '/app//snapshots' ]</msg>
+<msg time="2026-07-07T18:49:54.081830" level="TRACE">Return: '/app//snapshots'</msg>
+<msg time="2026-07-07T18:49:54.081906" level="INFO">${snapshots_dir} = /app//snapshots</msg>
+<var>${snapshots_dir}</var>
+<arg>${RESULTS_DIRECTORY}/snapshots</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.081454" elapsed="0.000483"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2026-07-07T18:49:54.082187" level="TRACE">Arguments: [ '/app//snapshots' ]</msg>
+<msg time="2026-07-07T18:49:54.082363" level="INFO" html="true">Directory '&lt;a href="file:///app/snapshots"&gt;/app/snapshots&lt;/a&gt;' already exists.</msg>
+<msg time="2026-07-07T18:49:54.082426" level="TRACE">Return: None</msg>
+<arg>${snapshots_dir}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.082070" elapsed="0.000402"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.082960" level="TRACE">Arguments: [ '"/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:54.083042" level="TRACE">Return: '"/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"'</msg>
+<msg time="2026-07-07T18:49:54.083122" level="INFO">${snapshot_path} = "/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"</msg>
+<var>${snapshot_path}</var>
+<arg>"${snapshots_dir}/${test_name}"</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.082631" elapsed="0.000519"/>
+</kw>
+<kw name="Execute Command" owner="Remote">
+<msg time="2026-07-07T18:49:54.083500" level="TRACE">Arguments: [ 'Save "/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:54.096177" level="TRACE">Return: ''</msg>
+<arg>Save ${snapshot_path}</arg>
+<status status="PASS" start="2026-07-07T18:49:54.083360" elapsed="0.012989"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.097101" level="TRACE">Arguments: [ '!!!!! Emulation\'s state saved to "/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"' ]</msg>
+<msg time="2026-07-07T18:49:54.097320" level="TRACE">Return: None</msg>
+<arg>!!!!! Emulation's state saved to ${snapshot_path}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.096597" elapsed="0.000803"/>
+</kw>
+<msg time="2026-07-07T18:49:54.097486" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:54.075292" elapsed="0.022239"/>
+</kw>
+<msg time="2026-07-07T18:49:54.097577" level="TRACE">Return: None</msg>
+<arg>Create Snapshot Of Failed Test</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.074746" elapsed="0.022871"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:54.074518" elapsed="0.023140"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.074499" elapsed="0.023206"/>
+</if>
+<if>
+<branch type="IF" condition="${SAVE_LOGS}">
+<if>
+<branch type="IF" condition="&quot;${SAVE_LOGS_WHEN}&quot; == &quot;Always&quot;">
+<kw name="Save Test Log" owner="renode-keywords">
+<status status="NOT RUN" start="2026-07-07T18:49:54.098412" elapsed="0.000042"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:54.098019" elapsed="0.000473"/>
+</branch>
+<branch type="ELSE IF" condition="&quot;${SAVE_LOGS_WHEN}&quot; == &quot;Fail&quot;">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.099203" level="TRACE">Arguments: [ 'Save Test Log' ]</msg>
+<kw name="Save Test Log" owner="renode-keywords">
+<msg time="2026-07-07T18:49:54.100016" level="TRACE">Arguments: [  ]</msg>
+<kw name="Return From Keyword If" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.100562" level="TRACE">Arguments: [ "'skipped' in []" ]</msg>
+<msg time="2026-07-07T18:49:54.100695" level="TRACE">Return: None</msg>
+<arg>'skipped' in @{TEST TAGS}</arg>
+<doc>Returns from the enclosing user keyword if ``condition`` is true.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.100197" elapsed="0.000547"/>
+</kw>
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.101311" level="TRACE">Arguments: [ '\\${RETRYFAILED_RETRY_INDEX}' | '0' ]</msg>
+<msg time="2026-07-07T18:49:54.102323" level="TRACE">Return: '0'</msg>
+<msg time="2026-07-07T18:49:54.102439" level="INFO">${retry_index} = 0</msg>
+<var>${retry_index}</var>
+<arg>\${RETRYFAILED_RETRY_INDEX}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.100981" elapsed="0.001506"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.103013" level="TRACE">Arguments: [ 'decoder_test.Should Set Speed and Change PWM.fail0' ]</msg>
+<msg time="2026-07-07T18:49:54.103104" level="TRACE">Return: 'decoder_test.Should Set Speed and Change PWM.fail0'</msg>
+<msg time="2026-07-07T18:49:54.103185" level="INFO">${test_name} = decoder_test.Should Set Speed and Change PWM.fail0</msg>
+<var>${test_name}</var>
+<arg>${SUITE NAME}.${TEST NAME}.fail${retry_index}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.102645" elapsed="0.000570"/>
+</kw>
+<kw name="Sanitize Test Name" owner="renode-keywords">
+<msg time="2026-07-07T18:49:54.103734" level="TRACE">Arguments: [ ${test_name}='decoder_test.Should Set Speed and Change PWM.fail0' ]</msg>
+<kw name="Replace String" owner="String">
+<msg time="2026-07-07T18:49:54.104135" level="TRACE">Arguments: [ 'decoder_test.Should Set Speed and Change PWM.fail0' | ' ' | '_' ]</msg>
+<msg time="2026-07-07T18:49:54.104276" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0'</msg>
+<msg time="2026-07-07T18:49:54.104370" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>${SPACE}</arg>
+<arg>_</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.103919" elapsed="0.000481"/>
+</kw>
+<kw name="Replace String Using Regexp" owner="String">
+<msg time="2026-07-07T18:49:54.104797" level="TRACE">Arguments: [ 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0' | '[/""]' | '-' ]</msg>
+<msg time="2026-07-07T18:49:54.104983" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0'</msg>
+<msg time="2026-07-07T18:49:54.105077" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<arg>[/""]</arg>
+<arg>-</arg>
+<doc>Replaces ``pattern`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.104625" elapsed="0.000483"/>
+</kw>
+<return>
+<value>${test_name}</value>
+<status status="PASS" start="2026-07-07T18:49:54.105219" elapsed="0.000104"/>
+</return>
+<msg time="2026-07-07T18:49:54.105456" level="TRACE">Return: 'decoder_test.Should_Set_Speed_and_Change_PWM.fail0'</msg>
+<msg time="2026-07-07T18:49:54.105540" level="INFO">${test_name} = decoder_test.Should_Set_Speed_and_Change_PWM.fail0</msg>
+<var>${test_name}</var>
+<arg>${test_name}</arg>
+<status status="PASS" start="2026-07-07T18:49:54.103483" elapsed="0.002086"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.106023" level="TRACE">Arguments: [ '/app//logs' ]</msg>
+<msg time="2026-07-07T18:49:54.106105" level="TRACE">Return: '/app//logs'</msg>
+<msg time="2026-07-07T18:49:54.106182" level="INFO">${logs_dir} = /app//logs</msg>
+<var>${logs_dir}</var>
+<arg>${RESULTS_DIRECTORY}/logs</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.105720" elapsed="0.000490"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2026-07-07T18:49:54.106525" level="TRACE">Arguments: [ '/app//logs' ]</msg>
+<msg time="2026-07-07T18:49:54.106643" level="INFO" html="true">Directory '&lt;a href="file:///app/logs"&gt;/app/logs&lt;/a&gt;' already exists.</msg>
+<msg time="2026-07-07T18:49:54.106700" level="TRACE">Return: None</msg>
+<arg>${logs_dir}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.106401" elapsed="0.000339"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.107192" level="TRACE">Arguments: [ '/app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log' ]</msg>
+<msg time="2026-07-07T18:49:54.107319" level="TRACE">Return: '/app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log'</msg>
+<msg time="2026-07-07T18:49:54.107404" level="INFO">${log_path} = /app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log</msg>
+<var>${log_path}</var>
+<arg>${logs_dir}/${test_name}.log</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.106881" elapsed="0.000552"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<msg time="2026-07-07T18:49:54.107859" level="TRACE">Arguments: [ '!!!!! Log saved to "/app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log"' ]</msg>
+<msg time="2026-07-07T18:49:54.108020" level="TRACE">Return: None</msg>
+<arg>!!!!! Log saved to "${log_path}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.107572" elapsed="0.000503"/>
+</kw>
+<kw name="Save Cached Log" owner="Remote">
+<msg time="2026-07-07T18:49:54.108403" level="TRACE">Arguments: [ '/app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log' ]</msg>
+<msg time="2026-07-07T18:49:54.114053" level="TRACE">Return: ''</msg>
+<arg>${log_path}</arg>
+<status status="PASS" start="2026-07-07T18:49:54.108276" elapsed="0.005894"/>
+</kw>
+<msg time="2026-07-07T18:49:54.114319" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:54.099520" elapsed="0.014860"/>
+</kw>
+<msg time="2026-07-07T18:49:54.114432" level="TRACE">Return: None</msg>
+<arg>Save Test Log</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2026-07-07T18:49:54.098912" elapsed="0.015563"/>
+</kw>
+<status status="PASS" start="2026-07-07T18:49:54.098524" elapsed="0.015993"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.097998" elapsed="0.016564"/>
+</if>
+<status status="PASS" start="2026-07-07T18:49:54.097806" elapsed="0.016794"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.097777" elapsed="0.016850"/>
+</if>
+<if>
+<branch type="IF" condition="${HOLD_ON_ERROR}">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<var>${res}</var>
+<arg>Run Keyword And Ignore Error</arg>
+<arg>Import Library</arg>
+<arg>Dialogs</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:54.115055" elapsed="0.000030"/>
+</kw>
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<arg>Run Keywords</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' == 'FAIL'</arg>
+<arg>Log</arg>
+<arg>Couldn't load the Dialogs library - interactive debugging is not possible</arg>
+<arg>console=True</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Open GUI</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Pause Execution</arg>
+<arg>Test failed. Press OK once done debugging.</arg>
+<arg>AND</arg>
+<arg>Run Keyword If</arg>
+<arg>'${res[0]}' != 'FAIL'</arg>
+<arg>Close GUI</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:54.115378" elapsed="0.000042"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:54.114722" elapsed="0.000799"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.114691" elapsed="0.000867"/>
+</if>
+<kw name="Reset Emulation" owner="Remote">
+<msg time="2026-07-07T18:49:54.115789" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:54.119791" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:54.115706" elapsed="0.004181"/>
+</kw>
+<kw name="Clear Cached Log" owner="Remote">
+<msg time="2026-07-07T18:49:54.120190" level="TRACE">Arguments: [  ]</msg>
+<msg time="2026-07-07T18:49:54.123152" level="TRACE">Return: ''</msg>
+<status status="PASS" start="2026-07-07T18:49:54.120098" elapsed="0.003196"/>
+</kw>
+<msg time="2026-07-07T18:49:54.123391" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:54.068449" elapsed="0.054996"/>
+</kw>
+<doc>Verifies that setting speed via CLI updates the motor state.</doc>
+<timeout value="30 seconds"/>
+<status status="FAIL" start="2026-07-07T18:49:54.047121" elapsed="0.076404">KeywordException: Could not execute script: There was an error executing command 'machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl'Could not find file 'test/renode/boards/seeed_xiao_rp2040.repl'.</status>
+</test>
+<kw name="Teardown" owner="renode-keywords" type="TEARDOWN">
+<msg time="2026-07-07T18:49:54.126332" level="TRACE">Arguments: [  ]</msg>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER}">
+<kw name="Stop Remote Server" owner="Remote">
+<status status="NOT RUN" start="2026-07-07T18:49:54.126756" elapsed="0.000031"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:54.126463" elapsed="0.000375"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.126428" elapsed="0.000447"/>
+</if>
+<if>
+<branch type="IF" condition="not ${SKIP_RUNNING_SERVER}">
+<kw name="Wait For Process" owner="Process">
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="NOT RUN" start="2026-07-07T18:49:54.127174" elapsed="0.000029"/>
+</kw>
+<status status="NOT RUN" start="2026-07-07T18:49:54.126950" elapsed="0.000345"/>
+</branch>
+<status status="PASS" start="2026-07-07T18:49:54.126930" elapsed="0.000405"/>
+</if>
+<msg time="2026-07-07T18:49:54.127394" level="TRACE">Return: None</msg>
+<status status="PASS" start="2026-07-07T18:49:54.126130" elapsed="0.001320"/>
+</kw>
+<meta name="HotSpot_Action">-</meta>
+<status status="FAIL" start="2026-07-07T18:49:51.605109" elapsed="2.522452"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="2" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Test Suite" id="s1" pass="0" fail="2" skip="0">Test Suite</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-07-07T18:49:51.603123" level="ERROR">Taking listener '/app/test/renode-bin/tests/retry_and_timeout_listener.py:1' into use failed: Invalid listener priority 'None'.</msg>
+<msg time="2026-07-07T18:49:52.546034" level="ERROR">Calling method 'start_test' of listener '/app/test/renode-bin/tests/robot_output_formatter.py' failed: AttributeError: 'tuple' object has no attribute 'full_name'</msg>
+<msg time="2026-07-07T18:49:54.046677" level="ERROR">Calling method 'end_test' of listener '/app/test/renode-bin/tests/robot_output_formatter.py' failed: AttributeError: 'tuple' object has no attribute 'full_name'</msg>
+<msg time="2026-07-07T18:49:54.048719" level="ERROR">Calling method 'start_test' of listener '/app/test/renode-bin/tests/robot_output_formatter.py' failed: AttributeError: 'tuple' object has no attribute 'full_name'</msg>
+<msg time="2026-07-07T18:49:54.125184" level="ERROR">Calling method 'end_test' of listener '/app/test/renode-bin/tests/robot_output_formatter.py' failed: AttributeError: 'tuple' object has no attribute 'full_name'</msg>
+</errors>
+</robot>

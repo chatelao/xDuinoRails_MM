@@ -1,0 +1,26 @@
+Installing Python dependencies...
+
+[notice] A new release of pip is available: 26.0.1 -> 26.1.2
+[notice] To update, run: pip install --upgrade pip
+Running Renode simulation tests...
+Required `robotframework` version is `6.1`, while the one available in your system is `7.4.2`. Tests may still work, but this version of Robot is not officially supported. Please install the required version using `pip install robotframework==6.1` before running the tests
+Preparing suites
+Starting suites
+Running suite on Renode pid 79159 using port 49152: test/renode/decoder_test.robot
+!!!!! Emulation's state saved to "/app//snapshots/decoder_test.Should_Show_Help_Menu.fail0.save"
+!!!!! Log saved to "/app//logs/decoder_test.Should_Show_Help_Menu.fail0.log"
+!!!!! Emulation's state saved to "/app//snapshots/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.save"
+!!!!! Log saved to "/app//logs/decoder_test.Should_Set_Speed_and_Change_PWM.fail0.log"
+Suite test/renode/decoder_test.robot failed in 2.54 seconds.
+Cleaning up suites
+Closing Renode pid 79159
+Renode pid 79159 closed
+Aggregating all robot results
+Output:  /app/robot_output.xml
+Log:     /app/log.html
+Report:  /app/report.html
+Some tests failed :( See the list of failed tests below and logs for details!
+Failed robot critical tests:
+	1. decoder_test.Should Show Help Menu
+	2. decoder_test.Should Set Speed and Change PWM
+------
