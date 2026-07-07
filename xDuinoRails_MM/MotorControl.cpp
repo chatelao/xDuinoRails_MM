@@ -171,6 +171,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
       logger.println("Motor: Kickstart ended (timeout)", LogCategory::PWM);
+      // Ensure target PWM is applied immediately after kickstart ends
+      writeMotorHardware(targetPwm, currDirection);
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
       if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
@@ -184,6 +186,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
           logger.println("Motor: Kickstart ended (BEMF)", LogCategory::PWM);
+          // Ensure target PWM is applied immediately after kickstart ends
+          writeMotorHardware(targetPwm, currDirection);
         }
       }
       if (isKickstarting_priv) {
@@ -234,6 +238,12 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         }
         finalPwm += lastAdjustment;
       } else {
+        lastAdjustment = 0;
+        bemfErrorSum   = 0;
+      }
+
+      // Explicitly zero out adjustments if BEMF is disabled to avoid any drift
+      if (!bemfEnabled) {
         lastAdjustment = 0;
         bemfErrorSum   = 0;
       }
