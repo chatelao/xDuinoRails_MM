@@ -75,8 +75,9 @@ const int NUMPIXELS = 1;
 CvManager cvManager;
 
 ProtocolHandler protocol(DCC_MM_SIGNAL);
-MotorControl motor(cvManager, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B);
-LightsControl lights(cvManager, LED_F0f, LED_F0b);
+MotorControl motor(cvManager, MOTOR_PIN_A, MOTOR_PIN_B, BEMF_PIN_A, BEMF_PIN_B,
+                   MOTOR_SHUT_PIN);
+LightsControl lights(cvManager, LED_F0f, LED_F0b, FUNC_SHUT_PIN);
 CvProgrammer  cvProgrammer(&cvManager, &protocol);
 SerialConsole serialConsole(&cvManager, &protocol);
 

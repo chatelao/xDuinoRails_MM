@@ -31,6 +31,8 @@ void test_repro_watchdog_stop_no_kickstart(void);
 void test_repro_start_backward_kickstart_wrong_dir(void);
 void test_repro_bemf_disabled_leftover_adjustment(void);
 void test_repro_direction_change_kickstart(void);
+void test_repro_kickstart_only(void);
+void test_repro_kickstart_only_with_vstart_zero(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -122,7 +124,7 @@ void test_motor_speed_control(void) {
   cvManager.setCv(CV_START_VOLTAGE, 10);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   cvManager.setCv(CV_MAXIMUM_SPEED, 255);
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Test: Geschwindigkeit 0
@@ -169,7 +171,7 @@ void test_motor_speed_control(void) {
 // Testet das Standardverhalten der Lichtsteuerung.
 void test_lights_control_default_behavior(void) {
   CvManagerMock cvManager;
-  LightsControl lights(cvManager, 0, 1);
+  LightsControl lights(cvManager, 0, 1, 13);
   // TODO: Behauptungen hinzufügen, um das Standard-Lichtverhalten zu überprüfen
 }
 
@@ -226,7 +228,7 @@ void test_watchdog_shutdown(void) {
   protocol.setAddress(1);
   protocol.setSignalTimeout(cvManager.getCv(CV_WATCHDOG_TIMEOUT) * 100);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // 1. Normaler Betrieb: Geschwindigkeit auf 14 setzen
@@ -313,7 +315,7 @@ void test_pwm_freq_logging(void) {
   cvManager.setCv(CV_MOTOR_TYPE, 0);
   Serial.clearLog();
   {
-    MotorControl motor(cvManager, 10, 11, 2, 3);
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
     motor.setup();
     bool found = false;
     for (const auto &line : Serial.logLines) {
@@ -330,7 +332,7 @@ void test_pwm_freq_logging(void) {
   cvManager.setCv(CV_MOTOR_TYPE, 1);
   Serial.clearLog();
   {
-    MotorControl motor(cvManager, 10, 11, 2, 3);
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
     motor.setup();
     bool found = false;
     for (const auto &line : Serial.logLines) {
@@ -347,7 +349,7 @@ void test_pwm_freq_logging(void) {
   cvManager.setCv(CV_MOTOR_TYPE, 2);
   Serial.clearLog();
   {
-    MotorControl motor(cvManager, 10, 11, 2, 3);
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
     motor.setup();
     bool found = false;
     for (const auto &line : Serial.logLines) {
@@ -429,7 +431,7 @@ void test_logging(void) {
   Serial.clearLog();
 
   // Test Motor kickstart logging
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
   motor.setSpeed(1, MM2DirectionState_Forward);
 
@@ -580,7 +582,7 @@ void test_motor_kickstart_bemf_disabled(void) {
   // BEMF is disabled by default, but we set it explicitly here too
   cvManager.setCv(CV_BEMF_CONFIG, 0);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   Serial.clearLog();
@@ -630,7 +632,7 @@ void test_motor_kickstart_bemf_enabled(void) {
   // Enable BEMF
   cvManager.setCv(CV_BEMF_CONFIG, 1);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   Serial.clearLog();
@@ -666,7 +668,7 @@ void test_motor_speed_curve(void) {
   cvManager.setCv(CV_START_VOLTAGE, 50);
   cvManager.setCv(CV_MAXIMUM_SPEED, 200);
   cvManager.setCv(CV_MEDIUM_SPEED, 0);
-  MotorControl motor1(cvManager, 10, 11, 2, 3);
+  MotorControl motor1(cvManager, 10, 11, 2, 3, 12);
   motor1.setup();
 
   motor1.setSpeed(1, MM2DirectionState_Forward);
@@ -866,5 +868,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
   RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
   RUN_TEST(test_repro_direction_change_kickstart);
+  RUN_TEST(test_repro_kickstart_only);
+  RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   return UNITY_END();
 }

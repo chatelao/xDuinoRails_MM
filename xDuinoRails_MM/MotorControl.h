@@ -7,7 +7,8 @@
 
 class MotorControl {
 public:
-  MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA, int bemfB);
+  MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA, int bemfB,
+               int shutPin);
   void              setup();
   void              setSpeed(int step, MM2DirectionState targetDir);
   void              stop();
@@ -24,6 +25,7 @@ private:
   int               pinB_priv;
   int               bemfA_priv;
   int               bemfB_priv;
+  int               shutPin_priv;
   int               targetPwm;
   MM2DirectionState currDirection;
   MM2DirectionState targetDirection;
@@ -34,6 +36,9 @@ private:
   int               previousPwm;
   long              bemfErrorSum;
   int               lastAdjustment;
+
+  int               lastWrittenPwm;
+  MM2DirectionState lastWrittenDir;
 
   // Telemetry
   unsigned long lastTelemetryTime;

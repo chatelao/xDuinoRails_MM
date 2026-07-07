@@ -13,7 +13,7 @@ void test_repro_watchdog_stop_no_kickstart(void) {
   cvManager.setCv(CV_START_VOLTAGE, 10);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // 1. Start moving
@@ -37,7 +37,7 @@ void test_repro_start_backward_kickstart_wrong_dir(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_MOTOR_TYPE, 0); // KICK_PWM = 800
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Start moving Backward from standstill
@@ -59,7 +59,7 @@ void test_repro_bemf_disabled_leftover_adjustment(void) {
   cvManager.setCv(CV_BEMF_I, 0);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Set speed to step 7 (targetPwm = 531)
@@ -94,7 +94,7 @@ void test_repro_direction_change_kickstart(void) {
   cvManager.setCv(CV_START_VOLTAGE, 10);
   cvManager.setCv(CV_MOTOR_TYPE, 0);
 
-  MotorControl motor(cvManager, 10, 11, 2, 3);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
   motor.setup();
 
   // Start moving Forward
