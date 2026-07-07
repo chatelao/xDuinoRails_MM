@@ -7,6 +7,9 @@ flash: Memory.MappedMemory @ sysbus 0x10000000
 sram0: Memory.MappedMemory @ sysbus 0x20000000
     size: 0x40000
 
+sram1: Memory.MappedMemory @ sysbus 0x20040000
+    size: 0x2000
+
 cpu0: CPU.CortexM @ sysbus
     cpuType: "cortex-m0+"
     cpuId: 0
@@ -21,9 +24,28 @@ uart0: UART.PL011 @ sysbus 0x40034000
 sysbus:
     init:
         // Mock RP2040 registers to satisfy bootloader/SDK
-        Tag <0x40008000 4> "CLOCKS_BASE" 0xFFFFFFFF
-        Tag <0x4000C000 4> "RESETS_BASE" 0xFFFFFFFF
-        Tag <0x40014000 4> "IO_BANK0_BASE" 0xFFFFFFFF
-        Tag <0x4001C000 4> "PADS_BANK0_BASE" 0xFFFFFFFF
-        Tag <0x40024000 4> "XOSC_BASE" 0xFFFFFFFF
-        Tag <0x40028000 4> "PLL_SYS_BASE" 0xFFFFFFFF
+        // CLOCKS
+        Tag <0x40008000 0x1000> "CLOCKS"
+        // RESETS
+        Tag <0x4000C000 0x1000> "RESETS"
+        // PSM
+        Tag <0x40010000 0x1000> "PSM"
+        // IO_BANK0
+        Tag <0x40014000 0x1000> "IO_BANK0"
+        // PADS_BANK0
+        Tag <0x4001C000 0x1000> "PADS_BANK0"
+        // XOSC
+        Tag <0x40024000 0x1000> "XOSC"
+        Tag <0x40024004 4> "XOSC_STATUS" 0x80000000 // Stable
+        // PLL_SYS
+        Tag <0x40028000 0x1000> "PLL_SYS"
+        Tag <0x40028000 4> "PLL_SYS_CS" 0x80000000 // Locked
+        // PLL_USB
+        Tag <0x4002C000 0x1000> "PLL_USB"
+        Tag <0x4002C000 4> "PLL_USB_CS" 0x80000000 // Locked
+        // SIO
+        Tag <0xD0000000 0x1000> "SIO"
+        // WATCHDOG
+        Tag <0x40058000 0x1000> "WATCHDOG"
+        // TIMER
+        Tag <0x40054000 0x1000> "TIMER"

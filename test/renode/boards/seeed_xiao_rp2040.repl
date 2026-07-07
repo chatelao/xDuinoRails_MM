@@ -1,4 +1,4 @@
-using "@rp2040.repl"
+using "$ORIGIN/../rp2040.repl"
 
 // Seeed Studio XIAO RP2040 Pin Mapping:
 // D7: GPIO 0  (Motor A)
