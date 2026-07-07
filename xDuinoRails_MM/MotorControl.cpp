@@ -162,6 +162,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (isKickstarting_priv) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
+      writeMotorHardware(targetPwm, currDirection);
       logger.println("Motor: Kickstart ended (timeout)", LogCategory::PWM);
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
@@ -175,6 +176,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
 
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
+          writeMotorHardware(targetPwm, currDirection);
           logger.println("Motor: Kickstart ended (BEMF)", LogCategory::PWM);
         }
       }
