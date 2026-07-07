@@ -17,6 +17,7 @@ private:
   int              bufferIndex;
 
   void parseCommand(char *line);
+  void printHelp();
 };
 
 #endif // SERIAL_CONSOLE_H
