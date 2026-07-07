@@ -25,6 +25,8 @@ void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
 void test_motor_bemf_pi_control(void);
 void test_serial_console_logging_toggle(void);
+void test_cv49_bemf_disabled_pwm_scaling(void);
+void test_cv49_bemf_disabled_default_scaling(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -802,5 +804,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_debug_leds_heartbeat);
   RUN_TEST(test_motor_bemf_pi_control);
   RUN_TEST(test_serial_console_logging_toggle);
+  RUN_TEST(test_cv49_bemf_disabled_pwm_scaling);
+  RUN_TEST(test_cv49_bemf_disabled_default_scaling);
   return UNITY_END();
 }
