@@ -54,9 +54,9 @@ void ProtocolHandler::loop() {
   bool signalTimeout = isSignalTimeout();
   if (signalTimeout != wasSignalTimeout) {
     if (signalTimeout) {
-      logger.println("MM Signal lost");
+      logger.println("MM Signal lost", LogCategory::Protocol);
     } else {
-      logger.println("MM Signal recovered");
+      logger.println("MM Signal recovered", LogCategory::Protocol);
     }
     wasSignalTimeout = signalTimeout;
   }
@@ -104,7 +104,8 @@ void ProtocolHandler::loop() {
       stateF1 != lastStateF1 || stateF2 != lastStateF2 ||
       mm2Locked != wasMm2Locked) {
 
-    logger.printf("State: Addr=%d, Speed=%d, Dir=%s, F0=%d, F1=%d, F2=%d, "
+    logger.printf(LogCategory::Protocol,
+                  "State: Addr=%d, Speed=%d, Dir=%s, F0=%d, F1=%d, F2=%d, "
                   "MM2Lock=%d\n",
                   mmAddress, targetSpeed,
                   targetDirection == MM2DirectionState_Forward ? "F" : "B",

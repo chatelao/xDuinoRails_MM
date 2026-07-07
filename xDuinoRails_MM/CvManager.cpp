@@ -35,7 +35,7 @@ void CvManager::setCv(int cv, uint8_t value) {
   EEPROM.write(cv, value);
   EEPROM.commit();
 
-  logger.printf("CV %d set to %d\n", cv, value);
+  logger.printf(LogCategory::CV, "CV %d set to %d\n", cv, value);
 
   if (cv == CV_MANUFACTURER_ID || cv == CV_MOTOR_TYPE) {
 #ifdef ARDUINO_ARCH_RP2040
@@ -47,30 +47,33 @@ void CvManager::setCv(int cv, uint8_t value) {
 }
 
 void CvManager::printAllCvs() {
-  logger.println("--- Current CV Settings ---");
-  logger.printf("CV 1 (Address): %d\n", getCv(CV_BASE_ADDRESS));
-  logger.printf("CV 2 (Vstart): %d\n", getCv(CV_START_VOLTAGE));
-  logger.printf("CV 3 (Acc): %d\n", getCv(CV_ACCELERATION));
-  logger.printf("CV 4 (Dec): %d\n", getCv(CV_BRAKING_TIME));
-  logger.printf("CV 5 (Vhigh): %d\n", getCv(CV_MAXIMUM_SPEED));
-  logger.printf("CV 6 (Vmid): %d\n", getCv(CV_MEDIUM_SPEED));
-  logger.printf("CV 7 (Version): %d\n", getCv(CV_VERSION));
-  logger.printf("CV 8 (Manuf ID): %d\n", getCv(CV_MANUFACTURER_ID));
-  logger.printf("CV 11 (Watchdog): %d\n", getCv(CV_WATCHDOG_TIMEOUT));
-  logger.printf("CV 15 (Prog Lock): %d\n", getCv(CV_PROGRAMMING_LOCK));
-  logger.printf("CV 17/18 (Long Addr): %d\n",
+  logger.println("--- Current CV Settings ---", LogCategory::CV);
+  logger.printf(LogCategory::CV, "CV 1 (Address): %d\n", getCv(CV_BASE_ADDRESS));
+  logger.printf(LogCategory::CV, "CV 2 (Vstart): %d\n", getCv(CV_START_VOLTAGE));
+  logger.printf(LogCategory::CV, "CV 3 (Acc): %d\n", getCv(CV_ACCELERATION));
+  logger.printf(LogCategory::CV, "CV 4 (Dec): %d\n", getCv(CV_BRAKING_TIME));
+  logger.printf(LogCategory::CV, "CV 5 (Vhigh): %d\n", getCv(CV_MAXIMUM_SPEED));
+  logger.printf(LogCategory::CV, "CV 6 (Vmid): %d\n", getCv(CV_MEDIUM_SPEED));
+  logger.printf(LogCategory::CV, "CV 7 (Version): %d\n", getCv(CV_VERSION));
+  logger.printf(LogCategory::CV, "CV 8 (Manuf ID): %d\n", getCv(CV_MANUFACTURER_ID));
+  logger.printf(LogCategory::CV, "CV 11 (Watchdog): %d\n",
+                getCv(CV_WATCHDOG_TIMEOUT));
+  logger.printf(LogCategory::CV, "CV 15 (Prog Lock): %d\n",
+                getCv(CV_PROGRAMMING_LOCK));
+  logger.printf(LogCategory::CV, "CV 17/18 (Long Addr): %d\n",
                 (getCv(CV_LONG_ADDRESS_HIGH) << 8) | getCv(CV_LONG_ADDRESS_LOW));
-  logger.printf("CV 29 (Config): %d\n", getCv(CV_CONFIGURATION));
-  logger.printf("CV 33 (F0f): %d\n", getCv(CV_FRONT_LIGHT_F0F));
-  logger.printf("CV 34 (F0r): %d\n", getCv(CV_REAR_LIGHT_F0R));
-  logger.printf("CV 49 (BEMF Config): %d\n", getCv(CV_BEMF_CONFIG));
-  logger.printf("CV 54 (BEMF K): %d\n", getCv(CV_BEMF_K));
-  logger.printf("CV 55 (BEMF I): %d\n", getCv(CV_BEMF_I));
-  logger.printf("CV 52 (Motor Type): %d\n", getCv(CV_MOTOR_TYPE));
-  logger.printf("CV 107/108 (Ext ID): %d\n",
+  logger.printf(LogCategory::CV, "CV 29 (Config): %d\n", getCv(CV_CONFIGURATION));
+  logger.printf(LogCategory::CV, "CV 33 (F0f): %d\n", getCv(CV_FRONT_LIGHT_F0F));
+  logger.printf(LogCategory::CV, "CV 34 (F0r): %d\n", getCv(CV_REAR_LIGHT_F0R));
+  logger.printf(LogCategory::CV, "CV 49 (BEMF Config): %d\n",
+                getCv(CV_BEMF_CONFIG));
+  logger.printf(LogCategory::CV, "CV 54 (BEMF K): %d\n", getCv(CV_BEMF_K));
+  logger.printf(LogCategory::CV, "CV 55 (BEMF I): %d\n", getCv(CV_BEMF_I));
+  logger.printf(LogCategory::CV, "CV 52 (Motor Type): %d\n", getCv(CV_MOTOR_TYPE));
+  logger.printf(LogCategory::CV, "CV 107/108 (Ext ID): %d\n",
                 (getCv(CV_EXT_ID_HIGH) << 8) | getCv(CV_EXT_ID_LOW));
-  logger.printf("CV 250 (Debug): %d\n", getCv(CV_DEBUG_ENABLE));
-  logger.println("---------------------------");
+  logger.printf(LogCategory::CV, "CV 250 (Debug): %d\n", getCv(CV_DEBUG_ENABLE));
+  logger.println("---------------------------", LogCategory::CV);
 }
 
 void CvManager::initCv() {

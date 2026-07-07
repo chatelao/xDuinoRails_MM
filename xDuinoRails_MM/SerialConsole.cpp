@@ -50,8 +50,25 @@ void SerialConsole::parseCommand(char *line) {
     protocol->setFunctionState(1, val1 > 0);
     logger.printf("Serial: Function 1 set to %d\n", val1 > 0);
   } else if (line[0] == 'L' || line[0] == 'l') {
-    logger.toggleLogging();
-    Serial.print("Serial: Logging ");
-    Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
+    if (line[1] == ' ' && line[2] != '\0') {
+      char sub = line[2];
+      if (sub == 'p') {
+        logger.toggleCategory(LogCategory::Protocol);
+        Serial.print("Serial: Protocol Logging ");
+        Serial.println(logger.isCategoryEnabled(LogCategory::Protocol) ? "ON" : "OFF");
+      } else if (sub == 'w') {
+        logger.toggleCategory(LogCategory::PWM);
+        Serial.print("Serial: PWM Logging ");
+        Serial.println(logger.isCategoryEnabled(LogCategory::PWM) ? "ON" : "OFF");
+      } else if (sub == 'c') {
+        logger.toggleCategory(LogCategory::CV);
+        Serial.print("Serial: CV Logging ");
+        Serial.println(logger.isCategoryEnabled(LogCategory::CV) ? "ON" : "OFF");
+      }
+    } else {
+      logger.toggleLogging();
+      Serial.print("Serial: Logging ");
+      Serial.println(logger.isLoggingEnabled() ? "ON" : "OFF");
+    }
   }
 }

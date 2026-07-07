@@ -58,7 +58,8 @@ void MotorControl::setup() {
     break;
   }
 
-  logger.printf("Motor: Type=%s, PWM Freq=%d Hz\n", typeName, PWM_FREQ);
+  logger.printf(LogCategory::PWM, "Motor: Type=%s, PWM Freq=%d Hz\n", typeName,
+                PWM_FREQ);
 
 #ifdef ARDUINO_ARCH_RP2040
   analogWriteFreq(PWM_FREQ);
@@ -80,7 +81,7 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   //
   if (step == 0) {
     if (lastSpeed != 0 || dir != targetDirection) {
-      logger.printf("Motor: Step 0 -> PWM 0, Dir %s\n",
+      logger.printf(LogCategory::PWM, "Motor: Step 0 -> PWM 0, Dir %s\n",
                     dir == MM2DirectionState_Forward ? "Forward" : "Backward");
       lastSpeed = 0;
     }
@@ -117,7 +118,8 @@ void MotorControl::setSpeed(int step, MM2DirectionState dir) {
   }
 
   if (step != lastSpeed || dir != targetDirection) {
-    logger.printf("Motor: Step %d -> PWM %d, Dir %s\n", step, pwm,
+    logger.printf(LogCategory::PWM, "Motor: Step %d -> PWM %d, Dir %s\n", step,
+                  pwm,
                   dir == MM2DirectionState_Forward ? "Forward" : "Backward");
     lastSpeed = step;
   }
@@ -140,7 +142,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
     isKickstarting_priv = true;
     currDirection       = targetDirection; // Ensure correct dir for kickstart
-    logger.println("Motor: Kickstart started");
+    logger.println("Motor: Kickstart started", LogCategory::PWM);
     kickstartBegin  = now;
     lastBemfMeasure = 0;
   }
@@ -151,7 +153,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
   if (isKickstarting_priv) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
-      logger.println("Motor: Kickstart ended (timeout)");
+      logger.println("Motor: Kickstart ended (timeout)", LogCategory::PWM);
     } else {
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
       if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
@@ -159,7 +161,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         lastBemfMeasure = now;
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
-          logger.println("Motor: Kickstart ended (BEMF)");
+          logger.println("Motor: Kickstart ended (BEMF)", LogCategory::PWM);
         }
       }
       if (isKickstarting_priv) {
