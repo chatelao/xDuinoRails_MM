@@ -8,7 +8,7 @@ This document tracks the current limitations and missing features in the Renode 
 
 ## Peripheral Support
 - **NeoPixel (WS2812B):** The Seeed XIAO's built-in NeoPixel is not currently simulated. Visual feedback from `DebugLeds` cannot be verified in Renode.
-- **ESP32-C6 Support:** The simulation environment is currently focused on the RP2040. There is no board definition for the ESP32-C6 version in Renode yet.
+- **ESP32-C6 Support:** The simulation environment is restricted to the RP2040 platform. There is no plan to support the ESP32-C6 in Renode at this time.
 - **EEPROM/Flash Persistence:** CV storage via EEPROM emulation is not yet verified in the simulation.
 
 ## Motor & BEMF

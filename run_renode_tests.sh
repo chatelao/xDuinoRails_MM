@@ -22,7 +22,8 @@ pip install -q robotframework psutil pyyaml
 # If in CI, install system dependencies
 if [ "$GITHUB_ACTIONS" == "true" ]; then
     echo "Installing system dependencies for Renode..."
-    sudo apt-get update -q
+    # Using || true for apt-get update to tolerate transient issues with unrelated repos
+    sudo apt-get update -y || true
     sudo apt-get install -y -q libgtk2.0-0 libglib2.0-0 libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxrender1 libxtst6
 fi
 

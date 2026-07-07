@@ -20,8 +20,7 @@ This document outlines the phases for integrating [Renode](https://renode.io/) s
 - [ ] Verify `ProtocolHandler` state transitions (address detection, speed step decoding).
 - [ ] Test signal timeout behavior and emergency stop logic in simulation.
 
-## Phase 4: Advanced Hardware & Multi-Platform Support
-- [ ] Add support for Seeed XIAO ESP32-C6 in Renode.
+## Phase 4: Advanced Hardware Support
 - [ ] Explore NeoPixel (WS2812B) protocol simulation for `DebugLeds` verification.
 - [ ] Implement complex load profiles (e.g., incline, friction) for the motor model to stress-test the BEMF logic.
 - [ ] Verify CV (Configuration Variable) persistence simulation.
