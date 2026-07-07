@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Configuration
 RENODE_VERSION="1.16.1"
@@ -31,3 +30,17 @@ fi
 echo "Running Renode simulation tests..."
 export PATH="$PATH:$(pwd)/$RENODE_DIR"
 ./$RENODE_DIR/renode-test test/renode/decoder_test.robot
+TEST_EXIT_CODE=$?
+
+# Print logs if failed
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+    echo "Tests failed! Printing logs..."
+    if [ -d "logs" ]; then
+        for log_file in logs/*.log; do
+            echo "--- $log_file ---"
+            cat "$log_file"
+        done
+    fi
+fi
+
+exit $TEST_EXIT_CODE
