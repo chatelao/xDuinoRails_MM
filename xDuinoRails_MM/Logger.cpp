@@ -6,7 +6,8 @@ Logger logger;
 
 Logger::Logger()
     : cvManager(nullptr), cachedEnabled(false), protocolEnabled(true),
-      pwmEnabled(true), cvEnabled(true), isInitialized(false) {}
+      pwmEnabled(true), cvEnabled(true), bemfEnabled(true),
+      isInitialized(false) {}
 
 void Logger::begin(CvManager *cvManager, unsigned long baudRate) {
   this->cvManager = cvManager;
@@ -33,6 +34,9 @@ void Logger::toggleCategory(LogCategory category) {
   case LogCategory::CV:
     cvEnabled = !cvEnabled;
     break;
+  case LogCategory::BEMF:
+    bemfEnabled = !bemfEnabled;
+    break;
   default:
     break;
   }
@@ -48,6 +52,8 @@ bool Logger::isCategoryEnabled(LogCategory category) {
     return pwmEnabled;
   case LogCategory::CV:
     return cvEnabled;
+  case LogCategory::BEMF:
+    return bemfEnabled;
   default:
     return true;
   }

@@ -4,7 +4,7 @@
 #include "CvManager.h"
 #include <Arduino.h>
 
-enum class LogCategory { General, Protocol, PWM, CV };
+enum class LogCategory { General, Protocol, PWM, CV, BEMF };
 
 class Logger {
 public:
@@ -27,6 +27,7 @@ private:
   bool       protocolEnabled;
   bool       pwmEnabled;
   bool       cvEnabled;
+  bool       bemfEnabled;
   bool       isInitialized;
 };
 

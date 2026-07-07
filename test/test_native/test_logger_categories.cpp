@@ -80,17 +80,33 @@ void test_logger_categories(void) {
   TEST_ASSERT_FALSE(foundCvHidden);
   TEST_ASSERT_TRUE(foundGeneralVisible);
 
+  // 4.5 Disable BEMF
+  Serial.clearLog();
+  Serial.pushInput("l b\n");
+  console.loop();
+
+  logger.printf(LogCategory::BEMF, "BEMF Hidden");
+  logger.printf(LogCategory::General, "General Visible 2");
+
+  bool foundBemfHidden = false;
+  for (const auto& line : Serial.logLines) {
+      if (line.find("BEMF Hidden") != std::string::npos) foundBemfHidden = true;
+  }
+  TEST_ASSERT_FALSE(foundBemfHidden);
+
   // 5. Re-enable all
   Serial.pushInput("l p\n");
   Serial.pushInput("l w\n");
   Serial.pushInput("l c\n");
+  Serial.pushInput("l b\n");
   console.loop();
 
   Serial.clearLog();
   logger.printf(LogCategory::Protocol, "P");
   logger.printf(LogCategory::PWM, "W");
   logger.printf(LogCategory::CV, "C");
-  TEST_ASSERT_EQUAL(3, Serial.logLines.size());
+  logger.printf(LogCategory::BEMF, "B");
+  TEST_ASSERT_EQUAL(4, Serial.logLines.size());
 
   // 6. Master Toggle
   Serial.pushInput("l\n");

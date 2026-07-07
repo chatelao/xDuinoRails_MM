@@ -20,6 +20,14 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   previousPwm         = 0;
   bemfErrorSum        = 0;
   lastAdjustment      = 0;
+
+  lastTelemetryTime = 0;
+  bemfSum           = 0;
+  bemfCount         = 0;
+  lastMeasuredBemf  = 0;
+  pwmSum            = 0;
+  pwmCount          = 0;
+  lastSentPwm       = 0;
 }
 
 void MotorControl::setup() {
@@ -72,6 +80,7 @@ void MotorControl::setup() {
 #endif
 
   writeMotorHardware(0, MM2DirectionState_Forward);
+  lastTelemetryTime = millis();
 }
 
 void MotorControl::setSpeed(int step, MM2DirectionState dir) {
@@ -159,6 +168,11 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
+
+        lastMeasuredBemf = currentBEMF;
+        bemfSum += currentBEMF;
+        bemfCount++;
+
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
           logger.println("Motor: Kickstart ended (BEMF)", LogCategory::PWM);
@@ -185,6 +199,11 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
           int currentBEMF = readBEMF();
           lastBemfMeasure = now;
+
+          lastMeasuredBemf = currentBEMF;
+          bemfSum += currentBEMF;
+          bemfCount++;
+
 
           // PI-Regler
           // Ziel-BEMF: Wir nehmen an, dass BEMF proportional zu PWM ist.
@@ -215,6 +234,40 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     }
   }
   previousPwm = targetPwm;
+
+  // Track PWM for telemetry
+  int currentAppliedPwm = 0;
+  if (isKickstarting_priv) {
+    currentAppliedPwm = KICK_PWM;
+  } else if (currDirection != targetDirection) {
+    currentAppliedPwm = 0;
+  } else {
+    currentAppliedPwm = targetPwm + lastAdjustment;
+  }
+
+  if (currentAppliedPwm > PWM_RANGE)
+    currentAppliedPwm = PWM_RANGE;
+  if (currentAppliedPwm < 0)
+    currentAppliedPwm = 0;
+
+  lastSentPwm = currentAppliedPwm;
+  pwmSum += currentAppliedPwm;
+  pwmCount++;
+
+  if (now - lastTelemetryTime >= 1000) {
+    int avgBemf = (bemfCount > 0) ? (int)(bemfSum / bemfCount) : 0;
+    int avgPwm  = (pwmCount > 0) ? (int)(pwmSum / pwmCount) : 0;
+
+    logger.printf(LogCategory::BEMF,
+                  "BEMF: avg=%d, last=%d | PWM: avg=%d, last=%d\n", avgBemf,
+                  lastMeasuredBemf, avgPwm, lastSentPwm);
+
+    bemfSum           = 0;
+    bemfCount         = 0;
+    pwmSum            = 0;
+    pwmCount          = 0;
+    lastTelemetryTime = now;
+  }
 }
 
 void MotorControl::stop() { update(0, currDirection); }
