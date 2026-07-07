@@ -68,6 +68,10 @@ void SerialConsole::parseCommand(char *line) {
         logger.toggleCategory(LogCategory::BEMF);
         Serial.print("Serial: BEMF Logging ");
         Serial.println(logger.isCategoryEnabled(LogCategory::BEMF) ? "ON" : "OFF");
+      } else if (sub == 'h') {
+        logger.toggleHighSpeed();
+        Serial.print("Serial: High Speed CSV Logging ");
+        Serial.println(logger.isHighSpeedEnabled() ? "ON" : "OFF");
       }
     } else {
       logger.toggleLogging();
@@ -86,7 +90,7 @@ void SerialConsole::printHelp() {
   Serial.println("s <speed>      : Set speed (0-14)");
   Serial.println("d f/b          : Set direction (f: forward, b: backward)");
   Serial.println("f <0/1>        : Set Function 1 (0: off, 1: on)");
-  Serial.println("L [p/w/c]      : Toggle logging (p: protocol, w: pwm, c: cv)");
+  Serial.println("L [p/w/c/b/h]  : Toggle logging (p: protocol, w: pwm, c: cv, b: bemf, h: highspeed)");
   Serial.println("h/?            : Show this help");
   Serial.println("----------------------------");
 }

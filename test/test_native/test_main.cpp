@@ -35,6 +35,7 @@ void test_repro_kickstart_only(void);
 void test_repro_kickstart_only_with_vstart_zero(void);
 void test_cv49_zero_only_kickstart_works(void);
 void test_cv49_zero_with_direction_change(void);
+void test_high_speed_logging(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -779,6 +780,50 @@ void test_serial_console_help(void) {
   TEST_ASSERT_TRUE(foundHelpHeader);
 }
 
+void test_high_speed_logging(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  cvManager.setCv(CV_BEMF_CONFIG, 1); // Enable BEMF
+  logger.begin(&cvManager);
+
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+  motor.setup();
+
+  // Initially OFF
+  TEST_ASSERT_FALSE(logger.isHighSpeedEnabled());
+
+  // Toggle ON
+  Serial.pushInput("l h\n");
+  console.loop();
+  TEST_ASSERT_TRUE(logger.isHighSpeedEnabled());
+
+  Serial.clearLog();
+
+  // Set speed to trigger control loop
+  motor.setSpeed(7, MM2DirectionState_Forward);
+  advance_millis(150); // Past kickstart
+  motor.setSpeed(7, MM2DirectionState_Forward); // Update
+
+  // Should see CSV output
+  bool foundCsv = false;
+  for (const auto &line : Serial.logLines) {
+    if (line.find("CSV,") == 0) {
+      foundCsv = true;
+      break;
+    }
+  }
+  TEST_ASSERT_TRUE(foundCsv);
+
+  // Toggle OFF
+  Serial.pushInput("l h\n");
+  console.loop();
+  TEST_ASSERT_FALSE(logger.isHighSpeedEnabled());
+}
+
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -874,5 +919,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
+  RUN_TEST(test_high_speed_logging);
   return UNITY_END();
 }
