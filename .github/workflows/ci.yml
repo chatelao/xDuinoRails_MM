@@ -28,6 +28,31 @@ jobs:
       - name: Test PlatformIO Project
         run: pio test -e native --without-uploading
 
+  renode-simulation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+            test/renode-bin
+          key: ${{ runner.os }}-renode-${{ hashFiles('run_renode_tests.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-renode-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk2.0-0 libglib2.0-0 libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxrender1 libxtst6
+      - name: Run Renode Simulation
+        run: ./run_renode_tests.sh
+
   arduino-cli-build:
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +71,7 @@ jobs:
         run: arduino-cli compile xDuinoRails_MM
 
   release:
-    needs: [build, arduino-cli-build]
+    needs: [build, arduino-cli-build, renode-simulation]
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:

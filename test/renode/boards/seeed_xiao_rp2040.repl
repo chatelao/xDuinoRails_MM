@@ -1,0 +1,21 @@
+using "test/renode/boards/rp2040.repl"
+
+// Mapping for xDuinoRails_MM on Seeed XIAO RP2040
+// D7  -> GPIO 0  (Motor A)
+// D8  -> GPIO 1  (Motor B)
+// D9  -> GPIO 2  (Front Light)
+// D10 -> GPIO 4  (Rear Light)
+// D5  -> GPIO 7  (DCC/MM Input)
+// D4  -> GPIO 6  (DCC-ACK)
+// D6  -> GPIO 21 (RailCom)
+
+motor_a: Miscellaneous.LED @ gpio 0
+motor_b: Miscellaneous.LED @ gpio 1
+light_f: Miscellaneous.LED @ gpio 2
+light_r: Miscellaneous.LED @ gpio 4
+
+gpio:
+    0 -> motor_a@0
+    1 -> motor_b@0
+    2 -> light_f@0
+    4 -> light_r@0
