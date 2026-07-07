@@ -64,6 +64,10 @@ void SerialConsole::parseCommand(char *line) {
         logger.toggleCategory(LogCategory::CV);
         Serial.print("Serial: CV Logging ");
         Serial.println(logger.isCategoryEnabled(LogCategory::CV) ? "ON" : "OFF");
+      } else if (sub == 'b') {
+        logger.toggleCategory(LogCategory::BEMF);
+        Serial.print("Serial: BEMF Logging ");
+        Serial.println(logger.isCategoryEnabled(LogCategory::BEMF) ? "ON" : "OFF");
       }
     } else {
       logger.toggleLogging();
