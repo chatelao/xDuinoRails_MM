@@ -1,9 +1,9 @@
 using "test/renode/boards/seeed_xiao_rp2040.repl"
 
 mach create
-machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl
+machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
 
-$bin?=@.pio/build/seeed_xiao_rp2040/firmware.elf
+$bin?=@../../.pio/build/seeed_xiao_rp2040/firmware.elf
 
 showAnalyzer sysbus.uart0
 

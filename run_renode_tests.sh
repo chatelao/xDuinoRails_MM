@@ -6,15 +6,18 @@ RENODE_VERSION="1.16.1"
 RENODE_DIR="test/renode-bin"
 RENODE_URL="https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/renode-${RENODE_VERSION}.linux-portable.tar.gz"
 
-# 1. Install dependencies
-echo "Checking dependencies..."
-pip install robotframework psutil --quiet
-
-# 2. Download Renode if not present
+# 1. Download Renode if not present
 if [ ! -f "$RENODE_DIR/renode" ]; then
     echo "Downloading Renode v${RENODE_VERSION}..."
     mkdir -p "$RENODE_DIR"
     curl -L "$RENODE_URL" | tar -xzC "$RENODE_DIR" --strip-components=1
+fi
+
+# 2. Install dependencies
+echo "Checking dependencies..."
+pip install robotframework psutil pyyaml --quiet
+if [ -f "$RENODE_DIR/tests/requirements.txt" ]; then
+    pip install -r "$RENODE_DIR/tests/requirements.txt" --quiet
 fi
 
 # 3. Build Firmware
