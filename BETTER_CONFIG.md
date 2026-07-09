@@ -34,7 +34,7 @@ The output is prefixed with `CSV,` and follows this structure:
 
 ## Tuning Procedure
 
-1.  **Baseline:** Set CV 54 (K) and CV 55 (I) to default values (e.g., K=32, I=24).
+1.  **Baseline:** Set CV 54 (K) and CV 55 (I) to default values (e.g., K=16, I=12).
 2.  **Capture Data:** Enable high-speed logging (`l h`) and start the locomotive at a medium speed step (e.g., `s 7`).
 3.  **Analyze Step Response:**
     *   Observe how quickly `currentBEMF` reaches the target.
@@ -47,7 +47,7 @@ The output is prefixed with `CSV,` and follows this structure:
 
 | Motor Type | CV 52 | CV 54 (K) | CV 55 (I) |
 | :--- | :--- | :--- | :--- |
-| Standard DC | 0 | 32 | 24 |
+| Standard DC | 0 | 16 | 12 |
 | Faulhaber | 1 | 16 | 12 |
 | Maxon | 2 | 48 | 32 |
 
