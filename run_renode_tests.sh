@@ -4,13 +4,17 @@ set -e
 # Configuration
 RENODE_VERSION="1.16.1"
 RENODE_DIR="./test/renode-bin"
-RENODE_URL="https://builds.antmicro.com/renode/builds/renode-${RENODE_VERSION}.linux-portable.tar.gz"
+RENODE_TAR="renode-${RENODE_VERSION}.linux-portable.tar.gz"
+RENODE_URL="https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/${RENODE_TAR}"
 
 # 1. Install Renode if not present
 if [ ! -d "$RENODE_DIR" ] || [ ! -f "$RENODE_DIR/renode" ]; then
     echo "Installing Renode ${RENODE_VERSION}..."
     mkdir -p "$RENODE_DIR"
-    curl -L "$RENODE_URL" | tar -xz -C "$RENODE_DIR" --strip-components=1
+    # Use wget with retries and follow redirects
+    wget -q --show-progress --tries=3 "$RENODE_URL" -O "$RENODE_TAR"
+    tar -xzf "$RENODE_TAR" -C "$RENODE_DIR" --strip-components=1
+    rm "$RENODE_TAR"
 fi
 
 export PATH="$PWD/$RENODE_DIR:$PATH"
@@ -30,5 +34,5 @@ echo "Running Renode tests..."
 mkdir -p robot_outputs
 
 # Use renode-test from the portable install
-# We use --variable to pass the firmware path if needed, but it's currently hardcoded in RESC relative to origin
-renode-test --results-dir robot_outputs test/renode/tests/basic_test.robot
+# We use the full path to renode-test to be safe
+"$PWD/$RENODE_DIR/renode-test" --results-dir robot_outputs test/renode/tests/basic_test.robot

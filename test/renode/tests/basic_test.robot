@@ -1,8 +1,7 @@
 *** Settings ***
-Suite Setup                   Setup
-Suite Teardown                Teardown
-Test Teardown                 Test Teardown
 Resource                      ${RENODEKEYWORDS}
+Suite Setup                   Run Keywords    Create Machine    Start Emulation
+Test Teardown                 Test Teardown
 
 *** Variables ***
 ${UART}                       sysbus.uart0
@@ -12,9 +11,6 @@ ${RESC}                       ${CURDIR}/../seeed_xiao_rp2040.resc
 Should Boot and Respond to Help
     [Documentation]           Verifies that the firmware boots and the serial console is interactive.
     [Timeout]                 30 seconds
-    Create Machine
-    Start Emulation
-
     Wait For Line On Uart     xDuinoRails_MM starting...
 
     # Send help command
@@ -25,9 +21,6 @@ Should Boot and Respond to Help
 Should Set and Read CV
     [Documentation]           Verifies that CVs can be set and read via serial console.
     [Timeout]                 30 seconds
-    Create Machine
-    Start Emulation
-
     Wait For Line On Uart     xDuinoRails_MM starting...
 
     # Set CV 1 (Address) to 42
@@ -42,3 +35,6 @@ Should Set and Read CV
 Create Machine
     Execute Command           include @${RESC}
     Create Terminal Tester    ${UART}
+
+Test Teardown
+    Execute Command           mach clear
