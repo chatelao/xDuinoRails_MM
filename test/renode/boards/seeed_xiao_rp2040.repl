@@ -1,5 +1,3 @@
-using "../cores/rp2040.repl"
-
 // Seeed Studio XIAO RP2040 Pinout for Renode
 // Based on xDuinoRails_MM.ino mappings
 

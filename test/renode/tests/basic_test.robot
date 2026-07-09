@@ -1,6 +1,6 @@
 *** Settings ***
 Resource                      ${RENODEKEYWORDS}
-Suite Setup                   Run Keywords    Create Machine    Start Emulation
+Test Setup                    Run Keywords    Create Machine    Start Emulation
 Test Teardown                 Test Teardown
 
 *** Variables ***

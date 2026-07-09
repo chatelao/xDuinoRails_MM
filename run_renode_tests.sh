@@ -11,7 +11,6 @@ RENODE_URL="https://github.com/renode/renode/releases/download/v${RENODE_VERSION
 if [ ! -d "$RENODE_DIR" ] || [ ! -f "$RENODE_DIR/renode" ]; then
     echo "Installing Renode ${RENODE_VERSION}..."
     mkdir -p "$RENODE_DIR"
-    # Use wget with retries and follow redirects
     wget -q --show-progress --tries=3 "$RENODE_URL" -O "$RENODE_TAR"
     tar -xzf "$RENODE_TAR" -C "$RENODE_DIR" --strip-components=1
     rm "$RENODE_TAR"
@@ -25,14 +24,13 @@ if [ ! -f ".pio/build/seeed_xiao_rp2040/firmware.elf" ]; then
     pio run -e seeed_xiao_rp2040
 fi
 
-# 3. Install Robot Framework dependencies
-echo "Installing Robot Framework and dependencies..."
-pip install robotframework psutil pyyaml
+# 3. Install Robot Framework dependencies (using version recommended by Renode)
+echo "Installing Robot Framework 6.1 and dependencies..."
+pip install robotframework==6.1 psutil pyyaml
 
 # 4. Run tests
 echo "Running Renode tests..."
 mkdir -p robot_outputs
 
 # Use renode-test from the portable install
-# We use the full path to renode-test to be safe
 "$PWD/$RENODE_DIR/renode-test" --results-dir robot_outputs test/renode/tests/basic_test.robot
