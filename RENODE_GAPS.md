@@ -7,7 +7,7 @@ This document tracks known limitations and missing features in the Renode simula
 - **Protocol Handler Timing:** High-frequency timing sensitivity of the `ProtocolHandler` (e.g., bit duration measurements) is not fully validated in the current simulation environment.
 
 ## 2. Peripheral Models
-- **NeoPixel Protocol:** The WS2812B/NeoPixel protocol (Bit-banging or PIO) is not simulated. `DebugLeds` transitions cannot be visually or programmatically verified beyond GPIO state.
+- **PIO & NeoPixel Protocol:** PIO support is currently disabled in the simulation to avoid native library dependencies (`libpiosim.so`). Consequently, WS2812B/NeoPixel transitions in `DebugLeds` cannot be verified beyond GPIO state changes.
 - **MM/DCC ACK:** The current-draw based acknowledgement (`DCC_ACK_PIN`) is not linked to a power-consumption model in Renode.
 
 ## 3. Platform Support

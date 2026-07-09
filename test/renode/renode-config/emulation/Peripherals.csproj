@@ -165,7 +165,6 @@
     <Compile Include="peripherals/timer/rp2040_timer.cs" />
 
     <!-- PIO -->
-    <Compile Include="peripherals/pio/rp2040_pio.cs" />
 
     <!-- SPI -->
     <Compile Include="peripherals/spi/rp2040_spi.cs" />

@@ -52,45 +52,9 @@ uart0:
     DMATransmitRequest -> dma@20
     DMAReceiveRequest -> dma@21
 
-piocpu0: CPU.RP2040PIOCPU @ sysbus
-    cpuType: "rp2040_pio"
-    address: 0x50200000
-    gpio: gpio
-    PerformanceInMips: 1
-    id: 0
-    clocks: clocks
 
-piocpu1: CPU.RP2040PIOCPU @ sysbus
-    cpuType: "rp2040_pio"
-    address: 0x50300000
-    gpio: gpio
-    PerformanceInMips: 1
-    id: 1
-    clocks: clocks
 
-piocpu0:
-    0 -> nvic0@7
-    1 -> nvic0@8
-    2 -> dma@0
-    3 -> dma@1
-    4 -> dma@2
-    5 -> dma@3
-    6 -> dma@4
-    7 -> dma@5
-    8 -> dma@6
-    9 -> dma@7
 
-piocpu1:
-    0 -> nvic0@9
-    1 -> nvic0@10
-    2 -> dma@8
-    3 -> dma@9
-    4 -> dma@10
-    5 -> dma@11
-    6 -> dma@12
-    7 -> dma@13
-    8 -> dma@14
-    9 -> dma@15
 
 // raspberrypi,rp2040 overlay
 
