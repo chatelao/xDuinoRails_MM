@@ -6,7 +6,7 @@ This roadmap outlines the plan for integrating and enhancing Renode simulation f
 - [x] Setup basic Renode infrastructure (REPL, RESC).
 - [x] Integrate UART CLI verification using Robot Framework.
 - [x] Basic CI/CD integration in GitHub Actions.
-- [ ] Automated firmware build and test execution script.
+- [x] Automated firmware build and test execution script.
 
 ## Phase 2: Peripheral & Logic Verification
 - [ ] **Motor Control:** Verify PWM output and direction logic in simulation.

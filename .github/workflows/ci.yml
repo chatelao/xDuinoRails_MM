@@ -29,12 +29,17 @@ jobs:
         run: pio test -e native --without-uploading
 
       - name: Build firmware
-        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6
+        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6 -e seeed_xiao_rp2040_renode
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
         with:
           name: firmware-rp2040
           path: .pio/build/seeed_xiao_rp2040/firmware.elf
+      - name: Upload Renode firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-rp2040-renode
+          path: .pio/build/seeed_xiao_rp2040_renode/firmware.elf
 
   renode-simulation:
     runs-on: ubuntu-latest
@@ -44,11 +49,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Download firmware artifacts
+      - name: Download Renode firmware artifacts
         uses: actions/download-artifact@v4
         with:
-          name: firmware-rp2040
-          path: .pio/build/seeed_xiao_rp2040/
+          name: firmware-rp2040-renode
+          path: .pio/build/seeed_xiao_rp2040_renode/
       - name: Run Renode tests
         run: |
           sudo apt-get update

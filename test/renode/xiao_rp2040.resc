@@ -6,7 +6,7 @@ mach create "xDuinoRails"
 
 machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
 
-$bin?=@../../.pio/build/seeed_xiao_rp2040/firmware.elf
+$bin?=@../../.pio/build/seeed_xiao_rp2040_renode/firmware.elf
 
 macro reset
 """

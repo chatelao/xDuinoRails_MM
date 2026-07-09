@@ -1,9 +1,16 @@
 // seeed_xiao_rp2040.repl
 
-using "@rp2040.repl"
+using "platforms/cpus/rp2040.repl"
+
+// UART0 @ 0x40034000
+uart0: UART.PL011 @ sysbus 0x40034000
+    -> nvic@20
+
+// GPIO @ 0x40014000
+gpio: GPIOPort.RP2040GPIO @ sysbus 0x40014000
+    -> nvic@13
 
 // User LEDs (Internal)
-// Red: GPIO 17, Green: GPIO 16, Blue: GPIO 25
 led_red: Miscellaneous.LED @ gpio 17
 led_green: Miscellaneous.LED @ gpio 16
 led_blue: Miscellaneous.LED @ gpio 25

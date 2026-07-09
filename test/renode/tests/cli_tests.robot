@@ -13,8 +13,12 @@ Setup
     Execute Command           include @${RESC}
     Create Terminal Tester    ${UART}
 
+Teardown
+    Execute Command           clear
+
 *** Test Cases ***
 Should Print Help
+    Start Emulation
     Wait For Line On Uart     xDuinoRails_MM starting...
     Write Line To Uart        h
     Wait For Line On Uart     Available commands:
@@ -24,6 +28,9 @@ Should Print Help
     Wait For Line On Uart     d f/b - Set direction
 
 Should Read CVs
+    Start Emulation
+    Wait For Line On Uart     xDuinoRails_MM starting...
     Write Line To Uart        cv
     Wait For Line On Uart     CV 1: 3
     Wait For Line On Uart     CV 8: 8
+    Wait For Line On Uart     CV 250: 1
