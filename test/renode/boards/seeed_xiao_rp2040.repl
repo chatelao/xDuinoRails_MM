@@ -1,0 +1,20 @@
+// seeed_xiao_rp2040.repl
+
+using "@rp2040.repl"
+
+// User LEDs (Internal)
+// Red: GPIO 17, Green: GPIO 16, Blue: GPIO 25
+led_red: Miscellaneous.LED @ gpio 17
+led_green: Miscellaneous.LED @ gpio 16
+led_blue: Miscellaneous.LED @ gpio 25
+
+// External LEDs for lights (D9, D10)
+led_front: Miscellaneous.LED @ gpio 2
+led_rear: Miscellaneous.LED @ gpio 4
+
+gpio:
+    17 -> led_red@0
+    16 -> led_green@0
+    25 -> led_blue@0
+    2 -> led_front@0
+    4 -> led_rear@0

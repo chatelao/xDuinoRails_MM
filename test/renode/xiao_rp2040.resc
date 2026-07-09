@@ -1,0 +1,19 @@
+:name: Seeed Studio XIAO RP2040
+:description: Simulation of the xDuinoRails_MM decoder on XIAO RP2040
+
+using sysbus
+mach create "xDuinoRails"
+
+machine LoadPlatformDescription @test/renode/boards/seeed_xiao_rp2040.repl
+
+$bin?=@.pio/build/seeed_xiao_rp2040/firmware.elf
+
+showAnalyzer uart0
+
+macro reset
+"""
+    sysbus LoadELF $bin
+    cpu0 VectorTableOffset 0x10000000
+"""
+
+runMacro $reset

@@ -1,0 +1,10 @@
+
+using "platforms/cpus/rp2040.repl"
+
+// Add UART0
+uart0: UART.PL011 @ sysbus 0x40034000
+    -> nvic@20
+
+// Add GPIO
+gpio: GPIOPort.RP2040GPIO @ sysbus 0x40014000
+    -> nvic@13
