@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 6.1 (Python 3.12.13 on linux)" generated="20260709 11:16:38.996" rpa="false" schemaversion="4">
+<suite id="s1" name="Test Suite" source="/app/test/renode/tests/test_decoder.robot">
+<kw name="Setup" type="SETUP">
+<msg timestamp="20260709 11:16:38.923" level="TRACE">Arguments: [  ]</msg>
+<kw name="Execute Command">
+<arg>$ELF_FILE = @${ELF_FILE}</arg>
+<msg timestamp="20260709 11:16:38.927" level="FAIL">No keyword with name 'Execute Command' found.</msg>
+<status status="FAIL" starttime="20260709 11:16:38.927" endtime="20260709 11:16:38.927"/>
+</kw>
+<kw name="Execute Command">
+<arg>include @${RESC_FILE}</arg>
+<status status="NOT RUN" starttime="20260709 11:16:38.930" endtime="20260709 11:16:38.930"/>
+</kw>
+<kw name="Create Terminal Tester">
+<arg>${UART}</arg>
+<status status="NOT RUN" starttime="20260709 11:16:38.934" endtime="20260709 11:16:38.934"/>
+</kw>
+<status status="FAIL" starttime="20260709 11:16:38.923" endtime="20260709 11:16:38.934"/>
+</kw>
+<test id="s1-t1" name="Should Initialize And Print Help" line="22">
+<status status="FAIL" starttime="20260709 11:16:38.934" endtime="20260709 11:16:38.935">Parent suite setup failed:
+No keyword with name 'Execute Command' found.
+
+Also parent suite teardown failed:
+User keyword cannot be empty.</status>
+</test>
+<test id="s1-t2" name="Should Set Speed Via Serial" line="27">
+<status status="FAIL" starttime="20260709 11:16:38.935" endtime="20260709 11:16:38.936">Parent suite setup failed:
+No keyword with name 'Execute Command' found.
+
+Also parent suite teardown failed:
+User keyword cannot be empty.</status>
+</test>
+<test id="s1-t3" name="Should Read CVs" line="39">
+<status status="FAIL" starttime="20260709 11:16:38.936" endtime="20260709 11:16:38.936">Parent suite setup failed:
+No keyword with name 'Execute Command' found.
+
+Also parent suite teardown failed:
+User keyword cannot be empty.</status>
+</test>
+<kw name="Teardown" type="TEARDOWN">
+<msg timestamp="20260709 11:16:38.937" level="FAIL">User keyword cannot be empty.</msg>
+<status status="FAIL" starttime="20260709 11:16:38.937" endtime="20260709 11:16:38.937">User keyword cannot be empty.</status>
+</kw>
+<meta name="HotSpot_Action">-</meta>
+<status status="FAIL" starttime="20260709 11:16:38.852" endtime="20260709 11:16:38.937">Suite setup failed:
+No keyword with name 'Execute Command' found.
+
+Also suite teardown failed:
+User keyword cannot be empty.</status>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="3" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="0" fail="3" skip="0" id="s1" name="Test Suite">Test Suite</stat>
+</suite>
+</statistics>
+<errors>
+<msg timestamp="20260709 11:16:38.853" level="ERROR">Error in file '/app/test/renode/tests/test_decoder.robot' on line 18: Creating keyword 'Teardown' failed: User keyword cannot be empty.</msg>
+</errors>
+</robot>
