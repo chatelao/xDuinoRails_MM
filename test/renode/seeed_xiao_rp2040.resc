@@ -1,0 +1,16 @@
+$name?="xiao-rp2040"
+$platform_file?=$ORIGIN/boards/seeed_xiao_rp2040.repl
+$bin?=$ORIGIN/../../.pio/build/seeed_xiao_rp2040/firmware.elf
+
+# Create the machine
+mach create $name
+machine LoadPlatformDescription $platform_file
+
+# Set the vector table offset
+cpu0 VectorTableOffset 0x10000000
+
+# Load the firmware
+sysbus LoadELF $bin
+
+# Enable UART logging to console
+showAnalyzer sysbus.uart0

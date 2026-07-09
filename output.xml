@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.2 (Python 3.12.13 on linux)" generated="2026-07-09T11:05:35.581257" rpa="false" schemaversion="5">
+<suite id="s1" name="Basic Test" source="/app/test/renode/tests/basic_test.robot">
+<kw name="Setup" type="SETUP">
+<msg time="2026-07-09T11:05:35.648541" level="FAIL">No keyword with name 'Setup' found.</msg>
+<status status="FAIL" start="2026-07-09T11:05:35.648421" elapsed="0.000215">No keyword with name 'Setup' found.</status>
+</kw>
+<test id="s1-t1" name="Should Boot and Respond to Help" line="12">
+<doc>Verifies that the firmware boots and the serial console is interactive.</doc>
+<timeout value="30 seconds"/>
+<status status="FAIL" start="2026-07-09T11:05:35.648926" elapsed="0.000637">Parent suite setup failed:
+No keyword with name 'Setup' found.</status>
+</test>
+<test id="s1-t2" name="Should Set and Read CV" line="25">
+<doc>Verifies that CVs can be set and read via serial console.</doc>
+<timeout value="30 seconds"/>
+<status status="FAIL" start="2026-07-09T11:05:35.649894" elapsed="0.000491">Parent suite setup failed:
+No keyword with name 'Setup' found.</status>
+</test>
+<kw name="Teardown" type="TEARDOWN">
+<msg time="2026-07-09T11:05:35.651824" level="FAIL">No keyword with name 'Teardown' found.</msg>
+<status status="FAIL" start="2026-07-09T11:05:35.651764" elapsed="0.000123">No keyword with name 'Teardown' found.</status>
+</kw>
+<status status="FAIL" start="2026-07-09T11:05:35.584265" elapsed="0.067705">Suite setup failed:
+No keyword with name 'Setup' found.
+
+Also suite teardown failed:
+No keyword with name 'Teardown' found.</status>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="2" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Basic Test" id="s1" pass="0" fail="2" skip="0">Basic Test</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-07-09T11:05:35.646345" level="ERROR">Error in file '/app/test/renode/tests/basic_test.robot' on line 5: Replacing variables from setting 'Resource' failed: Variable '${RENODEKEYWORDS}' not found.</msg>
+</errors>
+</robot>

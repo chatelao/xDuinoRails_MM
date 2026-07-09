@@ -1,0 +1,29 @@
+using "../cores/rp2040.repl"
+
+// Seeed Studio XIAO RP2040 Pinout for Renode
+// Based on xDuinoRails_MM.ino mappings
+
+// DCC Input: D5 -> GPIO 7
+// DCC ACK: D4 -> GPIO 6
+// RailCom: D6 -> GPIO 21
+
+// Motor A: D7 -> GPIO 0
+// Motor B: D8 -> GPIO 1
+// BEMF A: A0 -> GPIO 26
+// BEMF B: A1 -> GPIO 27
+// Motor Shut: A2/D2 -> GPIO 28
+
+// Front Light: D9 -> GPIO 2
+// Rear Light: D10 -> GPIO 4
+// Func Shut: A3/D3 -> GPIO 29
+
+led_front: Miscellaneous.LED @ gpio 2
+led_rear: Miscellaneous.LED @ gpio 4
+
+gpio:
+    2 -> led_front@0
+    4 -> led_rear@0
+
+// Motor simulation (placeholders for now)
+motor_a: Miscellaneous.LED @ gpio 0
+motor_b: Miscellaneous.LED @ gpio 1
