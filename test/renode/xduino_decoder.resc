@@ -4,7 +4,6 @@ $platform_file?=$ORIGIN/boards/seeed_xiao_rp2040.repl
 # Include peripheral definitions from source
 include $ORIGIN/cores/initialize_peripherals_source.resc
 
-mach create $machine_name
 machine LoadPlatformDescription $platform_file
 
 # Set up some tags for registers not fully implemented but accessed
@@ -15,9 +14,12 @@ sysbus Tag <0x4002C000 4> "PLL_USB_CS" 0xFFFFFFFF
 # Load firmware
 sysbus LoadELF $global.ELF_FILE
 
-# RP2040 specific: bootrom and vector table
+# RP2040 specific: vector table and start address
 sysbus.cpu0 VectorTableOffset 0x10000000
 sysbus.cpu1 VectorTableOffset 0x10000000
 
-# Start simulation
-# cpu0 IsHalted false
+# Manually set SP and PC from the vector table at 0x10000000
+$sp = `sysbus ReadDoubleWord 0x10000000`
+$pc = `sysbus ReadDoubleWord 0x10000004`
+cpu0 SP $sp
+cpu0 PC $pc

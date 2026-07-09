@@ -23,11 +23,12 @@ echo "Installing Python dependencies..."
 pip install -r test/renode/tests/requirements.txt --quiet
 
 # 3. Build firmware
-echo "Building firmware for Seeed XIAO RP2040..."
-pio run -e seeed_xiao_rp2040
+echo "Building firmware for Seeed XIAO RP2040 (Renode compatible)..."
+pio run -e seeed_xiao_rp2040_renode
 
 # 4. Run Renode tests
 echo "Running Renode simulation tests..."
 PYTHONPATH=$RENODE_DIR/tests $RENODE_DIR/renode-test \
     --variable RENODEKEYWORDS:$RENODE_DIR/tests/renode-keywords.robot \
+    --variable ELF_FILE_VAR:${CURDIR}/.pio/build/seeed_xiao_rp2040_renode/firmware.elf \
     test/renode/tests/test_decoder.robot
