@@ -54,6 +54,7 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | ℹ️ | 7 | Version | Mandatory | 10 | Read-Only. E.g. 10 for version 1.0. |
 | 🏭 | 8 | Manufacturer ID | Mandatory | 13 | Important: NMRA ID for DIY/Public Domain. Writing to 8 triggers a reset. |
 | 🐕 | 11 | Watchdog Timeout | Standard | 5 | Timeout in 100ms steps (Default 5 = 500ms). Shuts down motor if no signal. |
+| 🔒 | 15 | Programming Lock | Standard | 0 | Set to 7 to allow programming via direction changes. |
 | 🔢 | 17 | Long Addr. (High) | Standard | 192 | Upper byte of the long address (default 192). |
 | 🔢 | 18 | Long Addr. (Low) | Standard | 100 | Lower byte (Default 192+100 is often address 100 or 3). |
 | ⚙️ | 29 | Configuration | Mandatory | 6 | Default 6 = 28/128 speed steps (2) + analog allowed (4). |
@@ -61,6 +62,8 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | 🔴 | 34 | Rear Light (F0r) | Standard | 2 | Bit 1 on: Switches physical output B. |
 | 🔄 | 49 | BEMF Config | Standard | 1 | Bit 0: Enable BEMF sensing and Load Compensation. |
 | 🏎️ | 52 | Motor Type | Standard | 0 | Selects the motor characteristics curve. 0 = Standard DC, 1 = Faulhaber, 2 = Maxon. |
+| 🎛️ | 54 | BEMF K | Standard | 32 | Proportional gain for the BEMF PI controller. |
+| 🎛️ | 55 | BEMF I | Standard | 24 | Integral gain for the BEMF PI controller. |
 | 🆔 | 107 | Ext. ID (High) | Meta | 1 | Identifier for DecoderDB (part 1 of ID 266). |
 | 🆔 | 108 | Ext. ID (Low) | Meta | 10 | Identifier for DecoderDB (part 2 of ID 266). |
 | 🪵 | 250 | Debug Enable | Standard | 1 | 0 = Disabled, 1 = Enabled (default). Outputs debug info to Serial USB. |
