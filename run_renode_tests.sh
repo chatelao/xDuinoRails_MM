@@ -27,4 +27,4 @@ fi
 
 # 4. Run Renode tests
 echo "Running Renode tests..."
-renode-test -v test/renode/tests/cli_tests.robot
+renode-test test/renode/tests/cli_tests.robot
