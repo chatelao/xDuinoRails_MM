@@ -36,6 +36,7 @@ private:
   int               previousPwm;
   long              bemfErrorSum;
   int               lastAdjustment;
+  int               bemfHistory[3];
 
   int               lastWrittenPwm;
   MM2DirectionState lastWrittenDir;

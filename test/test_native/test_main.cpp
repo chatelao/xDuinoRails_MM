@@ -38,6 +38,9 @@ void test_cv49_zero_with_direction_change(void);
 void test_high_speed_logging(void);
 void test_pwm_frequency_defaults(void);
 void test_pwm_frequency_override(void);
+void test_bemf_collector_gap_glitch(void);
+void test_bemf_collector_gap_persistent_failure(void);
+void test_bemf_collector_gap_with_integral_filtered(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -924,5 +927,8 @@ int main(int argc, char **argv) {
   RUN_TEST(test_high_speed_logging);
   RUN_TEST(test_pwm_frequency_defaults);
   RUN_TEST(test_pwm_frequency_override);
+  RUN_TEST(test_bemf_collector_gap_glitch);
+  RUN_TEST(test_bemf_collector_gap_persistent_failure);
+  RUN_TEST(test_bemf_collector_gap_with_integral_filtered);
   return UNITY_END();
 }
