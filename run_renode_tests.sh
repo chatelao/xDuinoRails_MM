@@ -28,7 +28,8 @@ pio run -e seeed_xiao_rp2040_renode
 
 # 4. Run Renode tests
 echo "Running Renode simulation tests..."
+ABS_ELF_PATH="$(pwd)/.pio/build/seeed_xiao_rp2040_renode/firmware.elf"
 PYTHONPATH=$RENODE_DIR/tests $RENODE_DIR/renode-test \
     --variable RENODEKEYWORDS:$RENODE_DIR/tests/renode-keywords.robot \
-    --variable ELF_FILE_VAR:${CURDIR}/.pio/build/seeed_xiao_rp2040_renode/firmware.elf \
+    --variable ELF_FILE_VAR:"$ABS_ELF_PATH" \
     test/renode/tests/test_decoder.robot
