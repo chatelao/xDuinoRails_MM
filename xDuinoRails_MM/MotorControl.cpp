@@ -46,6 +46,7 @@ void MotorControl::setup() {
   }
 
   int         motorType = cvManager.getCv(CV_MOTOR_TYPE);
+  int         cv9Freq   = cvManager.getCv(CV_PWM_FREQUENCY);
   const char *typeName  = "Standard DC";
 
   switch (motorType) {
@@ -73,6 +74,11 @@ void MotorControl::setup() {
     BEMF_SAMPLE_INT = 12;
     typeName        = "Standard DC";
     break;
+  }
+
+  if (cv9Freq > 0) {
+    PWM_FREQ = cv9Freq * 100;
+    logger.printf(LogCategory::PWM, "Motor: Overriding PWM Freq from CV 9 to %d Hz\n", PWM_FREQ);
   }
 
   logger.printf(LogCategory::PWM, "Motor: Type=%s, PWM Freq=%d Hz\n", typeName,

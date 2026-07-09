@@ -37,7 +37,7 @@ void CvManager::setCv(int cv, uint8_t value) {
 
   logger.printf(LogCategory::CV, "CV %d set to %d\n", cv, value);
 
-  if (cv == CV_MANUFACTURER_ID || cv == CV_MOTOR_TYPE) {
+  if (cv == CV_MANUFACTURER_ID || cv == CV_MOTOR_TYPE || cv == CV_PWM_FREQUENCY) {
 #ifdef ARDUINO_ARCH_RP2040
     rp2040.reboot();
 #elif defined(ARDUINO_ARCH_ESP32)
@@ -56,6 +56,7 @@ void CvManager::printAllCvs() {
   logger.printf(LogCategory::CV, "CV 6 (Vmid): %d\n", getCv(CV_MEDIUM_SPEED));
   logger.printf(LogCategory::CV, "CV 7 (Version): %d\n", getCv(CV_VERSION));
   logger.printf(LogCategory::CV, "CV 8 (Manuf ID): %d\n", getCv(CV_MANUFACTURER_ID));
+  logger.printf(LogCategory::CV, "CV 9 (PWM Freq): %d\n", getCv(CV_PWM_FREQUENCY));
   logger.printf(LogCategory::CV, "CV 11 (Watchdog): %d\n",
                 getCv(CV_WATCHDOG_TIMEOUT));
   logger.printf(LogCategory::CV, "CV 15 (Prog Lock): %d\n",
@@ -87,6 +88,7 @@ void CvManager::initCv() {
     EEPROM.write(CV_MEDIUM_SPEED, 0);
     EEPROM.write(CV_VERSION, 10);
     EEPROM.write(CV_MANUFACTURER_ID, 13);
+    EEPROM.write(CV_PWM_FREQUENCY, 0);
     EEPROM.write(CV_WATCHDOG_TIMEOUT, 5);
     EEPROM.write(CV_LONG_ADDRESS_HIGH, 192);
     EEPROM.write(CV_LONG_ADDRESS_LOW, 100);
