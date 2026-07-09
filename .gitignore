@@ -1,2 +1,8 @@
 .pio
 .vscode
+test/renode-bin/
+*.log
+robot_outputs/
+snapshots/
+log.html
+report.html

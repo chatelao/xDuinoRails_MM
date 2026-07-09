@@ -1,0 +1,11 @@
+using "./seeed_xiao_rp2040.repl"
+
+motor: Miscellaneous.MotorModel @ sysbus
+    Adc: adc
+    AdcChannel: 0 // BEMF_PIN_A (A0 / GPIO 26)
+    Vbus: 12.0
+    Kv: 1000
+
+gpio:
+    0 -> motor@0 // Motor A (D7 / GPIO 0)
+    1 -> motor@1 // Motor B (D8 / GPIO 1)

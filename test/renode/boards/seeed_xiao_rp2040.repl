@@ -1,0 +1,37 @@
+using "../renode-config/cores/rp2040.repl"
+
+// xDuinoRails_MM XIAO RP2040 Pinout:
+// D0 (GPIO 26/A0) -> BEMF A
+// D1 (GPIO 27/A1) -> BEMF B
+// D2 (GPIO 28/A2) -> MOTOR SHUT
+// D3 (GPIO 29/A3) -> FUNC SHUT
+// D4 (GPIO 6)    -> DCC-ACK
+// D5 (GPIO 7)    -> DCC/MM Input
+// D6 (GPIO 21)   -> RailCom
+// D7 (GPIO 0)    -> Motor A (PWM0_A)
+// D8 (GPIO 1)    -> Motor B (PWM0_B)
+// D9 (GPIO 2)    -> Front Light (PWM1_A)
+// D10 (GPIO 4)   -> Rear Light (PWM2_A)
+
+// Internal RGB:
+// GPIO 17 -> Red
+// GPIO 16 -> Green
+// GPIO 25 -> Blue
+// GPIO 12 -> NeoPixel
+
+led_red: Miscellaneous.LED @ gpio 17
+led_green: Miscellaneous.LED @ gpio 16
+led_blue: Miscellaneous.LED @ gpio 25
+
+gpio:
+    17 -> led_red@0
+    16 -> led_green@0
+    25 -> led_blue@0
+
+// PWM to GPIO mapping
+pwm:
+    0 -> gpio@0  // PWM0_A (Motor A / D7)
+    1 -> gpio@1  // PWM0_B (Motor B / D8)
+    4 -> gpio@2  // PWM1_A (Front Light / D9)
+    8 -> gpio@4  // PWM2_A (Rear Light / D10)
+    12 -> gpio@12 // PWM6_A (NeoPixel / D12)

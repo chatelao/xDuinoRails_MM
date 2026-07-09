@@ -1,0 +1,7 @@
+$machine_name?="raspberry_pico"
+$visualization_path?=$ORIGIN/../visualization
+
+# Fixed path to point to renode-config/cores
+include $ORIGIN/../renode-config/cores/initialize_peripherals.resc
+machine LoadPlatformDescription $platform_file
+sysbus LoadELF $ORIGIN/../bootroms/rp2040/b2.elf
