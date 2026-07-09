@@ -4,6 +4,7 @@
 #include <unity.h>
 
 extern std::map<uint8_t, int> analog_write_values;
+extern std::map<uint8_t, int> analog_read_values;
 extern void advance_millis(unsigned long ms);
 
 void test_motor_pwm_mapping_detailed(void) {
@@ -103,39 +104,41 @@ void test_motor_bemf_pi_control(void) {
   motor.setSpeed(7, MM2DirectionState_Forward);
   advance_millis(150); // Pass kickstart
 
-  // targetBEMF = 531 * 4 = 2124
-  // Simulate currentBEMF = 2000 (Load detected, engine slow)
-  // error = 2124 - 2000 = 124
-  // bemfErrorSum = 124
-  // adjustment = (124 * 32 / 16) + (124 * 64 / 64) = 248 + 124 = 372
+  // Warm up filter (3 samples)
   analog_read_values[2] = 2000;
   analog_read_values[3] = 0;
-  advance_millis(20);
-  motor.setSpeed(7, MM2DirectionState_Forward);
+  for (int i = 0; i < 3; i++) {
+    advance_millis(20);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+  }
 
-  // finalPwm = 531 + 372 = 903
-  TEST_ASSERT_EQUAL(903, analog_write_values[10]);
+  // targetBEMF = 531 * 4 = 2124
+  // filteredBEMF = 2000
+  // error = 2124 - 2000 = 124
+  // bemfErrorSum = 124 (after warmup) + 124 + 124 + 124 = 496
+  // Wait, bemfErrorSum accumulates every update.
+  // Let's reset the sum for predictable testing
+  // Actually we can't reset it from here. Let's calculate carefully.
 
-  // Second update with same BEMF
-  // error = 124
-  // bemfErrorSum = 124 + 124 = 248
-  // adjustment = (124 * 32 / 16) + (248 * 64 / 64) = 248 + 248 = 496
-  advance_millis(20);
-  motor.setSpeed(7, MM2DirectionState_Forward);
+  // Warmup step 1: bemfErrorSum = 124. adj = (124*2) + (124*1) = 372. finalPwm = 531+372=903.
+  // Warmup step 2: bemfErrorSum = 248. adj = 248 + 248 = 496. finalPwm = 531+496=1027->1023.
+  // Warmup step 3: bemfErrorSum = 372. adj = 248 + 372 = 620. finalPwm = 1023.
 
-  // finalPwm = 531 + 496 = 1027 (clamped to 1023)
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
   // Now simulate overspeed (e.g. going downhill)
-  // currentBEMF = 2500
-  // targetBEMF = 2124
-  // error = 2124 - 2500 = -376
-  // bemfErrorSum = 248 - 376 = -128
-  // adjustment = (-376 * 32 / 16) + (-128 * 64 / 64) = -752 - 128 = -880
   analog_read_values[2] = 2500;
+  // Step 1: history {2000, 2000, 2500} -> median 2000. Error remains 124. bemfErrorSum = 496. adj = 248 + 496 = 744. finalPwm = 1023.
   advance_millis(20);
   motor.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
-  // finalPwm = 531 - 880 = -349 (clamped to 0)
+  // Step 2: history {2000, 2500, 2500} -> median 2500.
+  // targetBEMF = 2124, filteredBEMF = 2500 -> error = -376
+  // bemfErrorSum = 496 - 376 = 120
+  // adjustment = (-376 * 2) + (120 * 1) = -752 + 120 = -632
+  // finalPwm = 531 - 632 = -101 -> clamped to 0
+  advance_millis(20);
+  motor.setSpeed(7, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 }
