@@ -1,0 +1,8 @@
+$machine_name?="raspberry_pico"
+$visualization_path?=$ORIGIN/../visualization
+
+include $ORIGIN/../renode-config/cores/initialize_peripherals.resc
+machine LoadPlatformDescription $platform_file
+
+# Bootrom loading removed to avoid binary bloat and use direct ELF boot
+# sysbus LoadELF $ORIGIN/../bootroms/rp2040/b2.elf
