@@ -1,14 +1,13 @@
-$name?="xiao-rp2040"
 $bin?=@../../.pio/build/seeed_xiao_rp2040/firmware.elf
 
-# Create the machine
-mach create $name
+# Create the machine (anonymous)
+mach create
 
-# Load the core description
-machine LoadPlatformDescription @cores/rp2040.repl
+# Load the core description using $ORIGIN for reliable path resolution
+machine LoadPlatformDescription $ORIGIN/cores/rp2040.repl
 
 # Load the board description (pin mappings, LEDs)
-machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
+machine LoadPlatformDescription $ORIGIN/boards/seeed_xiao_rp2040.repl
 
 # Tag PIO regions as ignored to avoid crashes if firmware touches them
 sysbus Tag <0x50200000 0x1000> "PIO0"
