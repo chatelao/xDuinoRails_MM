@@ -49,8 +49,6 @@ uart0: UART.RP2040Uart @ sysbus 0x40034000
 
 uart0:
     IRQ ->nvic0@20
-    DMATransmitRequest -> dma@20
-    DMAReceiveRequest -> dma@21
 
 
 
