@@ -1,6 +1,6 @@
 *** Settings ***
-Suite Setup                   Setup
-Suite Teardown                Teardown
+Suite Setup                   Suite Setup
+Suite Teardown                Suite Teardown
 Test Setup                    Reset Emulation
 Resource                      ${RENODEKEYWORDS}
 
@@ -9,11 +9,11 @@ ${UART}                       sysbus.uart0
 ${RESC}                       ${CURDIR}/../xiao_rp2040.resc
 
 *** Keywords ***
-Setup
-    Execute Command           include @${RESC}
+Suite Setup
+    Execute Script            ${RESC}
     Create Terminal Tester    ${UART}
 
-Teardown
+Suite Teardown
     Execute Command           clear
 
 *** Test Cases ***
@@ -31,6 +31,6 @@ Should Read CVs
     Start Emulation
     Wait For Line On Uart     xDuinoRails_MM starting...
     Write Line To Uart        cv
-    Wait For Line On Uart     CV 1: 3
-    Wait For Line On Uart     CV 8: 8
-    Wait For Line On Uart     CV 250: 1
+    Wait For Line On Uart     CV 1 (Address): 3
+    Wait For Line On Uart     CV 8 (Manuf ID): 8
+    Wait For Line On Uart     CV 250 (Debug): 1

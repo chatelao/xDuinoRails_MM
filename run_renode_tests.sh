@@ -16,8 +16,8 @@ fi
 
 # 2. Install compatible dependencies
 echo "Installing dependencies..."
-# Pin robotframework to a version known to work with Renode 1.16.1
-pip install -q "robotframework==6.1.1" psutil pyyaml
+# Pin robotframework to version 6.1 for strict compatibility with Renode 1.16.1
+pip install -q "robotframework==6.1" psutil pyyaml
 
 export PATH="$PWD/$RENODE_DIR:$PATH"
 export PYTHONPATH="$PWD/$RENODE_DIR/tests:$PYTHONPATH"
