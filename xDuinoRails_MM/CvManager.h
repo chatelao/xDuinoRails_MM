@@ -12,6 +12,7 @@ constexpr int CV_MAXIMUM_SPEED   = 5;
 constexpr int CV_MEDIUM_SPEED    = 6;
 constexpr int CV_VERSION         = 7;
 constexpr int CV_MANUFACTURER_ID = 8; // Writing 8 to this CV resets the decoder
+constexpr int CV_PWM_FREQUENCY   = 9;
 constexpr int CV_WATCHDOG_TIMEOUT  = 11;
 constexpr int CV_PROGRAMMING_LOCK  = 15;
 constexpr int CV_LONG_ADDRESS_HIGH = 17;

@@ -3,6 +3,8 @@
 std::map<uint8_t, int> analog_write_values;
 std::map<uint8_t, int> digital_write_values;
 std::map<uint8_t, int> analog_read_values;
+int                    last_pwm_freq = 0;
+std::map<uint8_t, int> last_esp32_pwm_freq;
 
 static unsigned long current_millis = 0;
 
@@ -21,11 +23,17 @@ int analogRead(uint8_t pin) {
 
 void analogWrite(uint8_t pin, int val) { analog_write_values[pin] = val; }
 
-void analogWriteFreq(int freq) {
+void analogWriteFreq(int freq) { last_pwm_freq = freq; }
+
+void analogWriteRange(int range) {
   // Mock implementation
 }
 
-void analogWriteRange(int range) {
+void analogWriteFrequency(uint8_t pin, int freq) {
+  last_esp32_pwm_freq[pin] = freq;
+}
+
+void analogWriteResolution(uint8_t pin, int res) {
   // Mock implementation
 }
 
@@ -43,6 +51,8 @@ void reset_arduino_mock() {
   analog_write_values.clear();
   digital_write_values.clear();
   analog_read_values.clear();
+  last_pwm_freq = 0;
+  last_esp32_pwm_freq.clear();
   current_millis = 0;
 }
 

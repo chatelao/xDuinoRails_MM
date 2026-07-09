@@ -53,6 +53,7 @@ This table specifies the minimal supported Configuration Variables (CVs) for thi
 | ℹ️ | 6 | Medium Speed | Standard | 0 | Mid-point voltage for the speed curve (0 = auto). |
 | ℹ️ | 7 | Version | Mandatory | 10 | Read-Only. E.g. 10 for version 1.0. |
 | 🏭 | 8 | Manufacturer ID | Mandatory | 13 | Important: NMRA ID for DIY/Public Domain. Writing to 8 triggers a reset. |
+| ⚡ | 9 | PWM Frequency | Optional | 0 | 0 = Profile default, 1–255 = Value * 100 Hz. |
 | 🐕 | 11 | Watchdog Timeout | Standard | 5 | Timeout in 100ms steps (Default 5 = 500ms). Shuts down motor if no signal. |
 | 🔒 | 15 | Programming Lock | Standard | 0 | Set to 7 to allow programming via direction changes. |
 | 🔢 | 17 | Long Addr. (High) | Standard | 192 | Upper byte of the long address (default 192). |

@@ -10,6 +10,8 @@
 extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> digital_write_values;
 extern std::map<uint8_t, int> analog_read_values;
+extern int                    last_pwm_freq;
+extern std::map<uint8_t, int> last_esp32_pwm_freq;
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -24,6 +26,8 @@ int  analogRead(uint8_t pin);
 void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(int freq);
 void analogWriteRange(int range);
+void analogWriteFrequency(uint8_t pin, int freq);
+void analogWriteResolution(uint8_t pin, int res);
 
 unsigned long millis();
 void          advance_millis(unsigned long ms);

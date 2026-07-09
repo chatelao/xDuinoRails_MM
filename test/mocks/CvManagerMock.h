@@ -16,6 +16,7 @@ public:
     cvStore[CV_MEDIUM_SPEED]      = 0;
     cvStore[CV_VERSION]           = 10;
     cvStore[CV_MANUFACTURER_ID]   = 13;
+    cvStore[CV_PWM_FREQUENCY]     = 0;
     cvStore[CV_LONG_ADDRESS_HIGH] = 192;
     cvStore[CV_LONG_ADDRESS_LOW]  = 100;
     cvStore[CV_CONFIGURATION]     = 6;
