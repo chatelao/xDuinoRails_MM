@@ -22,8 +22,9 @@ Should Read All CVs
 
 *** Keywords ***
 Setup
-    Start Emulation
-    Execute Script          ${RESC}
+    Execute Command         include @${RESC}
+    Create Terminal Tester  ${UART}
+    Execute Command         emulation Start
 
 Teardown
-    Reset Emulation
+    Execute Command         emulation Stop
