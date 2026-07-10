@@ -1,2 +1,11 @@
 .pio
+test/renode-bin/
+venv-renode/
+*.log
+robot_outputs/
+snapshots/
+log.html
+output.xml
+report.html
+robot_output.xml
 .vscode

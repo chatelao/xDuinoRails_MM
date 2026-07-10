@@ -29,7 +29,23 @@ jobs:
         run: pio test -e native --without-uploading
 
       - name: Build firmware
-        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6
+        run: pio run -e seeed_xiao_rp2040 -e seeed_xiao_esp32c6 -e seeed_xiao_rp2040_renode
+
+  renode-simulation:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk2.0-0 libglib2.0-0 libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxrender1 libxtst6
+          pip install platformio robotframework==6.1
+      - name: Run Renode tests
+        run: ./run_renode_tests.sh
 
   arduino-cli-build:
     runs-on: ubuntu-latest

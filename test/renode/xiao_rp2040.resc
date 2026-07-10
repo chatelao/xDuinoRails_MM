@@ -1,0 +1,20 @@
+$bin?=@../../.pio/build/seeed_xiao_rp2040_renode/firmware.elf
+
+using sysbus
+mach create "xiao-rp2040"
+machine LoadPlatformDescription @boards/seeed_xiao_rp2040.repl
+
+showAnalyzer sysbus.uart0
+
+sysbus LoadELF $bin
+
+# Set Vector Table Offset for RP2040
+cpu0 VectorTableOffset 0x10000000
+
+macro reset
+"""
+    sysbus LoadELF $bin
+    cpu0 VectorTableOffset 0x10000000
+"""
+
+runMacro $reset
