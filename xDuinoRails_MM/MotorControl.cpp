@@ -362,8 +362,12 @@ int MotorControl::readBEMF() {
   if (shutPin_priv != -1) {
     digitalWrite(shutPin_priv, HIGH); // Disable H-bridge (coast)
   }
+  // Ensure PWM is fully off and pins are LOW for Stand-by/Coast mode
+  analogWrite(pinA_priv, 0);
+  analogWrite(pinB_priv, 0);
   digitalWrite(pinA_priv, LOW);
   digitalWrite(pinB_priv, LOW);
+
   delayMicroseconds(500);
   int valA = analogRead(bemfA_priv);
   int valB = analogRead(bemfB_priv);
