@@ -260,10 +260,10 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
 
           bemfErrorSum += error;
           // Begrenzung des Integrals, um Windup zu verhindern
-          if (bemfErrorSum > 10000)
-            bemfErrorSum = 10000;
-          if (bemfErrorSum < -10000)
-            bemfErrorSum = -10000;
+          if (bemfErrorSum > 4096)
+            bemfErrorSum = 4096;
+          if (bemfErrorSum < -4096)
+            bemfErrorSum = -4096;
 
           lastAdjustment = ((long)error * K / 16) + ((long)bemfErrorSum * I / 64);
 
@@ -353,11 +353,22 @@ void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
 }
 
 int MotorControl::readBEMF() {
+  if (shutPin_priv != -1) {
+    digitalWrite(shutPin_priv, HIGH); // Disable H-bridge (coast)
+  }
+  // Ensure PWM is fully off and pins are LOW for Stand-by/Coast mode
+  analogWrite(pinA_priv, 0);
+  analogWrite(pinB_priv, 0);
   digitalWrite(pinA_priv, LOW);
   digitalWrite(pinB_priv, LOW);
+
   delayMicroseconds(500);
   int valA = analogRead(bemfA_priv);
   int valB = analogRead(bemfB_priv);
+
+  if (shutPin_priv != -1) {
+    digitalWrite(shutPin_priv, LOW); // Re-enable H-bridge
+  }
 
   // Since we touched the pins, invalidate the write cache
   lastWrittenPwm = -1;

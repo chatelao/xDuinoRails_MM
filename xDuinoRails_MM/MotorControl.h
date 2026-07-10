@@ -14,11 +14,11 @@ public:
   void              stop();
   bool              isKickstarting();
   MM2DirectionState getCurrentDirection();
+  int               readBEMF();
 
 private:
   void update(int targetPwm, MM2DirectionState targetDir);
   void writeMotorHardware(int pwm, MM2DirectionState dir);
-  int  readBEMF();
 
   CvManager        &cvManager;
   int               pinA_priv;
