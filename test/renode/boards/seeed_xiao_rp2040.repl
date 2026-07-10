@@ -1,0 +1,43 @@
+using "../cores/rp2040.repl"
+
+// Seeed Studio XIAO RP2040 Pinout mapping for xDuinoRails_MM
+
+led_f0f: Miscellaneous.LED @ gpio 9
+led_f0b: Miscellaneous.LED @ gpio 10
+
+led_int_red: Miscellaneous.LED @ gpio 15
+led_int_blue: Miscellaneous.LED @ gpio 16
+neopixel: Miscellaneous.LED @ gpio 12
+
+gpio:
+    9 -> led_f0f@0
+    10 -> led_f0b@0
+    15 -> led_int_red@0
+    16 -> led_int_blue@0
+    12 -> neopixel@0
+
+// Motor pins
+motor_a: Miscellaneous.LED @ gpio 7
+motor_b: Miscellaneous.LED @ gpio 8
+motor_shut: Miscellaneous.LED @ gpio 2
+
+gpio:
+    7 -> motor_a@0
+    8 -> motor_b@0
+    2 -> motor_shut@0
+
+// DCC / BEMF / ACK / RailCom - mostly tags for now or stubbed
+dcc_in: Miscellaneous.Button @ gpio 5
+dcc_ack: Miscellaneous.LED @ gpio 4
+railcom: Miscellaneous.LED @ gpio 6
+
+gpio:
+    5 -> dcc_in@0
+    4 -> dcc_ack@0
+    6 -> railcom@0
+
+// BEMF ADC Pins
+// GPIO 26 -> A0 (BEMF A)
+// GPIO 27 -> A1 (BEMF B)
+// GPIO 28 -> A2 (MOTOR_SHUT/D2)
+// GPIO 29 -> A3 (FUNC_SHUT/D3)

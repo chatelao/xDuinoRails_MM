@@ -1,0 +1,162 @@
+bootrom0: Memory.MappedMemory @ sysbus 0x00000000
+    size: 0x4000
+
+flash0: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x200000
+
+flash0_al1: Memory.MemoryAlias @ sysbus 0x13000000
+    address: 0x10000000
+    size: 0x200000
+
+
+sram0: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x42000
+
+
+usbram: Memory.MappedMemory @ sysbus 0x50100000
+    size: 0x1000
+
+cpu0: CPU.CortexM @ sysbus
+    cpuType: "cortex-m0+"
+    id: 0
+    nvic: nvic0
+    PerformanceInMips: 20
+
+cpu1: CPU.CortexM @ sysbus
+    cpuType: "cortex-m0+"
+    id: 1
+    nvic: nvic1
+    PerformanceInMips: 20
+    init:
+        IsHalted false
+
+nvic0: IRQControllers.NVIC @ sysbus new Bus.BusPointRegistration {
+        address: 0xe000e000;
+        cpu: cpu0
+    }
+    systickFrequency: 125000000
+    -> cpu0@0
+
+nvic1: IRQControllers.NVIC @ sysbus new Bus.BusPointRegistration {
+    address: 0xe000e000;
+    cpu: cpu1
+    }
+    systickFrequency: 125000000
+    -> cpu1@0
+
+uart0: UART.RP2040Uart @ sysbus 0x40034000
+    address: 0x40034000
+
+uart0:
+    IRQ ->nvic0@20
+    DMATransmitRequest -> dma@20
+    DMAReceiveRequest -> dma@21
+
+// Tag PIO for now to allow firmware to boot without full PIO implementation if not available in standard renode
+sysbus:
+    init:
+        Tag <0x50200000 0x1000> "PIO0"
+        Tag <0x50300000 0x1000> "PIO1"
+
+// raspberrypi,rp2040 overlay
+
+resets: Resets.RP2040Resets @ sysbus 0x4000c000
+    address: 0x4000c000
+
+sysbus:
+    init:
+        Tag <0x40024004 4> "XOSC_STATUS" 0xFFFFFFFF
+        Tag <0x40028000 4> "PLL_SYS_CS" 0xFFFFFFFF
+        Tag <0x4002C000 4> "PLL_USB_CS" 0xFFFFFFFF
+// cortex-m overlay
+
+dwt: Miscellaneous.DWT @ sysbus 0xE0001000
+    // according to 4.7.2 RP2040 Datasheet is 1MHz
+    frequency: 1000000
+
+timer: Timers.RP2040Timer @  sysbus 0x40054000
+    address: 0x40054000
+    IRQ0 -> nvic0@0
+    IRQ1 -> nvic0@1
+    IRQ2 -> nvic0@2
+    IRQ3 -> nvic0@3
+
+clocks: Miscellaneous.RP2040Clocks @ sysbus 0x40008000 {
+    address: 0x40008000;
+    gpio: gpio
+}
+
+clocks:
+    IRQ -> nvic0@17
+
+gpio: GPIOPort.RP2040GPIO @ sysbus 0x40014000 {
+    numberOfPins: 30;
+    numberOfCores: 2;
+    address: 0x40014000
+}
+
+gpio:
+    IRQ0 -> nvic0@13
+    IRQ1 -> nvic1@13
+
+
+gpio_qspi: GPIOPort.RP2040GPIO @ sysbus 0x40018000 {
+    numberOfPins: 6;
+    numberOfCores: 2;
+    address: 0x40018000
+}
+
+sio: Miscellaneous.RP2040SIO @ sysbus 0xd0000000 {
+    gpio: gpio;
+    gpioQspi: gpio_qspi;
+    address: 0xd0000000
+}
+sio:
+    Core0IRQ -> nvic0@15
+    Core1IRQ -> nvic1@16
+
+pads: GPIOPort.RP2040Pads @ sysbus 0x4001c000 {
+    gpio: gpio;
+    address: 0x4001c000
+}
+
+adc: Analog.RP2040ADC @ sysbus 0x4004c000 {
+    address: 0x4004c000;
+    clocks: clocks;
+    pads: pads
+}
+adc:
+    IRQ -> nvic0@22
+    DMARequest -> dma@36
+
+dma: DMA.RPDMA @ sysbus 0x50000000 {
+    numberOfChannels: 12;
+    address: 0x50000000
+}
+
+dma:
+    IRQ0 -> nvic0@11
+    IRQ1 -> nvic0@12
+
+watchdog: Timers.RP2040Watchdog @ sysbus 0x40058000 {
+    address: 0x40058000;
+    clocks: clocks
+}
+
+rtc: Timers.RP2040RTC @ sysbus 0x4005c000 {
+    address: 0x4005c000
+}
+
+rtc:
+    IRQ -> nvic0@25
+
+psm: Miscellaneous.PSM @ sysbus 0x40010000 {
+    address: 0x40010000
+}
+
+pwm: PWM.RP2040PWM @ sysbus 0x40050000 {
+    address: 0x40050000
+}
+
+pwm:
+    IRQ -> nvic0@4
