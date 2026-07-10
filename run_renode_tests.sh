@@ -22,7 +22,10 @@ pio run -e seeed_xiao_rp2040_renode
 # 3. Run Robot Framework tests
 echo "Running Renode simulation tests..."
 # Renode's robot runner is usually called 'renode-test'
-# We might need to install robotframework if not present in the environment
+# We need to install robotframework and Renode's test dependencies
 pip install robotframework==6.1
+if [ -f "$RENODE_DIR/tests/requirements.txt" ]; then
+    pip install -r "$RENODE_DIR/tests/requirements.txt"
+fi
 
 renode-test test/renode/tests/cli_tests.robot
