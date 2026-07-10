@@ -341,17 +341,11 @@ void MotorControl::writeMotorHardware(int pwm, MM2DirectionState dir) {
     return;
 
   if (dir == MM2DirectionState_Forward) {
-    digitalWrite(pinB_priv, LOW);
     analogWrite(pinA_priv, pwm);
-    if (lastWrittenDir == MM2DirectionState_Backward) {
-      analogWrite(pinB_priv, 0); // Ensure other pin is off
-    }
+    analogWrite(pinB_priv, 0); // Ensure other pin is off
   } else {
-    digitalWrite(pinA_priv, LOW);
+    analogWrite(pinA_priv, 0); // Ensure other pin is off
     analogWrite(pinB_priv, pwm);
-    if (lastWrittenDir == MM2DirectionState_Forward) {
-      analogWrite(pinA_priv, 0); // Ensure other pin is off
-    }
   }
 
   lastWrittenPwm = pwm;
