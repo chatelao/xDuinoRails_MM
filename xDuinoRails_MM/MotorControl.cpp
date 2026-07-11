@@ -268,9 +268,9 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
           lastAdjustment = ((long)error * K / 16) + ((long)bemfErrorSum * I / 64);
 
           if (logger.isHighSpeedEnabled()) {
-            logger.printf(LogCategory::HighSpeed, "CSV | %lu | %d | %d | %d | %ld | %d | %d | %d | %d\n",
-                          now, targetPwm, currentBEMF, error, bemfErrorSum,
-                          lastAdjustment, targetPwm + (int)lastAdjustment, K, I);
+            logger.printf(LogCategory::HighSpeed, "CSV | %lu | %d | %d | %d | %d | %ld | %d | %d | %d | %d\n",
+                          now, targetPwm, currentBEMF, filteredBEMF, error,
+                          bemfErrorSum, lastAdjustment, targetPwm + (int)lastAdjustment, K, I);
           }
         }
         finalPwm += lastAdjustment;
@@ -363,8 +363,14 @@ int MotorControl::readBEMF() {
   digitalWrite(pinB_priv, LOW);
 
   delayMicroseconds(1000);
-  int valA = analogRead(bemfA_priv);
-  int valB = analogRead(bemfB_priv);
+
+  int samples[3];
+  for (int i = 0; i < 3; i++) {
+    int valA   = analogRead(bemfA_priv);
+    int valB   = analogRead(bemfB_priv);
+    samples[i] = (valA > valB) ? (valA - valB) : (valB - valA);
+    if (i < 2) delayMicroseconds(10);
+  }
 
   if (shutPin_priv != -1) {
     digitalWrite(shutPin_priv, LOW); // Re-enable H-bridge
@@ -373,5 +379,11 @@ int MotorControl::readBEMF() {
   // Since we touched the pins, invalidate the write cache
   lastWrittenPwm = -1;
 
-  return (valA > valB) ? (valA - valB) : (valB - valA);
+  // Median-of-3
+  int a = samples[0];
+  int b = samples[1];
+  int c = samples[2];
+  if ((a <= b && b <= c) || (c <= b && b <= a)) return b;
+  if ((b <= a && a <= c) || (c <= a && a <= b)) return a;
+  return c;
 }

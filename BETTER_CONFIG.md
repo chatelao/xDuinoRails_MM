@@ -23,12 +23,13 @@ This toggles the high-speed mode. Note that this generates a lot of serial traff
 
 ### CSV Format
 The output is prefixed with `CSV | ` and follows this structure:
-`CSV | timestamp | targetPwm | currentBEMF | error | integral | adjustment | finalPwm | K | I`
+`CSV | timestamp | targetPwm | rawBEMF | filteredBEMF | error | integral | adjustment | finalPwm | K | I`
 
 *   **timestamp:** Milliseconds since boot.
 *   **targetPwm:** The PWM value calculated from the speed curve (0-1023).
-*   **currentBEMF:** The raw 12-bit ADC value read from the motor (0-4095).
-*   **error:** The difference between `targetBEMF` (targetPwm * 4) and `currentBEMF`.
+*   **rawBEMF:** The raw 12-bit ADC value read from the motor (0-4095).
+*   **filteredBEMF:** The value after applying the median-of-3 filter.
+*   **error:** The difference between `targetBEMF` (targetPwm * 4) and `filteredBEMF`.
 *   **integral:** The accumulated error sum (clamped to ±4096).
 *   **adjustment:** The final correction value added to `targetPwm`.
 *   **finalPwm:** The resulting PWM value after adjustment (before clamping).
