@@ -50,7 +50,7 @@ To overcome initial motor friction, the firmware implements a kickstart phase wh
 * **Function:** `MotorControl::readBEMF()`
 * **Mechanism:**
   1. Both motor pins are set to `LOW`.
-  2. A blanking delay of **500 microseconds** (`delayMicroseconds(500)`) is applied to allow inductive spikes to decay.
+  2. A blanking delay of **1000 microseconds (1ms)** (`delayMicroseconds(1000)`) is applied to allow inductive spikes to decay.
   3. Analog values are sampled from both BEMF pins.
   4. The absolute difference between the samples is returned.
 * **Filtering:** A **median-of-3 filter** is applied to the raw BEMF samples in `MotorControl::update()`. This filter effectively rejects single-sample glitches, such as those caused by collector gaps or brush sparking, preventing aggressive PI controller responses to transient errors.

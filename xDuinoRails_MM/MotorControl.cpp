@@ -362,7 +362,7 @@ int MotorControl::readBEMF() {
   digitalWrite(pinA_priv, LOW);
   digitalWrite(pinB_priv, LOW);
 
-  delayMicroseconds(500);
+  delayMicroseconds(1000);
   int valA = analogRead(bemfA_priv);
   int valB = analogRead(bemfB_priv);
 
