@@ -3,6 +3,7 @@
 std::map<uint8_t, int> analog_write_values;
 std::map<uint8_t, int> digital_write_values;
 std::map<uint8_t, int> analog_read_values;
+std::map<uint8_t, std::deque<int>> analog_read_sequences;
 int                    last_pwm_freq = 0;
 std::map<uint8_t, int> last_esp32_pwm_freq;
 
@@ -15,6 +16,11 @@ void pinMode(uint8_t pin, uint8_t mode) {
 void digitalWrite(uint8_t pin, uint8_t val) { digital_write_values[pin] = val; }
 
 int analogRead(uint8_t pin) {
+  if (analog_read_sequences.count(pin) && !analog_read_sequences[pin].empty()) {
+    int val = analog_read_sequences[pin].front();
+    analog_read_sequences[pin].pop_front();
+    return val;
+  }
   if (analog_read_values.count(pin)) {
     return analog_read_values[pin];
   }
@@ -51,6 +57,7 @@ void reset_arduino_mock() {
   analog_write_values.clear();
   digital_write_values.clear();
   analog_read_values.clear();
+  analog_read_sequences.clear();
   last_pwm_freq = 0;
   last_esp32_pwm_freq.clear();
   current_millis = 0;

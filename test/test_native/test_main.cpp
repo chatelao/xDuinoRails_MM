@@ -46,6 +46,7 @@ void test_bemf_collector_gap_persistent_failure(void);
 void test_bemf_collector_gap_with_integral_filtered(void);
 void test_bemf_stability_integral_clamping(void);
 void test_read_bemf_shutdown_toggling(void);
+void test_read_bemf_internal_median(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -993,5 +994,6 @@ int main(int argc, char **argv) {
   RUN_TEST(test_bemf_collector_gap_with_integral_filtered);
   RUN_TEST(test_bemf_stability_integral_clamping);
   RUN_TEST(test_read_bemf_shutdown_toggling);
+  RUN_TEST(test_read_bemf_internal_median);
   return UNITY_END();
 }
