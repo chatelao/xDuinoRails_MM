@@ -10,6 +10,7 @@
 extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> digital_write_values;
 extern std::map<uint8_t, int> analog_read_values;
+extern std::map<uint8_t, std::deque<int>> analog_read_sequences;
 extern int                    last_pwm_freq;
 extern std::map<uint8_t, int> last_esp32_pwm_freq;
 
