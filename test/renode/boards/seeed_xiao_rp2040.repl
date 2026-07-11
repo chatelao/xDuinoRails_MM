@@ -1,0 +1,54 @@
+using "../cores/rp2040.repl"
+
+// Seeed Studio XIAO RP2040 Pinout for xDuinoRails_MM (Thor Mapping) adapted for simulation
+
+// Simulation uses UART0 on GPIO 0 (TX) and GPIO 1 (RX)
+// We move motor pins to avoid conflict
+
+// D7 (Motor A) -> GPIO 12
+// D8 (Motor B) -> GPIO 13
+// D9 (Front Light) -> GPIO 2
+// D10 (Rear Light) -> GPIO 4
+// D5 (DCC Input) -> GPIO 7
+// D4 (DCC-ACK) -> GPIO 6
+// D6 (RailCom) -> GPIO 21
+
+// BEMF A (D0) -> GPIO 26 (ADC0)
+// BEMF B (D1) -> GPIO 27 (ADC1)
+// Motor Shut (D2) -> GPIO 28
+// Func Shut (D3) -> GPIO 29
+
+led_f0f: Miscellaneous.LED @ gpio 2
+led_f0b: Miscellaneous.LED @ gpio 4
+
+// Internal RGB LED (Xiao RP2040 defaults)
+led_red: Miscellaneous.LED @ gpio 17
+led_green: Miscellaneous.LED @ gpio 16
+led_blue: Miscellaneous.LED @ gpio 25
+
+// Motor Model
+motor: Miscellaneous.MotorModel @ sysbus
+    Adc: adc
+    AdcChannel: 0 // Connected to BEMF A (GPIO 26)
+    Vbus: 12.0
+    Kv: 1000
+
+gpio:
+    12 -> motor@0 // Motor A
+    2 -> led_f0f@0
+    4 -> led_f0b@0
+    17 -> led_red@0
+    16 -> led_green@0
+    25 -> led_blue@0
+
+// PWM to GPIO mapping
+// GPIO 12 -> PWM6_A
+// GPIO 13 -> PWM6_B
+// GPIO 2 -> PWM1_A
+// GPIO 4 -> PWM2_A
+
+pwm:
+    12 -> gpio@12
+    13 -> gpio@13
+    2 -> gpio@2
+    4 -> gpio@4

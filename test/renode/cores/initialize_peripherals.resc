@@ -1,0 +1,5 @@
+# mach create $machine_name
+
+# Load peripherals from the precompiled DLL. For live source compilation during
+# development, include initialize_peripherals_source.resc instead.
+include $ORIGIN/initialize_peripherals_source.resc

@@ -34,8 +34,13 @@ const int DCC_MM_SIGNAL = D5;
 const int DCC_ACK_PIN   = D4;
 const int RAILCOM_PIN   = D6;
 
+#ifdef RENODE_SIMULATION
+const int MOTOR_PIN_A    = 12; // Use GPIO 12/13 for simulation to avoid UART0 conflict (GPIO 0/1)
+const int MOTOR_PIN_B    = 13;
+#else
 const int MOTOR_PIN_A    = D7;
 const int MOTOR_PIN_B    = D8;
+#endif
 
 #ifdef ARDUINO_ARCH_RP2040
 const int BEMF_PIN_A     = A0;

@@ -1,0 +1,10 @@
+using "./seeed_xiao_rp2040.repl"
+
+motor: Miscellaneous.MotorModel @ sysbus
+    Adc: adc
+    AdcChannel: 1
+    Vbus: 12.0
+    Kv: 1000
+
+gpio:
+    17 -> motor@0

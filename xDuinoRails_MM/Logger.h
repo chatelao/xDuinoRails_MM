@@ -4,6 +4,10 @@
 #include "CvManager.h"
 #include <Arduino.h>
 
+#ifdef RENODE_SIMULATION
+#define Serial Serial1
+#endif
+
 enum class LogCategory { General, Protocol, PWM, CV, BEMF, HighSpeed };
 
 class Logger {
