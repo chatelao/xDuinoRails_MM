@@ -23,13 +23,12 @@ This toggles the high-speed mode. Note that this generates a lot of serial traff
 
 ### CSV Format
 The output is prefixed with `CSV | ` and follows this structure:
-`CSV | timestamp | targetPwm | rawBEMF | filteredBEMF | error | integral | adjustment | finalPwm | K | I`
+`CSV | timestamp | targetPwm | rawBEMF | error | integral | adjustment | finalPwm | K | I`
 
 *   **timestamp:** Milliseconds since boot.
 *   **targetPwm:** The PWM value calculated from the speed curve (0-1023).
 *   **rawBEMF:** The raw 12-bit ADC value read from the motor (0-4095).
-*   **filteredBEMF:** The value after applying the median-of-3 filter.
-*   **error:** The difference between `targetBEMF` (targetPwm * 4) and `filteredBEMF`.
+*   **error:** The difference between `targetBEMF` (targetPwm * 4) and `rawBEMF`.
 *   **integral:** The accumulated error sum (clamped to ±4096).
 *   **adjustment:** The final correction value added to `targetPwm`.
 *   **finalPwm:** The resulting PWM value after adjustment (before clamping).
@@ -41,9 +40,9 @@ The output is prefixed with `CSV | ` and follows this structure:
 1.  **Baseline:** Set CV 54 (K) and CV 55 (I) to default values (e.g., K=16, I=12).
 2.  **Capture Data:** Enable high-speed logging (`l h`) and start the locomotive at a medium speed step (e.g., `s 7`).
 3.  **Analyze Step Response:**
-    *   Observe how quickly `currentBEMF` reaches the target.
-    *   If `currentBEMF` overshoots and oscillates, **reduce CV 54 (K)**.
-    *   If `currentBEMF` stays below target for a long time, **increase CV 55 (I)**.
+    *   Observe how quickly `rawBEMF` reaches the target.
+    *   If `rawBEMF` overshoots and oscillates, **reduce CV 54 (K)**.
+    *   If `rawBEMF` stays below target for a long time, **increase CV 55 (I)**.
 4.  **Load Test:** Apply physical resistance to the locomotive and observe the `adjustment` and `integral` values. They should increase to compensate for the load.
 5.  **Iterate:** Adjust CVs and repeat until the locomotive runs smoothly at all speeds.
 

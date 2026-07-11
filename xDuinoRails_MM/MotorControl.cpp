@@ -21,7 +21,6 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
   previousPwm         = 0;
   bemfErrorSum        = 0;
   lastAdjustment      = 0;
-  for (int i = 0; i < 3; i++) bemfHistory[i] = 0;
 
   lastWrittenPwm      = -1;
   lastWrittenDir      = MM2DirectionState_Unavailable;
@@ -161,7 +160,6 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     currDirection = targetDirection;
     bemfErrorSum   = 0;
     lastAdjustment = 0;
-    for (int i = 0; i < 3; i++) bemfHistory[i] = 0;
   }
 
   if (previousPwm == 0 && targetPwm > 0 && KICK_MAX_TIME > 0) {
@@ -179,9 +177,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     if (now - kickstartBegin >= KICK_MAX_TIME) {
       isKickstarting_priv = false;
       logger.println("Motor: Kickstart ended (timeout)", LogCategory::PWM);
-      // Seed history with current reading
-      int currentBEMF = readBEMF();
-      for (int i = 0; i < 3; i++) bemfHistory[i] = currentBEMF;
+
       // Ensure target PWM is applied immediately after kickstart ends
       writeMotorHardware(targetPwm, currDirection);
     } else {
@@ -197,9 +193,6 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
         if (currentBEMF > BEMF_THRESHOLD) {
           isKickstarting_priv = false;
           logger.println("Motor: Kickstart ended (BEMF)", LogCategory::PWM);
-
-          // Seed median filter with the first valid reading to avoid initial glitch
-          for (int i = 0; i < 3; i++) bemfHistory[i] = currentBEMF;
 
           // Ensure target PWM is applied immediately after kickstart ends
           writeMotorHardware(targetPwm, currDirection);
@@ -218,7 +211,6 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       bemfErrorSum   = 0;
       lastAdjustment = 0;
       targetPwm      = 0; // Force previousPwm to 0 for next call to trigger kickstart
-      for (int i = 0; i < 3; i++) bemfHistory[i] = 0;
     } else {
       int finalPwm = targetPwm;
 
@@ -228,32 +220,13 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
           int currentBEMF = readBEMF();
           lastBemfMeasure = now;
 
-          // Simple median-of-3 filter to reject collector gap spikes
-          // If history is empty, seed it with the first reading
-          if (bemfHistory[0] == 0 && bemfHistory[1] == 0 && bemfHistory[2] == 0) {
-            for (int i = 0; i < 3; i++) bemfHistory[i] = currentBEMF;
-          } else {
-            bemfHistory[0] = bemfHistory[1];
-            bemfHistory[1] = bemfHistory[2];
-            bemfHistory[2] = currentBEMF;
-          }
-
-          int filteredBEMF;
-          int a = bemfHistory[0];
-          int b = bemfHistory[1];
-          int c = bemfHistory[2];
-
-          if ((a <= b && b <= c) || (c <= b && b <= a)) filteredBEMF = b;
-          else if ((b <= a && a <= c) || (c <= a && a <= b)) filteredBEMF = a;
-          else filteredBEMF = c;
-
-          lastMeasuredBemf = filteredBEMF;
-          bemfSum += filteredBEMF;
+          lastMeasuredBemf = currentBEMF;
+          bemfSum += currentBEMF;
           bemfCount++;
 
           // PI-Regler
           int targetBEMF = targetPwm * 4;
-          int error      = targetBEMF - filteredBEMF;
+          int error      = targetBEMF - currentBEMF;
 
           uint8_t K = cvManager.getCv(CV_BEMF_K);
           uint8_t I = cvManager.getCv(CV_BEMF_I);
@@ -268,8 +241,8 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
           lastAdjustment = ((long)error * K / 16) + ((long)bemfErrorSum * I / 64);
 
           if (logger.isHighSpeedEnabled()) {
-            logger.printf(LogCategory::HighSpeed, "CSV | %lu | %d | %d | %d | %d | %ld | %d | %d | %d | %d\n",
-                          now, targetPwm, currentBEMF, filteredBEMF, error,
+            logger.printf(LogCategory::HighSpeed, "CSV | %lu | %d | %d | %d | %ld | %d | %d | %d | %d\n",
+                          now, targetPwm, currentBEMF, error,
                           bemfErrorSum, lastAdjustment, targetPwm + (int)lastAdjustment, K, I);
           }
         }

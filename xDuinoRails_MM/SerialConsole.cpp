@@ -77,7 +77,7 @@ void SerialConsole::parseCommand(char *line) {
         Serial.print("Serial: High Speed CSV Logging ");
         Serial.println(logger.isHighSpeedEnabled() ? "ON" : "OFF");
         if (logger.isHighSpeedEnabled()) {
-          Serial.println("CSV | timestamp | targetPwm | rawBEMF | filteredBEMF | error | integral | adjustment | finalPwm | K | I");
+          Serial.println("CSV | timestamp | targetPwm | rawBEMF | error | integral | adjustment | finalPwm | K | I");
         }
       }
     } else {

@@ -104,40 +104,30 @@ void test_motor_bemf_pi_control(void) {
   motor.setSpeed(7, MM2DirectionState_Forward);
   advance_millis(150); // Pass kickstart
 
-  // Warm up filter (3 samples)
+  // No warm up needed anymore
   analog_read_values[2] = 2000;
   analog_read_values[3] = 0;
-  for (int i = 0; i < 3; i++) {
-    advance_millis(20);
-    motor.setSpeed(7, MM2DirectionState_Forward);
-  }
 
   // targetBEMF = 531 * 4 = 2124
-  // filteredBEMF = 2000
+  // currentBEMF = 2000
   // error = 2124 - 2000 = 124
-  // bemfErrorSum = 124 (after warmup) + 124 + 124 + 124 = 496
-  // Wait, bemfErrorSum accumulates every update.
-  // Let's reset the sum for predictable testing
-  // Actually we can't reset it from here. Let's calculate carefully.
 
-  // Warmup step 1: bemfErrorSum = 124. adj = (124*2) + (124*1) = 372. finalPwm = 531+372=903.
-  // Warmup step 2: bemfErrorSum = 248. adj = 248 + 248 = 496. finalPwm = 531+496=1027->1023.
-  // Warmup step 3: bemfErrorSum = 372. adj = 248 + 372 = 620. finalPwm = 1023.
+  // Step 1: bemfErrorSum = 124. adj = (124*2) + (124*1) = 372. finalPwm = 531+372=903.
+  advance_millis(20);
+  motor.setSpeed(7, MM2DirectionState_Forward);
+  TEST_ASSERT_EQUAL(903, analog_write_values[10]);
 
-  TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
-
-  // Now simulate overspeed (e.g. going downhill)
-  analog_read_values[2] = 2500;
-  // Step 1: history {2000, 2000, 2500} -> median 2000. Error remains 124. bemfErrorSum = 496. adj = 248 + 496 = 744. finalPwm = 1023.
+  // Step 2: bemfErrorSum = 248. adj = (124*2) + (248*1) = 248 + 248 = 496. finalPwm = 531+496=1027->1023.
   advance_millis(20);
   motor.setSpeed(7, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(1023, analog_write_values[10]);
 
-  // Step 2: history {2000, 2500, 2500} -> median 2500.
-  // targetBEMF = 2124, filteredBEMF = 2500 -> error = -376
-  // bemfErrorSum = 496 - 376 = 120
-  // adjustment = (-376 * 2) + (120 * 1) = -752 + 120 = -632
-  // finalPwm = 531 - 632 = -101 -> clamped to 0
+  // Now simulate overspeed (e.g. going downhill)
+  analog_read_values[2] = 2500;
+  // targetBEMF = 2124, currentBEMF = 2500 -> error = -376
+  // bemfErrorSum = 248 - 376 = -128
+  // adjustment = (-376 * 2) + (-128 * 1) = -752 - 128 = -880
+  // finalPwm = 531 - 880 = -349 -> clamped to 0
   advance_millis(20);
   motor.setSpeed(7, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
