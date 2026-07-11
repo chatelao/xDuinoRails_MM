@@ -27,6 +27,8 @@ void test_bemf_stability_integral_clamping(void) {
   motor.setSpeed(7, MM2DirectionState_Forward);
   advance_millis(150); // Pass kickstart
 
+  // No warm up needed anymore as temporal filter is gone
+
   // Simulating a heavily loaded or stalled motor (BEMF = 0)
   analog_read_values[2] = 0;
   analog_read_values[3] = 0;
