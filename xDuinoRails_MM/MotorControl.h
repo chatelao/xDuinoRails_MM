@@ -7,8 +7,11 @@
 
 class MotorControl {
 public:
-  MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA, int bemfB,
-               int shutPin);
+  MotorControl( CvManager &cvManager
+              , int pinA,  int pinB
+              , int bemfA, int bemfB
+              , int shutPin);
+
   void              setup();
   void              setSpeed(int step, MM2DirectionState targetDir);
   void              stop();
