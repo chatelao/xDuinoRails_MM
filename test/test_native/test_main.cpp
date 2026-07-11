@@ -806,25 +806,28 @@ void test_high_speed_logging(void) {
   TEST_ASSERT_FALSE(logger.isHighSpeedEnabled());
 
   // Toggle ON
+  Serial.clearLog();
   Serial.pushInput("l h\n");
   console.loop();
   TEST_ASSERT_TRUE(logger.isHighSpeedEnabled());
-
-  Serial.clearLog();
 
   // Set speed to trigger control loop
   motor.setSpeed(7, MM2DirectionState_Forward);
   advance_millis(150); // Past kickstart
   motor.setSpeed(7, MM2DirectionState_Forward); // Update
 
-  // Should see CSV output
+  // Should see CSV output and header
+  bool foundHeader = false;
   bool foundCsv = false;
   for (const auto &line : Serial.logLines) {
-    if (line.find("CSV,") == 0) {
+    if (line.find("CSV | timestamp | targetPwm | currentBEMF | error | integral | adjustment") != std::string::npos) {
+      foundHeader = true;
+    }
+    if (line.find("CSV | ") == 0) {
       foundCsv = true;
-      break;
     }
   }
+  TEST_ASSERT_TRUE(foundHeader);
   TEST_ASSERT_TRUE(foundCsv);
 
   // Toggle OFF

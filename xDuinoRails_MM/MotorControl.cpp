@@ -268,7 +268,7 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
           lastAdjustment = ((long)error * K / 16) + ((long)bemfErrorSum * I / 64);
 
           if (logger.isHighSpeedEnabled()) {
-            logger.printf(LogCategory::HighSpeed, "CSV,%lu,%d,%d,%d,%ld,%d\n",
+            logger.printf(LogCategory::HighSpeed, "CSV | %lu | %d | %d | %d | %ld | %d\n",
                           now, targetPwm, currentBEMF, error, bemfErrorSum,
                           lastAdjustment);
           }

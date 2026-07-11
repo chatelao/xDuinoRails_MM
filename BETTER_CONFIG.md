@@ -22,8 +22,8 @@ l h
 This toggles the high-speed mode. Note that this generates a lot of serial traffic.
 
 ### CSV Format
-The output is prefixed with `CSV,` and follows this structure:
-`CSV,timestamp,targetPwm,currentBEMF,error,integral,adjustment`
+The output is prefixed with `CSV | ` and follows this structure:
+`CSV | timestamp | targetPwm | currentBEMF | error | integral | adjustment`
 
 *   **timestamp:** Milliseconds since boot.
 *   **targetPwm:** The PWM value calculated from the speed curve (0-1023).
