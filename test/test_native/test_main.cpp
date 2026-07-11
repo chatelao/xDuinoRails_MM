@@ -16,7 +16,10 @@ void test_cv_manager_reset_8(void);
 void test_motor_speed_curve(void);
 void test_logging(void);
 void test_logger_categories(void);
+void test_pwm_freq_logging(void);
+void test_cv_motor_type_reboot(void);
 void test_serial_console(void);
+void test_serial_console_short_forms(void);
 void test_serial_console_cv_readout(void);
 void test_cv_manager_print_all(void);
 void test_motor_kickstart_bemf_disabled(void);
@@ -521,6 +524,55 @@ void test_serial_console(void) {
   TEST_ASSERT_FALSE(protocol.getFunctionState(1));
 }
 
+void test_serial_console_short_forms(void) {
+  CvManagerMock   cvManager;
+  ProtocolHandler protocol(0);
+  protocol.setAddress(1);
+  SerialConsole console(&cvManager, &protocol);
+
+  cvManager.setCv(CV_DEBUG_ENABLE, 1);
+  logger.begin(&cvManager);
+
+  // Test "cv8 8"
+  Serial.pushInput("cv8 8\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(8, cvManager.getCv(8));
+
+  // Test "s10"
+  Serial.pushInput("s10\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(10, protocol.getTargetSpeed());
+
+  // Test "df"
+  Serial.pushInput("df\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Forward, protocol.getTargetDirection());
+
+  // Test "db"
+  Serial.pushInput("db\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(MM2DirectionState_Backward, protocol.getTargetDirection());
+
+  // Test "f1"
+  Serial.pushInput("f1\n");
+  console.loop();
+  TEST_ASSERT_TRUE(protocol.getFunctionState(1));
+
+  // Test "f0"
+  Serial.pushInput("f0\n");
+  console.loop();
+  TEST_ASSERT_FALSE(protocol.getFunctionState(1));
+
+  // Test "lh" (High speed toggle)
+  bool initialHighSpeed = logger.isHighSpeedEnabled();
+  Serial.pushInput("lh\n");
+  console.loop();
+  TEST_ASSERT_EQUAL(!initialHighSpeed, logger.isHighSpeedEnabled());
+  // Toggle back to restore state for other tests
+  Serial.pushInput("lh\n");
+  console.loop();
+}
+
 void test_serial_console_cv_readout(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -761,9 +813,10 @@ void test_serial_console_help(void) {
   for (const auto &line : Serial.logLines) {
     if (line.find("--- xDuinoRails CLI Help ---") != std::string::npos)
       foundHelpHeader = true;
-    if (line.find("cv <num> <val> : Set CV value") != std::string::npos)
+    if (line.find("cv <num> <val> : Set CV value") != std::string::npos ||
+        line.find("cv <num> <val> : Set CV value (short form: cv<num> <val>)") != std::string::npos)
       foundCvCmd = true;
-    if (line.find("s <speed>      : Set speed (0-14)") != std::string::npos)
+    if (line.find("s <speed>      : Set speed") != std::string::npos)
       foundSpeedCmd = true;
     if (line.find("h/?            : Show this help") != std::string::npos)
       foundHelpCmd = true;
@@ -913,6 +966,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_pwm_freq_logging);
   RUN_TEST(test_cv_motor_type_reboot);
   RUN_TEST(test_serial_console);
+  RUN_TEST(test_serial_console_short_forms);
   RUN_TEST(test_serial_console_cv_readout);
   RUN_TEST(test_cv_manager_print_all);
   RUN_TEST(test_motor_kickstart_bemf_disabled);

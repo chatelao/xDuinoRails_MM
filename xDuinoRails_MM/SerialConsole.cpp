@@ -37,11 +37,13 @@ void SerialConsole::parseCommand(char *line) {
   } else if (sscanf(line, "s %d", &val1) == 1) {
     protocol->setTargetSpeed(val1);
     logger.printf("Serial: Speed set to %d\n", val1);
-  } else if (line[0] == 'd' && line[1] == ' ') {
-    if (line[2] == 'f') {
+  } else if (line[0] == 'd') {
+    char *p = &line[1];
+    while (*p == ' ') p++;
+    if (*p == 'f') {
       protocol->setTargetDirection(MM2DirectionState_Forward);
       logger.println("Serial: Direction Forward");
-    } else if (line[2] == 'b') {
+    } else if (*p == 'b') {
       protocol->setTargetDirection(MM2DirectionState_Backward);
       logger.println("Serial: Direction Backward");
     }
@@ -50,8 +52,10 @@ void SerialConsole::parseCommand(char *line) {
     protocol->setFunctionState(1, val1 > 0);
     logger.printf("Serial: Function 1 set to %d\n", val1 > 0);
   } else if (line[0] == 'L' || line[0] == 'l') {
-    if (line[1] == ' ' && line[2] != '\0') {
-      char sub = line[2];
+    char *p = &line[1];
+    while (*p == ' ') p++;
+    if (*p != '\0') {
+      char sub = *p;
       if (sub == 'p') {
         logger.toggleCategory(LogCategory::Protocol);
         Serial.print("Serial: Protocol Logging ");
@@ -88,12 +92,12 @@ void SerialConsole::parseCommand(char *line) {
 
 void SerialConsole::printHelp() {
   Serial.println("--- xDuinoRails CLI Help ---");
-  Serial.println("cv <num> <val> : Set CV value");
+  Serial.println("cv <num> <val> : Set CV value (short form: cv<num> <val>)");
   Serial.println("cv             : Print all CV values");
-  Serial.println("s <speed>      : Set speed (0-14)");
-  Serial.println("d f/b          : Set direction (f: forward, b: backward)");
-  Serial.println("f <0/1>        : Set Function 1 (0: off, 1: on)");
-  Serial.println("L [p/w/c/b/h]  : Toggle logging (p: protocol, w: pwm, c: cv, b: bemf, h: highspeed)");
+  Serial.println("s <speed>      : Set speed 0-14 (short form: s<speed>)");
+  Serial.println("d f/b          : Set direction (f: forward, b: backward; short form: df/db)");
+  Serial.println("f <0/1>        : Set Function 1 (0: off, 1: on; short form: f0/f1)");
+  Serial.println("L [p/w/c/b/h]  : Toggle logging (p: protocol, w: pwm, c: cv, b: bemf, h: highspeed; short form: Lp/Lw...)");
   Serial.println("h/?            : Show this help");
   Serial.println("----------------------------");
 }
