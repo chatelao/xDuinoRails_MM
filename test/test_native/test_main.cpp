@@ -820,7 +820,7 @@ void test_high_speed_logging(void) {
   bool foundHeader = false;
   bool foundCsv = false;
   for (const auto &line : Serial.logLines) {
-    if (line.find("CSV | timestamp | targetPwm | currentBEMF | error | integral | adjustment") != std::string::npos) {
+    if (line.find("CSV | timestamp | targetPwm | currentBEMF | error | integral | adjustment | finalPwm | K | I") != std::string::npos) {
       foundHeader = true;
     }
     if (line.find("CSV | ") == 0) {
