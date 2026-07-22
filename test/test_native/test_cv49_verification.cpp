@@ -92,3 +92,43 @@ void test_cv49_zero_with_direction_change(void) {
     TEST_ASSERT_FALSE(motor.isKickstarting());
     TEST_ASSERT_EQUAL(531, analog_write_values[11]);
 }
+
+void test_cv49_disabled_by_default_open_loop_no_pid(void) {
+    CvManagerMock cvManager;
+    // BEMF config is 0 by default now.
+    cvManager.setCv(CV_START_VOLTAGE, 10);
+    cvManager.setCv(CV_MEDIUM_SPEED, 0);
+    cvManager.setCv(CV_MAXIMUM_SPEED, 0);
+    cvManager.setCv(CV_MOTOR_TYPE, 0);
+
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+    motor.setup();
+
+    // Verify CV 49 is indeed 0 by default
+    TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_BEMF_CONFIG));
+
+    // Set speed step 7
+    motor.setSpeed(7, MM2DirectionState_Forward);
+
+    // Pass the kickstart period (100ms for type 0)
+    advance_millis(150);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+
+    // Hardware PWM should be 531 (Vmid)
+    TEST_ASSERT_EQUAL(531, analog_write_values[10]);
+
+    // Now, even if we inject high/low BEMF values via analog reads,
+    // since BEMF is disabled, the control loop should NOT perform BEMF readings
+    // and there should be no adjustments.
+    extern std::map<uint8_t, std::deque<int>> analog_read_sequences;
+    analog_read_sequences[2] = {1000, 1000, 1000};
+    analog_read_sequences[3] = {0, 0, 0};
+
+    advance_millis(20);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+
+    // The output should still be exactly 531, and analog reads on BEMF pins 2 and 3 should not have been consumed
+    TEST_ASSERT_EQUAL(531, analog_write_values[10]);
+    // The sequence for Pin 2 should still contain 3 items because no analogRead was called!
+    TEST_ASSERT_EQUAL(3, analog_read_sequences[2].size());
+}

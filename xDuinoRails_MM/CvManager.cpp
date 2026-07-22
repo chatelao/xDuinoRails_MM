@@ -95,7 +95,7 @@ void CvManager::initCv() {
     EEPROM.write(CV_CONFIGURATION, 6);
     EEPROM.write(CV_FRONT_LIGHT_F0F, 1);
     EEPROM.write(CV_REAR_LIGHT_F0R, 2);
-    EEPROM.write(CV_BEMF_CONFIG, 1);
+    EEPROM.write(CV_BEMF_CONFIG, 0);
     EEPROM.write(CV_BEMF_K, 16);
     EEPROM.write(CV_BEMF_I, 12);
     EEPROM.write(CV_MOTOR_TYPE, 0);

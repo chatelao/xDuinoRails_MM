@@ -38,6 +38,7 @@ void test_repro_kickstart_only(void);
 void test_repro_kickstart_only_with_vstart_zero(void);
 void test_cv49_zero_only_kickstart_works(void);
 void test_cv49_zero_with_direction_change(void);
+void test_cv49_disabled_by_default_open_loop_no_pid(void);
 void test_high_speed_logging(void);
 void test_pwm_frequency_defaults(void);
 void test_pwm_frequency_override(void);
@@ -82,6 +83,7 @@ void test_cv_manager_defaults(void) {
   TEST_ASSERT_EQUAL(2, cvManager.getCv(CV_REAR_LIGHT_F0R));
   TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_EXT_ID_HIGH));
   TEST_ASSERT_EQUAL(10, cvManager.getCv(CV_EXT_ID_LOW));
+  TEST_ASSERT_EQUAL(0, cvManager.getCv(CV_BEMF_CONFIG));
   TEST_ASSERT_EQUAL(16, cvManager.getCv(CV_BEMF_K));
   TEST_ASSERT_EQUAL(12, cvManager.getCv(CV_BEMF_I));
   TEST_ASSERT_EQUAL(1, cvManager.getCv(CV_DEBUG_ENABLE));
@@ -984,6 +986,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
+  RUN_TEST(test_cv49_disabled_by_default_open_loop_no_pid);
   RUN_TEST(test_high_speed_logging);
   RUN_TEST(test_pwm_frequency_defaults);
   RUN_TEST(test_pwm_frequency_override);
