@@ -117,3 +117,74 @@ void test_is_bemf_enabled_compile_flags(void) {
     TEST_ASSERT_FALSE(motor.isBemfEnabled());
 #endif
 }
+
+#if defined(OPEN_LOOP) || defined(FORCE_OPEN_LOOP)
+void test_open_loop_kickstart_ignores_high_bemf(void) {
+    CvManagerMock cvManager;
+    cvManager.setCv(CV_START_VOLTAGE, 10);
+    cvManager.setCv(CV_MOTOR_TYPE, 0); // standard DC: kickstart = 100ms
+    cvManager.setCv(CV_BEMF_CONFIG, 1); // Enable BEMF via CV
+
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+    motor.setup();
+
+    // Start kickstart
+    motor.setSpeed(7, MM2DirectionState_Forward);
+    TEST_ASSERT_TRUE(motor.isKickstarting());
+
+    // Inject high BEMF
+    analog_read_values[2] = 500;
+    analog_read_values[3] = 0;
+
+    // Call update, kickstart must still be active because compiles as OPEN_LOOP
+    advance_millis(20);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+    TEST_ASSERT_TRUE(motor.isKickstarting());
+
+    // Timeout
+    advance_millis(100);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+    TEST_ASSERT_FALSE(motor.isKickstarting());
+}
+
+void test_open_loop_adjustments_always_zero(void) {
+    CvManagerMock cvManager;
+    cvManager.setCv(CV_START_VOLTAGE, 10);
+    cvManager.setCv(CV_MOTOR_TYPE, 0);
+    cvManager.setCv(CV_BEMF_CONFIG, 1); // Enable BEMF via CV
+    cvManager.setCv(CV_BEMF_K, 64);
+    cvManager.setCv(CV_BEMF_I, 64);
+
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+    motor.setup();
+
+    // Set speed step 7 (targetPwm = 531)
+    motor.setSpeed(7, MM2DirectionState_Forward);
+    advance_millis(150); // Pass kickstart
+
+    // Inject massive BEMF error (e.g. stalled motor)
+    analog_read_values[2] = 0;
+    analog_read_values[3] = 0;
+
+    // Under open loop, this error shouldn't be processed and adjustment must be 0
+    advance_millis(20);
+    motor.setSpeed(7, MM2DirectionState_Forward);
+
+    // It should be exactly 531 (no PI control adjustment added)
+    TEST_ASSERT_EQUAL(531, analog_write_values[10]);
+}
+
+void test_open_loop_cv_ignored_in_loop_type(void) {
+    CvManagerMock cvManager;
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+    motor.setup();
+
+    // Try setting BEMF_CONFIG to 1, should still return false
+    cvManager.setCv(CV_BEMF_CONFIG, 1);
+    TEST_ASSERT_FALSE(motor.isBemfEnabled());
+
+    // Try setting BEMF_CONFIG to 0, should still return false
+    cvManager.setCv(CV_BEMF_CONFIG, 0);
+    TEST_ASSERT_FALSE(motor.isBemfEnabled());
+}
+#endif

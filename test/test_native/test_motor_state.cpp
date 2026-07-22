@@ -49,6 +49,7 @@ void test_repro_start_backward_kickstart_wrong_dir(void) {
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 }
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_repro_bemf_disabled_leftover_adjustment(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_START_VOLTAGE, 10);
@@ -87,6 +88,7 @@ void test_repro_bemf_disabled_leftover_adjustment(void) {
   // FIX: adjustment should now be 0, so PWM should be 531
   TEST_ASSERT_EQUAL(531, analog_write_values[10]);
 }
+#endif
 
 void test_repro_direction_change_kickstart(void) {
   CvManagerMock cvManager;
