@@ -19,6 +19,9 @@ public:
   MM2DirectionState getCurrentDirection();
   int               readBEMF();
 
+public:
+  bool isBemfEnabled();
+
 private:
   void update(int targetPwm, MM2DirectionState targetDir);
   void writeMotorHardware(int pwm, MM2DirectionState dir);
