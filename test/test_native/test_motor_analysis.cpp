@@ -87,6 +87,7 @@ void test_motor_pwm_mapping_new_defaults(void) {
   TEST_ASSERT_EQUAL(1023, get_pwm(14));
 }
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_motor_bemf_pi_control(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_START_VOLTAGE, 10);  // PWM 40
@@ -132,3 +133,4 @@ void test_motor_bemf_pi_control(void) {
   motor.setSpeed(7, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 }
+#endif

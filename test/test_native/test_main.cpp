@@ -23,29 +23,44 @@ void test_serial_console_short_forms(void);
 void test_serial_console_cv_readout(void);
 void test_cv_manager_print_all(void);
 void test_motor_kickstart_bemf_disabled(void);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_motor_kickstart_bemf_enabled(void);
+#endif
 void test_motor_pwm_mapping_detailed(void);
 void test_motor_pwm_mapping_new_defaults(void);
 void test_debug_leds_heartbeat(void);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_motor_bemf_pi_control(void);
+#endif
 void test_serial_console_logging_toggle(void);
 void test_serial_console_help(void);
 void test_repro_watchdog_stop_no_kickstart(void);
 void test_repro_start_backward_kickstart_wrong_dir(void);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_repro_bemf_disabled_leftover_adjustment(void);
+#endif
 void test_repro_direction_change_kickstart(void);
 void test_repro_kickstart_only(void);
 void test_repro_kickstart_only_with_vstart_zero(void);
 void test_cv49_zero_only_kickstart_works(void);
 void test_cv49_zero_with_direction_change(void);
 void test_is_bemf_enabled_compile_flags(void);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_high_speed_logging(void);
+#endif
 void test_pwm_frequency_defaults(void);
 void test_pwm_frequency_override(void);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_bemf_collector_gap_glitch(void);
 void test_bemf_stability_integral_clamping(void);
+#endif
 void test_read_bemf_shutdown_toggling(void);
 void test_read_bemf_internal_median(void);
+#if defined(OPEN_LOOP) || defined(FORCE_OPEN_LOOP)
+void test_open_loop_kickstart_ignores_high_bemf(void);
+void test_open_loop_adjustments_always_zero(void);
+void test_open_loop_cv_ignored_in_loop_type(void);
+#endif
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -688,6 +703,7 @@ void test_motor_kickstart_bemf_disabled(void) {
   TEST_ASSERT_TRUE(foundTimeoutLog);
 }
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_motor_kickstart_bemf_enabled(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_DEBUG_ENABLE, 1);
@@ -723,6 +739,7 @@ void test_motor_kickstart_bemf_enabled(void) {
   }
   TEST_ASSERT_TRUE(foundBemfLog);
 }
+#endif
 
 void test_motor_speed_curve(void) {
   CvManagerMock cvManager;
@@ -842,6 +859,7 @@ void test_serial_console_help(void) {
   TEST_ASSERT_TRUE(foundHelpHeader);
 }
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_high_speed_logging(void) {
   CvManagerMock   cvManager;
   ProtocolHandler protocol(0);
@@ -888,6 +906,7 @@ void test_high_speed_logging(void) {
   console.loop();
   TEST_ASSERT_FALSE(logger.isHighSpeedEnabled());
 }
+#endif
 
 void test_cv_programming_6021(void) {
   CvManagerMock   cvManager;
@@ -970,28 +989,43 @@ int main(int argc, char **argv) {
   RUN_TEST(test_serial_console_cv_readout);
   RUN_TEST(test_cv_manager_print_all);
   RUN_TEST(test_motor_kickstart_bemf_disabled);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_motor_kickstart_bemf_enabled);
+#endif
   RUN_TEST(test_motor_pwm_mapping_detailed);
   RUN_TEST(test_motor_pwm_mapping_new_defaults);
   RUN_TEST(test_debug_leds_heartbeat);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_motor_bemf_pi_control);
+#endif
   RUN_TEST(test_serial_console_logging_toggle);
   RUN_TEST(test_serial_console_help);
   RUN_TEST(test_repro_watchdog_stop_no_kickstart);
   RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
+#endif
   RUN_TEST(test_repro_direction_change_kickstart);
   RUN_TEST(test_repro_kickstart_only);
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
   RUN_TEST(test_is_bemf_enabled_compile_flags);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_high_speed_logging);
+#endif
   RUN_TEST(test_pwm_frequency_defaults);
   RUN_TEST(test_pwm_frequency_override);
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_bemf_collector_gap_glitch);
   RUN_TEST(test_bemf_stability_integral_clamping);
+#endif
   RUN_TEST(test_read_bemf_shutdown_toggling);
   RUN_TEST(test_read_bemf_internal_median);
+#if defined(OPEN_LOOP) || defined(FORCE_OPEN_LOOP)
+  RUN_TEST(test_open_loop_kickstart_ignores_high_bemf);
+  RUN_TEST(test_open_loop_adjustments_always_zero);
+  RUN_TEST(test_open_loop_cv_ignored_in_loop_type);
+#endif
   return UNITY_END();
 }

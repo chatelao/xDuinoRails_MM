@@ -7,6 +7,7 @@ extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> analog_read_values;
 extern void advance_millis(unsigned long ms);
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 /**
  * Test to verify the stability of the PI controller and the effectiveness of the reduced integral windup limit.
  */
@@ -73,6 +74,7 @@ void test_bemf_stability_integral_clamping(void) {
   motor.setSpeed(7, MM2DirectionState_Forward);
   TEST_ASSERT_EQUAL(0, analog_write_values[10]);
 }
+#endif
 
 /**
  * Test to verify that readBEMF properly toggles the shutdown pin.

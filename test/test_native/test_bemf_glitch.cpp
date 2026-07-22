@@ -9,6 +9,7 @@ extern std::map<uint8_t, int> analog_write_values;
 extern std::map<uint8_t, int> analog_read_values;
 extern void advance_millis(unsigned long ms);
 
+#if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_bemf_collector_gap_glitch(void) {
   CvManagerMock cvManager;
   cvManager.setCv(CV_START_VOLTAGE, 10);  // PWM 40
@@ -52,3 +53,4 @@ void test_bemf_collector_gap_glitch(void) {
 
   TEST_ASSERT_EQUAL(531, analog_write_values[10]);
 }
+#endif
