@@ -38,6 +38,7 @@ void test_repro_kickstart_only(void);
 void test_repro_kickstart_only_with_vstart_zero(void);
 void test_cv49_zero_only_kickstart_works(void);
 void test_cv49_zero_with_direction_change(void);
+void test_is_bemf_enabled_compile_flags(void);
 void test_high_speed_logging(void);
 void test_pwm_frequency_defaults(void);
 void test_pwm_frequency_override(void);
@@ -984,6 +985,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
+  RUN_TEST(test_is_bemf_enabled_compile_flags);
   RUN_TEST(test_high_speed_logging);
   RUN_TEST(test_pwm_frequency_defaults);
   RUN_TEST(test_pwm_frequency_override);

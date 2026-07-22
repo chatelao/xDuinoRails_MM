@@ -92,3 +92,28 @@ void test_cv49_zero_with_direction_change(void) {
     TEST_ASSERT_FALSE(motor.isKickstarting());
     TEST_ASSERT_EQUAL(531, analog_write_values[11]);
 }
+
+void test_is_bemf_enabled_compile_flags(void) {
+    CvManagerMock cvManager;
+    MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+    motor.setup();
+
+    // Check behavior depending on what macros are defined during build
+#if defined(FORCE_OPEN_LOOP) || defined(OPEN_LOOP)
+    cvManager.setCv(CV_BEMF_CONFIG, 1);
+    TEST_ASSERT_FALSE(motor.isBemfEnabled());
+    cvManager.setCv(CV_BEMF_CONFIG, 0);
+    TEST_ASSERT_FALSE(motor.isBemfEnabled());
+#elif defined(FORCE_CLOSED_LOOP) || defined(CLOSED_LOOP)
+    cvManager.setCv(CV_BEMF_CONFIG, 1);
+    TEST_ASSERT_TRUE(motor.isBemfEnabled());
+    cvManager.setCv(CV_BEMF_CONFIG, 0);
+    TEST_ASSERT_TRUE(motor.isBemfEnabled());
+#else
+    // Default fallback case (reading from CV 49)
+    cvManager.setCv(CV_BEMF_CONFIG, 1);
+    TEST_ASSERT_TRUE(motor.isBemfEnabled());
+    cvManager.setCv(CV_BEMF_CONFIG, 0);
+    TEST_ASSERT_FALSE(motor.isBemfEnabled());
+#endif
+}
