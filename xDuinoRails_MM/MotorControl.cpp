@@ -186,7 +186,13 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
       // Ensure target PWM is applied immediately after kickstart ends
       writeMotorHardware(targetPwm, currDirection);
     } else {
+#if defined(FORCE_OPEN_LOOP) || defined(OPEN_LOOP)
+      bool bemfEnabled = false;
+#elif defined(FORCE_CLOSED_LOOP) || defined(CLOSED_LOOP)
+      bool bemfEnabled = true;
+#else
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+#endif
       if (bemfEnabled && (now - lastBemfMeasure > BEMF_SAMPLE_INT)) {
         int currentBEMF = readBEMF();
         lastBemfMeasure = now;
@@ -219,7 +225,13 @@ void MotorControl::update(int pwm, MM2DirectionState dir) {
     } else {
       int finalPwm = targetPwm;
 
+#if defined(FORCE_OPEN_LOOP) || defined(OPEN_LOOP)
+      bool bemfEnabled = false;
+#elif defined(FORCE_CLOSED_LOOP) || defined(CLOSED_LOOP)
+      bool bemfEnabled = true;
+#else
       bool bemfEnabled = (cvManager.getCv(CV_BEMF_CONFIG) & 0x01);
+#endif
       if (bemfEnabled && targetPwm > 0) {
         if (now - lastBemfMeasure > BEMF_SAMPLE_INT) {
           int currentBEMF = readBEMF();

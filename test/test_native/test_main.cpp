@@ -45,6 +45,8 @@ void test_bemf_collector_gap_glitch(void);
 void test_bemf_stability_integral_clamping(void);
 void test_read_bemf_shutdown_toggling(void);
 void test_read_bemf_internal_median(void);
+void test_compiler_flag_open_loop(void);
+void test_compiler_flag_closed_loop(void);
 
 // Mock implementation for RP2040 reboot
 bool   reboot_called = false;
@@ -939,6 +941,57 @@ void test_cv_programming_6021(void) {
   TEST_ASSERT_EQUAL(42, cvManager.getCv(10));
 }
 
+void test_compiler_flag_open_loop(void) {
+#if defined(FORCE_OPEN_LOOP) || defined(OPEN_LOOP)
+  CvManagerMock cvManager;
+  // Even if CV says BEMF is enabled, open loop flag forces it to be disabled
+  cvManager.setCv(CV_BEMF_CONFIG, 1);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+  motor.setup();
+
+  // Start kickstart
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  // Simulate BEMF detected
+  analog_write_values[10] = 0; // Reset
+  analog_read_values[2] = 500; // BemfA
+  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+
+  // Update motor - should NOT end kickstart because BEMF is disabled by compiler flag
+  advance_millis(20);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+#else
+  TEST_IGNORE_MESSAGE("Skipping forced open loop test (not compiled with open loop flag)");
+#endif
+}
+
+void test_compiler_flag_closed_loop(void) {
+#if defined(FORCE_CLOSED_LOOP) || defined(CLOSED_LOOP)
+  CvManagerMock cvManager;
+  // Even if CV says BEMF is disabled, closed loop flag forces it to be enabled
+  cvManager.setCv(CV_BEMF_CONFIG, 0);
+  MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+  motor.setup();
+
+  // Start kickstart
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_TRUE(motor.isKickstarting());
+
+  // Simulate BEMF detected
+  analog_read_values[2] = 500; // BemfA
+  analog_read_values[3] = 0;   // BemfB -> diff = 500 > threshold (100)
+
+  // Update motor - should end kickstart because BEMF is forced enabled by compiler flag
+  advance_millis(20);
+  motor.setSpeed(1, MM2DirectionState_Forward);
+  TEST_ASSERT_FALSE(motor.isKickstarting());
+#else
+  TEST_IGNORE_MESSAGE("Skipping forced closed loop test (not compiled with closed loop flag)");
+#endif
+}
+
 void setUp(void) {
   reboot_called = false;
   reset_arduino_mock();
@@ -968,28 +1021,44 @@ int main(int argc, char **argv) {
   RUN_TEST(test_serial_console_short_forms);
   RUN_TEST(test_serial_console_cv_readout);
   RUN_TEST(test_cv_manager_print_all);
+#if !defined(FORCE_CLOSED_LOOP) && !defined(CLOSED_LOOP)
   RUN_TEST(test_motor_kickstart_bemf_disabled);
+#endif
+#if !defined(FORCE_OPEN_LOOP) && !defined(OPEN_LOOP)
   RUN_TEST(test_motor_kickstart_bemf_enabled);
+#endif
   RUN_TEST(test_motor_pwm_mapping_detailed);
   RUN_TEST(test_motor_pwm_mapping_new_defaults);
   RUN_TEST(test_debug_leds_heartbeat);
+#if !defined(FORCE_OPEN_LOOP) && !defined(OPEN_LOOP)
   RUN_TEST(test_motor_bemf_pi_control);
+#endif
   RUN_TEST(test_serial_console_logging_toggle);
   RUN_TEST(test_serial_console_help);
   RUN_TEST(test_repro_watchdog_stop_no_kickstart);
   RUN_TEST(test_repro_start_backward_kickstart_wrong_dir);
+#if !defined(FORCE_CLOSED_LOOP) && !defined(CLOSED_LOOP) && !defined(FORCE_OPEN_LOOP) && !defined(OPEN_LOOP)
   RUN_TEST(test_repro_bemf_disabled_leftover_adjustment);
+#endif
   RUN_TEST(test_repro_direction_change_kickstart);
+#if !defined(FORCE_CLOSED_LOOP) && !defined(CLOSED_LOOP)
   RUN_TEST(test_repro_kickstart_only);
   RUN_TEST(test_repro_kickstart_only_with_vstart_zero);
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
+#endif
+#if !defined(FORCE_OPEN_LOOP) && !defined(OPEN_LOOP)
   RUN_TEST(test_high_speed_logging);
+#endif
   RUN_TEST(test_pwm_frequency_defaults);
   RUN_TEST(test_pwm_frequency_override);
+#if !defined(FORCE_OPEN_LOOP) && !defined(OPEN_LOOP)
   RUN_TEST(test_bemf_collector_gap_glitch);
   RUN_TEST(test_bemf_stability_integral_clamping);
+#endif
   RUN_TEST(test_read_bemf_shutdown_toggling);
   RUN_TEST(test_read_bemf_internal_median);
+  RUN_TEST(test_compiler_flag_open_loop);
+  RUN_TEST(test_compiler_flag_closed_loop);
   return UNITY_END();
 }
