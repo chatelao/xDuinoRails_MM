@@ -35,15 +35,6 @@ MotorControl::MotorControl(CvManager &cvManager, int pinA, int pinB, int bemfA,
 }
 
 void MotorControl::setup() {
-  pinMode(pinA_priv, OUTPUT);
-  pinMode(pinB_priv, OUTPUT);
-  pinMode(bemfA_priv, INPUT);
-  pinMode(bemfB_priv, INPUT);
-
-  if (shutPin_priv != -1) {
-    pinMode(shutPin_priv, OUTPUT);
-    digitalWrite(shutPin_priv, LOW); // Active high shutdown -> LOW = enabled
-  }
 
   int         motorType = cvManager.getCv(CV_MOTOR_TYPE);
   int         cv9Freq   = cvManager.getCv(CV_PWM_FREQUENCY);
@@ -81,18 +72,32 @@ void MotorControl::setup() {
     logger.printf(LogCategory::PWM, "Motor: Overriding PWM Freq from CV 9 to %d Hz\n", PWM_FREQ);
   }
 
-  logger.printf(LogCategory::PWM, "Motor: Type=%s, PWM Freq=%d Hz\n", typeName,
-                PWM_FREQ);
+  logger.printf( LogCategory::PWM, "Motor: Type=%s, PWM Freq=%d Hz\n"
+               , typeName
+               , PWM_FREQ
+               );
 
 #ifdef ARDUINO_ARCH_RP2040
-  analogWriteFreq(PWM_FREQ);
-  analogWriteRange(PWM_RANGE);
+  analogWriteFreq( PWM_FREQ );
+  analogWriteRange(PWM_RANGE );
 #elif defined(ARDUINO_ARCH_ESP32)
-  analogWriteFrequency(pinA_priv, PWM_FREQ);
-  analogWriteFrequency(pinB_priv, PWM_FREQ);
+  analogWriteFrequency( pinA_priv, PWM_FREQ);
   analogWriteResolution(pinA_priv, 10); // 10 bits = 1023
+
+  analogWriteFrequency( pinB_priv, PWM_FREQ);
   analogWriteResolution(pinB_priv, 10); // 10 bits = 1023
 #endif
+
+  pinMode(pinA_priv, OUTPUT);
+  pinMode(pinB_priv, OUTPUT);
+
+  pinMode(bemfA_priv, INPUT);
+  pinMode(bemfB_priv, INPUT);
+
+  if (shutPin_priv != -1) {
+    pinMode(shutPin_priv, OUTPUT);
+    digitalWrite(shutPin_priv, LOW); // Active high shutdown -> LOW = enabled
+  }
 
   writeMotorHardware(0, MM2DirectionState_Forward);
   lastTelemetryTime = millis();

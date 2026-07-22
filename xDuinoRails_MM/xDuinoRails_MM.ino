@@ -1,15 +1,15 @@
 /*
  * Seeed Studio XIAO RP2040 Pinout (Thor Mapping):
  *
- *                             +---USB---+
- *               (BEMF A)  D0  | [ ] [ ] |  5V
- *               (BEMF B)  D1  | [ ] [ ] |  GND
- *          (Motor Shut)   D2  | [ ] [ ] |  3V3
- *          (Func Shut)    D3  | [ ] [ ] |  D10 (Rear Light)
- *          (DCC-ACK)      D4  | [ ] [ ] |  D9  (Front Light)
- *          (DCC Input)    D5  | [ ] [ ] |  D8  (Motor B)
- *          (RailCom)      D6  | [ ] [ ] |  D7  (Motor A)
- *                             +---------+
+ *                         +---USB---+
+ *           (BEMF A)  D0  | [ ] [ ] |  5V
+ *           (BEMF B)  D1  | [ ] [ ] |  GND
+ *       (Motor Shut)  D2  | [ ] [ ] |  3V3
+ *        (Func Shut)  D3  | [ ] [ ] |  D10 (Rear Light)
+ *          (DCC-ACK)  D4  | [ ] [ ] |  D9  (Front Light)
+ *        (DCC Input)  D5  | [ ] [ ] |  D8  (Motor B)
+ *          (RailCom)  D6  | [ ] [ ] |  D7  (Motor A)
+ *                         +---------+
  */
 
 #include "CvManager.h"
@@ -30,9 +30,9 @@
 // PIN DEFINITIONEN
 // ==========================================
 
-const int DCC_MM_SIGNAL = D5;
-const int DCC_ACK_PIN   = D4;
-const int RAILCOM_PIN   = D6;
+const int DCC_MM_SIGNAL  = D5;
+const int DCC_ACK_PIN    = D4;
+const int RAILCOM_PIN    = D6;
 
 const int MOTOR_PIN_A    = D7;
 const int MOTOR_PIN_B    = D8;
