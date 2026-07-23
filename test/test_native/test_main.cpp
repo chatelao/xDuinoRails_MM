@@ -45,6 +45,7 @@ void test_repro_kickstart_only_with_vstart_zero(void);
 void test_cv49_zero_only_kickstart_works(void);
 void test_cv49_zero_with_direction_change(void);
 void test_is_bemf_enabled_compile_flags(void);
+void test_open_loop_start_voltage_active(void);
 #if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
 void test_high_speed_logging(void);
 #endif
@@ -1011,6 +1012,7 @@ int main(int argc, char **argv) {
   RUN_TEST(test_cv49_zero_only_kickstart_works);
   RUN_TEST(test_cv49_zero_with_direction_change);
   RUN_TEST(test_is_bemf_enabled_compile_flags);
+  RUN_TEST(test_open_loop_start_voltage_active);
 #if !defined(OPEN_LOOP) && !defined(FORCE_OPEN_LOOP)
   RUN_TEST(test_high_speed_logging);
 #endif

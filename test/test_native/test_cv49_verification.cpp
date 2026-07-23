@@ -118,6 +118,55 @@ void test_is_bemf_enabled_compile_flags(void) {
 #endif
 }
 
+void test_open_loop_start_voltage_active(void) {
+    CvManagerMock cvManager;
+    cvManager.setCv(CV_MEDIUM_SPEED, 0);
+    cvManager.setCv(CV_MAXIMUM_SPEED, 0);
+    cvManager.setCv(CV_BEMF_CONFIG, 0); // Open-loop mode at runtime (or compile-time anyway)
+    cvManager.setCv(CV_MOTOR_TYPE, 0);
+
+    // Test with CV_START_VOLTAGE = 20
+    cvManager.setCv(CV_START_VOLTAGE, 20);
+    {
+        MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+        motor.setup();
+
+        // Speed step 1 -> trigger kickstart first
+        motor.setSpeed(1, MM2DirectionState_Forward);
+        TEST_ASSERT_TRUE(motor.isKickstarting());
+
+        // Wait past kickstart timeout
+        advance_millis(150);
+        motor.setSpeed(1, MM2DirectionState_Forward);
+        TEST_ASSERT_FALSE(motor.isKickstarting());
+
+        // Check PWM is vStart (which maps 20 -> 80)
+        TEST_ASSERT_EQUAL(80, analog_write_values[10]);
+    }
+
+    // Reset mocks for next sub-test
+    reset_arduino_mock();
+
+    // Test with CV_START_VOLTAGE = 50
+    cvManager.setCv(CV_START_VOLTAGE, 50);
+    {
+        MotorControl motor(cvManager, 10, 11, 2, 3, 12);
+        motor.setup();
+
+        // Speed step 1 -> trigger kickstart first
+        motor.setSpeed(1, MM2DirectionState_Forward);
+        TEST_ASSERT_TRUE(motor.isKickstarting());
+
+        // Wait past kickstart timeout
+        advance_millis(150);
+        motor.setSpeed(1, MM2DirectionState_Forward);
+        TEST_ASSERT_FALSE(motor.isKickstarting());
+
+        // Check PWM is vStart (which maps 50 -> 200)
+        TEST_ASSERT_EQUAL(200, analog_write_values[10]);
+    }
+}
+
 #if defined(OPEN_LOOP) || defined(FORCE_OPEN_LOOP)
 void test_open_loop_kickstart_ignores_high_bemf(void) {
     CvManagerMock cvManager;
